@@ -11,7 +11,7 @@
 , gcc
 , gfortran
 , xml2
-#, mpi
+, mpi ? null
 , cuda ? null
 #, withOpenmp ? false
 }:
@@ -27,8 +27,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ gcc gfortran libunwind ];
 
-  buildInputs = [ binutils-unwrapped boost boost.dev libiberty
-#  openmpi
+  buildInputs = [ binutils-unwrapped boost boost.dev libiberty mpi
   xml2 libxml2.dev ];
 
   patchPhase = ''
@@ -54,7 +53,8 @@ stdenv.mkDerivation rec {
       --with-unwind=${libunwind.dev}
       --with-xml-prefix=${libxml2.dev}
       --with-papi=${papi}
-      --without-mpi
+      ${if (mpi != null) then ''--with-mpi=${mpi}''
+        else ''--without-mpi''}
       --without-dyninst)
   '';
 #      --with-mpi=${mpi}

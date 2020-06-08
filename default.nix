@@ -12,13 +12,14 @@ let
 
   self.bsc = rec {
     # Load the current implementations
-    mpi = pkgs.mpich;
+    self.mpi = pkgs.mpich;
 
     extrae = callPackage ./bsc/extrae {
+      mpi = self.mpi;
     };
 
     tampi = callPackage ./bsc/tampi {
-      mpi = mpi;
+      mpi = self.mpi;
     };
 
     nanos6 = callPackage ./bsc/nanos6 { };
