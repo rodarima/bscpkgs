@@ -9,11 +9,9 @@
 , hwloc
 , papi
 #, gnumake
-, withExtrae ? false , extrae
+, extrae
 , boost
 }:
-
-assert withExtrae -> extrae != null;
 
 with stdenv.lib;
 
@@ -26,6 +24,7 @@ stdenv.mkDerivation rec {
     sha256 = "03v1kpggdch25m1wfrdjl6crq252dgy6pms8h94d5jwcjh06fbf8";
   };
 
+  enableParallelBuilding = true;
   preConfigure = ''
     cd ${pname}-${version}
     sed -i 's|/bin/echo|echo|g' loader/scripts/common.sh loader/scripts/lint/common.sh
@@ -44,10 +43,6 @@ stdenv.mkDerivation rec {
     numactl
     hwloc
     papi ]
-    ++ optional withExtrae extrae;
+    ++ (if (extrae != null) then [extrae] else []);
 
-  buildPhase = ''
-    make V=1 src/version/CodeVersionInfo.cpp
-    make V=1
-  '';
 }

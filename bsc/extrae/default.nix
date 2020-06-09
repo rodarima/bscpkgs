@@ -25,6 +25,7 @@ stdenv.mkDerivation rec {
     sha256 = "0y036qc7y30pfj1mnb9nzv2vmxy6xxiy4pgfci6l3jc0lccdsgf8";
   };
 
+  enableParallelBuilding = true;
   nativeBuildInputs = [ gcc gfortran libunwind ];
 
   buildInputs = [ binutils-unwrapped boost boost.dev libiberty mpi

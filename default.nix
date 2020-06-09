@@ -12,16 +12,27 @@ let
 
   self.bsc = rec {
     # Load the current implementations
-    self.mpi = pkgs.mpich;
+    #mpi = pkgs.mpich;
+    mpi = pkgs.openmpi;
+
+    # Load the compiler
+    #stdenv = pkgs.gcc7Stdenv;
+    #stdenv = pkgs.gcc9Stdenv;
+    #stdenv = pkgs.gcc10Stdenv;
+    stdenv = pkgs.clangStdenv;
 
     extrae = callPackage ./bsc/extrae {
-      mpi = self.mpi;
+      mpi = mpi;
     };
 
     tampi = callPackage ./bsc/tampi {
-      mpi = self.mpi;
+      mpi = mpi;
     };
 
-    nanos6 = callPackage ./bsc/nanos6 { };
-};
+    nanos6 = callPackage ./bsc/nanos6 {
+      extrae = extrae;
+    };
+
+    #llvm-ompss2 = callPackage ./bsc/llvm-ompss2 { };
+  };
 in pkgs // self
