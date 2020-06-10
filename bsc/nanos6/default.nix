@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
   version = "2.3.2";
 
   src = fetchurl {
-    url = https://pm.bsc.es/ftp/ompss-2/releases/ompss-2-2019.11.2.tar.gz;
+    url = "https://pm.bsc.es/ftp/ompss-2/releases/ompss-2-2019.11.2.tar.gz";
     sha256 = "03v1kpggdch25m1wfrdjl6crq252dgy6pms8h94d5jwcjh06fbf8";
   };
 

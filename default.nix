@@ -29,7 +29,11 @@ let
       mpi = mpi;
     };
 
-    nanos6 = callPackage ./bsc/nanos6 {
+    nanos6 = callPackage ./bsc/nanos6/default.nix {
+      extrae = extrae;
+    };
+
+    nanos6-git = callPackage ./bsc/nanos6/git.nix {
       extrae = extrae;
     };
 
