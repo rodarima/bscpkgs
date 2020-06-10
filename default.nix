@@ -21,11 +21,11 @@ let
     #stdenv = pkgs.gcc10Stdenv;
     stdenv = pkgs.clangStdenv;
 
-    extrae = callPackage ./bsc/extrae {
+    extrae = callPackage ./bsc/extrae/default.nix {
       mpi = mpi;
     };
 
-    tampi = callPackage ./bsc/tampi {
+    tampi = callPackage ./bsc/tampi/default.nix {
       mpi = mpi;
     };
 
@@ -37,6 +37,6 @@ let
       extrae = extrae;
     };
 
-    #llvm-ompss2 = callPackage ./bsc/llvm-ompss2 { };
+    llvm-ompss2 = callPackage ./bsc/llvm-ompss2/default.nix { };
   };
 in pkgs // self
