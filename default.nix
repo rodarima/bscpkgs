@@ -11,11 +11,18 @@ let
   callPackages = callPackagesWith (pkgs // self.bsc);
 
   self.bsc = rec {
-    # Load the current implementations
-    #mpi = pkgs.mpich;
-    mpi = pkgs.openmpi;
 
-    # Load the compiler
+    # Custom OpenMPI with mpi_cxx enabled for TAMPI
+    openmpi = callPackage ./bsc/openmpi/default.nix {
+      enableCxx = true;
+    };
+
+    # Load the default implementation
+    #mpi = pkgs.mpich;
+    #mpi = pkgs.openmpi;
+    mpi = openmpi; # Our OpenMPI variant
+
+    # Load the default compiler
     #stdenv = pkgs.gcc7Stdenv;
     #stdenv = pkgs.gcc9Stdenv;
     #stdenv = pkgs.gcc10Stdenv;
@@ -38,5 +45,14 @@ let
     };
 
     llvm-ompss2 = callPackage ./bsc/llvm-ompss2/default.nix { };
+
+    cpic = callPackage ./bsc/cpic/default.nix {
+      mpi = mpi;
+      nanos6 = nanos6-git;
+      llvm-ompss2 = llvm-ompss2;
+    };
+
+    dummy = callPackage ./bsc/dummy/default.nix { };
+
   };
 in pkgs // self

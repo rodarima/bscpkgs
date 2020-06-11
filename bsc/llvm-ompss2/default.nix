@@ -15,7 +15,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  version = "10.0.0";
+  version = "11.0.0";
   name = "llvm-ompss2-${version}";
   enableParallelBuilding = true;
 
@@ -31,8 +31,11 @@ stdenv.mkDerivation rec {
     libffi
     pkg-config
   ];
+
   cmakeBuildType = if enableDebug then "Debug" else "Release";
+
   dontUseCmakeBuildDir = true;
+
   preConfigure = ''
     mkdir -p build
     cd build
