@@ -33,6 +33,7 @@ stdenv.mkDerivation rec {
 
   preConfigure = ''
     export NANOS6_HOME="${nanos6}"
+    export TAMPI_HOME="${tampi}"
   '';
 
   #enableParallelBuilding = true;
@@ -44,7 +45,7 @@ stdenv.mkDerivation rec {
     uthash
 #    llvmPackages_10.bintools
     fftw
-#    tampi
+    tampi
     hdf5
     libgcc
     strace
