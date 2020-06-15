@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
 
   src = builtins.fetchGit {
     url = "git@bscpm02.bsc.es:rarias/nanos6";
-    rev = "17415b8f1064ccd0b7cfcf7097a64e8d2297c81b";
+    rev = "61ba5d39d7f9c99ca41b74fff34e0284bf039881";
     ref = branch;
   };
 
