@@ -117,8 +117,8 @@ let
     cpic = callPackage ./bsc/cpic/default.nix {
       stdenv = stdenv_nanos6;
       tampi = tampi;
-#      mpi = mpi;
-#      nanos6 = nanos6-git;
+      mpi = mpi;
+      nanos6 = nanos6-git;
 #      llvm-ompss2 = llvm-ompss2;
     };
 
