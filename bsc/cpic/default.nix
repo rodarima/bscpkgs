@@ -37,6 +37,7 @@ stdenv.mkDerivation rec {
   '';
 
   #enableParallelBuilding = true;
+  dontStrip = true;
 
   buildInputs = [
     libconfig
