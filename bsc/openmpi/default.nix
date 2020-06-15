@@ -105,5 +105,9 @@ in stdenv.mkDerivation rec {
     maintainers = with maintainers; [ markuskowa ];
     license = licenses.bsd3;
     platforms = platforms.unix;
+    # In order to use OpenMPI with Extrae we need to keep the Extrae libraries
+    # rather than the ones from OpenMPI. This happens with libompitrace.so, so
+    # we set to a lower priority (higher value) the OpenMPI package.
+    priority = 10;
   };
 }
