@@ -28,8 +28,11 @@ stdenv.mkDerivation rec {
   preConfigure = ''
     cd ${pname}-${version}
     sed -i 's|/bin/echo|echo|g' loader/scripts/common.sh loader/scripts/lint/common.sh
-    autoreconf -fiv
   '';
+
+  configureFlags = [
+    "--with-symbol-resolution=indirect"
+  ];
 
   #configureFlags = []
   #  ++ (if (extrae != null) then ["--with-extrae=${extrae}"] else [""]);

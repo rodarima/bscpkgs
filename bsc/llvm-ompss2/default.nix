@@ -11,13 +11,17 @@
 , libelf
 , libffi
 , pkg-config
-, enableDebug ? false
+, enableDebug ? true
 }:
 
 stdenv.mkDerivation rec {
   version = "11.0.0";
-  name = "llvm-ompss2-${version}";
+  pname = "clang-ompss2";
   enableParallelBuilding = true;
+  isClang = true;
+  isGNU = true;
+
+  isClangWithOmpss = true;
 
   buildInputs = [
     which
@@ -46,8 +50,8 @@ stdenv.mkDerivation rec {
       "-DCMAKE_EXE_LINKER_FLAGS_DEBUG=-Wl,-gdb-index"
       "-DLLVM_LIT_ARGS=-sv --xunit-xml-output=xunit.xml"
       "-DLLVM_ENABLE_PROJECTS=clang;openmp"
-      "-DLLVM_INSTALL_UTILS=ON"
       "-DLLVM_ENABLE_ASSERTIONS=ON"
+      "-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON"
     )
   '';
 

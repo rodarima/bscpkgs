@@ -9,6 +9,9 @@
       src = null;
       dontUnpack = true;
 
-      buildPhase = ''ls -l /'';
+      buildPhase = ''
+        ls -l /
+        echo "${stdenv}"
+      '';
     };
 }

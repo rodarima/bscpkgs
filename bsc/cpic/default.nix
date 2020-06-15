@@ -2,53 +2,65 @@
   stdenv
 , libconfig
 , nanos6
-, llvm-ompss2
 , mpi
 , uthash
 , overrideCC
 , llvmPackages_10
 , fftw
+, tampi
+, hdf5
+, libgcc
+, strace
+, gcc
 }:
 
-with stdenv.lib;
-
-let
-  buildStdenv = overrideCC stdenv [ llvm-ompss2 ];
-in
-buildStdenv.mkDerivation rec {
+stdenv.mkDerivation rec {
   name = "cpic";
 
-  src = "${builtins.getEnv "HOME"}/cpic";
+  # Use my current cpic version, so I can test changes without commits
+  src = /home/Computational/rarias/cpic;
+
 #  src = builtins.fetchGit {
 #    url = "https://github.com/rodarima/cpic";
 ##    rev = "73bd70448587f0925b89e24c8f17e412ea3958e6";
 #    ref = "master";
 #  };
 
-#  patchPhase = ''
-#    echo LD=$LD
-#    echo CC=$CC
-#    echo ===================================================
-#    env
-#    echo ===================================================
-#    echo ${buildStdenv}
-#    echo ===================================================
-#  '';
+  postConfigure = ''
+    env | grep NIX
+  '';
 
-  configurePhase = ''
-    ls -l /
+
+  preConfigure = ''
     export NANOS6_HOME="${nanos6}"
   '';
 
-  enableParallelBuilding = true;
+  #enableParallelBuilding = true;
 
   buildInputs = [
     libconfig
     nanos6
-    llvm-ompss2
     mpi
     uthash
-    llvmPackages_10.bintools
+#    llvmPackages_10.bintools
     fftw
+#    tampi
+    hdf5
+    libgcc
+    strace
+    gcc
   ];
+
+# Doesnt work
+#    export LIBRARY_PATH=${libgcc}/lib
+#    export LD_LIBRARY_PATH=${libgcc}/lib
+#  buildPhase = ''
+#    #NIX_DEBUG=5 strace -ff -s99999 -e trace=execve make SHELL='bash -x'
+#    NIX_DEBUG=5 strace -ff -s99999 -e trace=execve make SHELL='bash -x'
+#  '';
+
+  installPhase = ''
+    mkdir -p $out/bin
+    cp cpic $out/bin/cpic
+  '';
 }
