@@ -125,5 +125,7 @@ let
     dummy = callPackage ./bsc/dummy/default.nix {
     };
 
+    chroot = callPackage ./test/chroot.nix {};
+
   };
 in pkgs // self
