@@ -4,14 +4,9 @@
 , nanos6
 , mpi
 , uthash
-, overrideCC
-, llvmPackages_10
 , fftw
 , tampi
 , hdf5
-, libgcc
-, strace
-, gcc
 }:
 
 stdenv.mkDerivation rec {
@@ -30,13 +25,12 @@ stdenv.mkDerivation rec {
     env
   '';
 
-
-#    export NANOS6_HOME="${nanos6}"
   preConfigure = ''
     export TAMPI_HOME="${tampi}"
+    #export NIX_DEBUG=5
   '';
 
-  #enableParallelBuilding = true;
+  enableParallelBuilding = true;
   dontStrip = true;
 
   buildInputs = [
@@ -44,22 +38,10 @@ stdenv.mkDerivation rec {
     nanos6
     mpi
     uthash
-#    llvmPackages_10.bintools
     fftw
     tampi
     hdf5
-    libgcc
-    strace
-    gcc
   ];
-
-# Doesnt work
-#    export LIBRARY_PATH=${libgcc}/lib
-#    export LD_LIBRARY_PATH=${libgcc}/lib
-#  buildPhase = ''
-#    #NIX_DEBUG=5 strace -ff -s99999 -e trace=execve make SHELL='bash -x'
-#    NIX_DEBUG=5 strace -ff -s99999 -e trace=execve make SHELL='bash -x'
-#  '';
 
   installPhase = ''
     mkdir -p $out/bin
