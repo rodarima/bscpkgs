@@ -3,11 +3,8 @@
 let
   inherit (pkgs.lib) callPackageWith;
   inherit (pkgs.lib) callPackagesWith;
-  inherit (pkgs) pythonPackages;
-  inherit (pkgs) perlPackages;
-  inherit (pkgs) buildPerlPackage;
+  #callPackage = callPackageWith (pkgs);
   callPackage = callPackageWith (pkgs // self.bsc);
-  callPackage_i686 = callPackageWith (pkgs.pkgsi686Linux // self.bsc);
   callPackages = callPackagesWith (pkgs // self.bsc);
 
   self.bsc = rec {
@@ -51,20 +48,22 @@ let
       extrae = extrae;
     };
 
-    clang-ompss2-unwrapped = callPackage ./bsc/llvm-ompss2/default.nix { };
+#
+#    clang-ompss2 = import ./bsc/cc-wrapper/default.nix {
+##      inherit stdenv binutils coreutils ;
+##      stdenv = bsc.stdenv;
+#      coreutils = pkgs.coreutils;
+#      bintools = pkgs.binutils;
+#      gnugrep = pkgs.gnugrep;
+#      stdenvNoCC = pkgs.stdenvNoCC;
+#      libc = pkgs.glibc;
+#      nativeTools = false;
+#      nativeLibc = false;
+#      cc = clang-ompss2-unwrapped;
+#    };
 
-    clang-ompss2 = import ./bsc/cc-wrapper/default.nix {
-#      inherit stdenv binutils coreutils ;
-#      stdenv = bsc.stdenv;
-      coreutils = pkgs.coreutils;
-      bintools = pkgs.binutils;
-      gnugrep = pkgs.gnugrep;
-      stdenvNoCC = pkgs.stdenvNoCC;
-      libc = pkgs.glibc;
-      nativeTools = false;
-      nativeLibc = false;
-      cc = clang-ompss2-unwrapped;
-    };
+
+    
 
 #    gcc = lib.makeOverridable (import ./bsc/cc-wrapper/default.nix) {
 #      nativeTools = false;
@@ -110,22 +109,50 @@ let
 
 #    llvmPackages_latest = llvmPackages_10;
 
-    stdenv_nanos6 = pkgs.clangStdenv.override {
-      cc = clang-ompss2;
-    };
-
-    cpic = callPackage ./bsc/cpic/default.nix {
-      stdenv = stdenv_nanos6;
-      tampi = tampi;
-      mpi = mpi;
-      nanos6 = nanos6-git;
-#      llvm-ompss2 = llvm-ompss2;
-    };
+#
+#    cpic = callPackage ./bsc/cpic/default.nix {
+#      stdenv = stdenv_nanos6;
+#      tampi = tampi;
+#      mpi = mpi;
+#      nanos6 = nanos6-git;
+##      llvm-ompss2 = llvm-ompss2;
+#    };
 
     dummy = callPackage ./bsc/dummy/default.nix {
     };
 
     chroot = callPackage ./test/chroot.nix {};
 
+#    llvmOmpss2Packages = callPackage bsc/llvm-ompss2/11/default.nix {};
+
+
+    clang-ompss2-unwrapped = callPackage ./bsc/llvm-ompss2/clang.nix {
+      stdenv = pkgs.llvmPackages_10.stdenv;
+    };
+
+    clang-ompss2 = callPackage bsc/llvm-ompss2/default.nix {
+      nanos6 = nanos6-git;
+      inherit clang-ompss2-unwrapped;
+    };
+
+    stdenv-nanos6 = pkgs.clangStdenv.override {
+      cc = clang-ompss2;
+    };
+
+    test-clang-ompss2 = callPackage ./test/compilers/clang-ompss2.nix {
+      stdenv = stdenv-nanos6;
+      nanos6 = nanos6-git;
+      inherit clang-ompss2;
+    };
+
+    cpic = callPackage ./bsc/cpic/default.nix {
+      stdenv = stdenv-nanos6;
+      tampi = tampi;
+      mpi = mpi;
+      nanos6 = nanos6-git;
+#      llvm-ompss2 = llvm-ompss2;
+    };
+
   };
+
 in pkgs // self

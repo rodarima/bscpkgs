@@ -27,12 +27,12 @@ stdenv.mkDerivation rec {
 #  };
 
   postConfigure = ''
-    env | grep NIX
+    env
   '';
 
 
+#    export NANOS6_HOME="${nanos6}"
   preConfigure = ''
-    export NANOS6_HOME="${nanos6}"
     export TAMPI_HOME="${tampi}"
   '';
 
