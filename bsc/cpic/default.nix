@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
 #  };
 
   postConfigure = ''
-    env
+    #env
   '';
 
   preConfigure = ''
