@@ -61,7 +61,7 @@ stdenv.mkDerivation rec {
 # and specify nanos6 at run time.
 
   src = builtins.fetchGit {
-    url = "git@bscpm02.bsc.es:llvm-ompss/llvm-mono.git";
+    url = "ssh://git@bscpm02.bsc.es/llvm-ompss/llvm-mono.git";
     rev = "38e2e6aac04d40b6b2823751ce25f6b414f52263";
     ref = "master";
   };

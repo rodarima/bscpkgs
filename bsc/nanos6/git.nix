@@ -21,7 +21,7 @@ stdenv.mkDerivation rec {
   cacheline-width = "64";
 
   src = builtins.fetchGit {
-    url = "git@bscpm02.bsc.es:rarias/nanos6";
+    url = "ssh://git@bscpm02.bsc.es/rarias/nanos6";
     rev = "a471bb29023ae526ecfc5db95cf06cabf800d842";
     ref = branch;
   };
