@@ -54,9 +54,6 @@ let
     dummy = callPackage ./bsc/dummy/default.nix {
     };
 
-    chroot = callPackage ./test/chroot.nix {
-    };
-
     clang-ompss2-unwrapped = callPackage ./bsc/llvm-ompss2/clang.nix {
       stdenv = pkgs.llvmPackages_10.stdenv;
     };
@@ -70,18 +67,13 @@ let
       cc = clang-ompss2;
     };
 
-    test-clang-ompss2 = callPackage ./test/compilers/clang-ompss2.nix {
-      stdenv = stdenv-nanos6;
-      nanos6 = nanos6-git;
-      inherit clang-ompss2;
-    };
-
     cpic = callPackage ./bsc/cpic/default.nix {
       stdenv = stdenv-nanos6;
       nanos6 = nanos6-git;
       inherit mpi tampi;
     };
 
+    # Patched nix for deep cluster
     inherit (callPackage ./bsc/nix/default.nix {
         storeDir = "/nix/store";
         stateDir = "/nix/var";
@@ -90,6 +82,18 @@ let
       nix
       nixUnstable
       nixFlakes;
+
+    test = {
+      chroot = callPackage ./test/chroot.nix { };
+
+      internet = callPackage ./test/security/internet.nix { };
+
+      clang-ompss2 = callPackage ./test/compilers/clang-ompss2.nix {
+        stdenv = stdenv-nanos6;
+        nanos6 = nanos6-git;
+        inherit clang-ompss2;
+      };
+    };
   };
 
 in pkgs // self
