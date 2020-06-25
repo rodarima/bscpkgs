@@ -78,6 +78,12 @@ let
       inherit mpi tampi;
     };
 
+    inherit (callPackage ./bsc/nix {
+        storeDir = "/nix/store";
+        stateDir = "/nix/var";
+        boehmgc = pkgs.boehmgc.override { enableLargeConfig = true; };
+        })
+      nix;
   };
 
 in pkgs // self
