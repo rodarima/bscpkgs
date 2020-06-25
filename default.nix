@@ -8,11 +8,6 @@ let
 
   self.bsc = rec {
 
-    # Custom OpenMPI with mpi_cxx enabled for TAMPI
-    openmpi = callPackage ./bsc/openmpi/default.nix {
-      enableCxx = true;
-    };
-
     # Load the default implementation
     #mpi = pkgs.mpich;
     #mpi = pkgs.openmpi;
@@ -26,6 +21,15 @@ let
 
     binutils = pkgs.binutils;
     coreutils = pkgs.coreutils;
+
+    # --------------------------------------------------------- #
+    #  BSC Packages
+    # --------------------------------------------------------- #
+
+    # Custom OpenMPI with mpi_cxx enabled for TAMPI
+    openmpi = callPackage ./bsc/openmpi/default.nix {
+      enableCxx = true;
+    };
 
     fftw = callPackage ./bsc/fftw/default.nix {
       mpi = mpi;
@@ -78,12 +82,14 @@ let
       inherit mpi tampi;
     };
 
-    inherit (callPackage ./bsc/nix {
+    inherit (callPackage ./bsc/nix/default.nix {
         storeDir = "/nix/store";
         stateDir = "/nix/var";
         boehmgc = pkgs.boehmgc.override { enableLargeConfig = true; };
         })
-      nix;
+      nix
+      nixUnstable
+      nixFlakes;
   };
 
 in pkgs // self
