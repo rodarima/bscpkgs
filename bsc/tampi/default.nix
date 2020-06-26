@@ -7,18 +7,15 @@
 , gnumake
 , boost
 , mpi
-, gcc}:
+, gcc
+, autoreconfHook
+}:
 
 stdenv.mkDerivation rec {
   version = "1.0.1";
   name = "tampi-${version}";
   enableParallelBuilding = true;
-  buildInputs = [ automake autoconf libtool gnumake boost mpi gcc ];
-  #hardeningDisable = [ "format" ];
-  preConfigure = ''
-      autoreconf -fiv
-  '';
-
+  buildInputs = [ autoreconfHook automake autoconf libtool gnumake boost mpi gcc ];
   dontDisableStatic = true;
   configureFlags = [ "--disable-mpi-mt-check" ];
   src = fetchurl {
