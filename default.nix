@@ -44,6 +44,7 @@ let
     };
 
     mcxx = callPackage ./bsc/mcxx/default.nix {
+      stdenv = pkgs.gcc9Stdenv;
       nanos6 = nanos6-git;
     };
 
