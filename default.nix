@@ -12,6 +12,7 @@ let
     #mpi = pkgs.mpich;
     #mpi = pkgs.openmpi;
     mpi = openmpi; # Our OpenMPI variant
+    #mpi = intel-mpi;
 
     # Load the default compiler
     #stdenv = pkgs.gcc7Stdenv;
@@ -30,6 +31,15 @@ let
     openmpi = callPackage ./bsc/openmpi/default.nix {
       enableCxx = true;
     };
+
+    intel-mpi-2019 = callPackage ./bsc/intel-mpi/default.nix {
+      # Intel MPI provides a debug version of the MPI library, but
+      # by default we use the release variant for performance
+      enableDebug = false;
+    };
+
+    # Default Intel MPI version is 2019 (the last one)
+    intel-mpi = intel-mpi-2019;
 
     fftw = callPackage ./bsc/fftw/default.nix {
       mpi = mpi;
@@ -81,7 +91,8 @@ let
     # Apps for Garlic
     nbody = callPackage ./bsc/apps/nbody/default.nix {
       stdenv = pkgs.gcc9Stdenv;
-      inherit mpi tampi;
+      mpi = mpi;
+      tampi = tampi;
       nanos6 = nanos6-git;
     };
 
