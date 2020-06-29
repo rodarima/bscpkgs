@@ -43,6 +43,10 @@ let
       mpi = mpi;
     };
 
+    mcxx = callPackage ./bsc/mcxx/default.nix {
+      nanos6 = nanos6-git;
+    };
+
     nanos6 = callPackage ./bsc/nanos6/default.nix {
       extrae = extrae;
     };
