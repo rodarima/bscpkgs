@@ -3,6 +3,7 @@
 , nanos6
 , mpi
 , tampi
+, mcxx
 }:
 
 stdenv.mkDerivation rec {
@@ -20,6 +21,7 @@ stdenv.mkDerivation rec {
     nanos6
     mpi
     tampi
+    mcxx
   ];
 
   installPhase = ''
