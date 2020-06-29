@@ -16,13 +16,13 @@ with stdenv.lib;
 
 stdenv.mkDerivation rec {
   pname = "nanos6";
-  version = "2.3.2";
+  version = "2.4-nix-526b0e14";
   branch = "master";
   cacheline-width = "64";
 
   src = builtins.fetchGit {
     url = "ssh://git@bscpm02.bsc.es/rarias/nanos6";
-    rev = "a471bb29023ae526ecfc5db95cf06cabf800d842";
+    rev = "526b0e1418e445115d79cca402a387a88ea61bb9";
     ref = branch;
   };
 
