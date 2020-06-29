@@ -17,14 +17,14 @@ with stdenv.lib;
 
 stdenv.mkDerivation rec {
   pname = "nanos6";
-  version = "2.3.2";
+  version = "2.4";
 
   src = fetchurl {
-    url = "https://pm.bsc.es/ftp/ompss-2/releases/ompss-2-2019.11.2.tar.gz";
-    sha256 = "03v1kpggdch25m1wfrdjl6crq252dgy6pms8h94d5jwcjh06fbf8";
+    url = "https://pm.bsc.es/ftp/ompss-2/releases/ompss-2-2020.06.tar.gz";
+    sha256 = "0f9hy2avblv31wi4910x81wc47dwx8x9nd72y02lgrhl7fc9i2sf";
   };
 
-  enableParallelBuilding = true;
+  enableParallelBuilding = false;
   preConfigure = ''
     cd ${pname}-${version}
     sed -i 's|/bin/echo|echo|g' loader/scripts/common.sh loader/scripts/lint/common.sh
