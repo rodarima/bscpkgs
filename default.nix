@@ -73,6 +73,13 @@ let
       inherit mpi tampi;
     };
 
+    # Apps for Garlic
+    nbody = callPackage ./bsc/apps/nbody/default.nix {
+      stdenv = pkgs.gcc9Stdenv;
+      inherit mpi tampi;
+      nanos6 = nanos6-git;
+    };
+
     # Patched nix for deep cluster
     inherit (callPackage ./bsc/nix/default.nix {
         storeDir = "/nix/store";
