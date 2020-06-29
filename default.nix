@@ -67,7 +67,7 @@ let
       cc = clang-ompss2;
     };
 
-    cpic = callPackage ./bsc/cpic/default.nix {
+    cpic = callPackage ./bsc/apps/cpic/default.nix {
       stdenv = stdenv-nanos6;
       nanos6 = nanos6-git;
       inherit mpi tampi;
