@@ -15,10 +15,13 @@ let
     #mpi = intel-mpi;
 
     # Load the default compiler
-    #stdenv = pkgs.gcc7Stdenv;
-    #stdenv = pkgs.gcc9Stdenv;
     #stdenv = pkgs.gcc10Stdenv;
-    stdenv = pkgs.clangStdenv;
+    #stdenv = pkgs.gcc9Stdenv;
+    #stdenv = pkgs.gcc7Stdenv;
+    stdenv = pkgs.llvmPackages_10.stdenv;
+    #stdenv = pkgs.llvmPackages_9.stdenv;
+    #stdenv = pkgs.llvmPackages_8.stdenv;
+    #stdenv = pkgs.llvmPackages_7.stdenv;
 
     binutils = pkgs.binutils;
     coreutils = pkgs.coreutils;
@@ -66,6 +69,11 @@ let
       extrae = extrae;
     };
 
+    vtk = callPackage ./bsc/vtk/default.nix {
+      mpi = mpi;
+      inherit (pkgs.xorg) libX11 xorgproto libXt;
+    };
+
     dummy = callPackage ./bsc/dummy/default.nix {
     };
 
@@ -91,9 +99,18 @@ let
     # Apps for Garlic
     nbody = callPackage ./bsc/apps/nbody/default.nix {
       stdenv = pkgs.gcc9Stdenv;
-      mpi = mpi;
+      mpi = intel-mpi;
       tampi = tampi;
       nanos6 = nanos6-git;
+    };
+
+    saiph = callPackage ./bsc/apps/saiph/default.nix {
+      stdenv = stdenv-nanos6;
+      mpi = intel-mpi;
+      tampi = tampi;
+      nanos6 = nanos6-git;
+      inherit vtk;
+      boost = pkgs.boost;
     };
 
     # Patched nix for deep cluster

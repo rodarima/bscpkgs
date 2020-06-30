@@ -17,6 +17,10 @@ stdenv.mkDerivation rec {
 
   dontStrip = true;
 
+  patchPhase = ''
+    sed -i 's/mpicc/mpigcc/g'  Makefile
+  '';
+
   buildInputs = [
     nanos6
     mpi
