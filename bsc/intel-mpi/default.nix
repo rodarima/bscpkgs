@@ -6,7 +6,6 @@
 , enableDebug ? false
 }:
 
-
 stdenv.mkDerivation rec {
   name = "intel-mpi-${version}";
   version = "2019.7.217";
@@ -31,31 +30,43 @@ stdenv.mkDerivation rec {
     '';
   };
 
-  dontBuild = true;
-  installPhase = ''
-    mkdir -p $out
-    rpmextract rpm/intel-mpi-*.rpm
-    cd opt/intel/compilers_and_libraries_2020.1.217/linux/mpi/intel64
+  buildInputs = [
+    rpmextract
+    libfabric
+    patchelf
+  ];
 
+  postUnpack = ''
+    pushd $sourceRoot
+      rpmextract rpm/intel-mpi-*.rpm
+    popd
+  '';
+
+  patches = [
+    ./mpicc.patch
+    ./mpicxx.patch
+  ];
+
+  postPatch = ''
     for i in bin/mpi* ; do
       sed -i "s:I_MPI_SUBSTITUTE_INSTALLDIR:$out:g" $i
     done     
+  '';
 
+  dontBuild = true;
+
+  installPhase = ''
+    cd opt/intel/compilers_and_libraries_2020.1.217/linux/mpi/intel64
+    mkdir -p $out
     mv etc $out
     mv bin $out 
     mv include $out 
-
     mkdir $out/lib
     cp -a lib/lib* $out/lib
     cp -a lib/${lib_variant}_mt/lib* $out/lib
-
-
   '';
 
   preFixup = ''
-    echo $out/lib contains:
-    ls -l $out/lib
-    echo ----------------------
     find $out/bin -type f -executable -exec \
       patchelf \
       --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
@@ -64,10 +75,4 @@ stdenv.mkDerivation rec {
     find $out/lib -name '*.so' -exec \
       patchelf --set-rpath "$out/lib:${stdenv.cc}/lib:${stdenv.glibc}/lib:${libfabric}/lib" '{}' \;
   '';
-
-  buildInputs = [
-    rpmextract
-    libfabric
-    patchelf
-  ];
 }

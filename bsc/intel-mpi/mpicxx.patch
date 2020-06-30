@@ -1,0 +1,28 @@
+--- a/opt/intel/compilers_and_libraries_2020.1.217/linux/mpi/intel64/bin/mpicxx	2020-06-30 14:26:14.619723932 +0200
++++ b/opt/intel/compilers_and_libraries_2020.1.217/linux/mpi/intel64/bin/mpicxx	2020-06-30 14:27:56.644687134 +0200
+@@ -49,9 +49,9 @@
+ 
+ if [ x"$opt_args" == x"" ]; then
+     case "${compiler_short_name}" in
+-    icc|icpc)   $dir/mpiicpc -cxx=$compiler_name "$@" ;;
+-    *g++*)        $dir/mpigxx -cxx=$compiler_name "$@" ;;
+-    mpicxx)     $dir/mpigxx "$@" ;;
++    icc|icpc)             $dir/mpiicpc -cxx=$compiler_name "$@" ;;
++    *g++*|clang*++|mcxx)  $dir/mpigxx -cxx=$compiler_name "$@" ;;
++    mpicxx)               $dir/mpigxx "$@" ;;
+     *)  
+             echo "Error: unsupported compiler name '$compiler_name'."
+             echo "Check -cxx=<compiler_name> command line option and I_MPI_CXX='$I_MPI_CXX' and MPICH_CXX='$MPICH_CXX' variables."; 
+@@ -59,9 +59,9 @@
+     esac
+ else
+     case "${compiler_short_name}" in
+-    icc|icpc)   $dir/mpiicpc -cxx=$compiler_name "$@" $opt_args ;;
+-    *g++*)        $dir/mpigxx -cxx=$compiler_name "$@" $opt_args ;;
+-    mpicxx)     $dir/mpigxx "$@" $opt_args ;;
++    icc|icpc)             $dir/mpiicpc -cxx=$compiler_name "$@" $opt_args ;;
++    *g++*|clang*++|mcxx)  $dir/mpigxx -cxx=$compiler_name "$@" $opt_args ;;
++    mpicxx)               $dir/mpigxx "$@" $opt_args ;;
+     *)  
+             echo "Error: unsupported compiler name '$compiler_name'."
+             echo "Check -cxx=<compiler_name> command line option and I_MPI_CXX='$I_MPI_CXX' and MPICH_CXX='$MPICH_CXX' variables."; 
