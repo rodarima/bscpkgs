@@ -3,6 +3,9 @@
 , rpmextract
 , libfabric
 , patchelf
+, gcc
+, zlib
+, autoPatchelfHook
 , enableDebug ? false
 }:
 
@@ -34,6 +37,9 @@ stdenv.mkDerivation rec {
     rpmextract
     libfabric
     patchelf
+    autoPatchelfHook
+    gcc.cc.lib
+    zlib
   ];
 
   postUnpack = ''
@@ -64,15 +70,6 @@ stdenv.mkDerivation rec {
     mkdir $out/lib
     cp -a lib/lib* $out/lib
     cp -a lib/${lib_variant}_mt/lib* $out/lib
-  '';
-
-  preFixup = ''
-    find $out/bin -type f -executable -exec \
-      patchelf \
-      --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
-      '{}' \;
-    
-    find $out/lib -name '*.so' -exec \
-      patchelf --set-rpath "$out/lib:${stdenv.cc}/lib:${stdenv.glibc}/lib:${libfabric}/lib" '{}' \;
+    rm $out/lib/libmpi.dbg
   '';
 }
