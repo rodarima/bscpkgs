@@ -43,8 +43,14 @@ let
       enableDebug = false;
     };
 
-    intel-compiler = intel-compiler-2020;
-    intel-compiler-2020 = callPackage ./bsc/intel-compiler/default.nix {
+    icc-unwrapped = callPackage ./bsc/intel-compiler/icc.nix {
+    };
+
+    icc = callPackage bsc/intel-compiler/default.nix {
+      intel-license = icc-license;
+    };
+
+    icc-license = callPackage bsc/intel-compiler/license.nix {
     };
 
     fftw = callPackage ./bsc/fftw/default.nix {

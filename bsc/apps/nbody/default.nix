@@ -4,6 +4,7 @@
 , mpi
 , tampi
 , mcxx
+, icc
 }:
 
 stdenv.mkDerivation rec {
@@ -15,15 +16,14 @@ stdenv.mkDerivation rec {
     ref = "master";
   };
 
-  dontStrip = true;
-
   patchPhase = ''
-    sed -i 's/mpicc/mpigcc/g'  Makefile
+    #sed -i 's/gcc/icc/g'  Makefile
   '';
 
   buildInputs = [
     nanos6
     mpi
+    icc
     tampi
     mcxx
   ];
@@ -32,4 +32,5 @@ stdenv.mkDerivation rec {
     mkdir -p $out/bin
     cp nbody_* $out/bin/
   '';
+
 }
