@@ -35,14 +35,17 @@ let
       enableCxx = true;
     };
 
+    # Default Intel MPI version is 2019 (the last one)
+    intel-mpi = intel-mpi-2019;
     intel-mpi-2019 = callPackage ./bsc/intel-mpi/default.nix {
       # Intel MPI provides a debug version of the MPI library, but
       # by default we use the release variant for performance
       enableDebug = false;
     };
 
-    # Default Intel MPI version is 2019 (the last one)
-    intel-mpi = intel-mpi-2019;
+    intel-compiler = intel-compiler-2020;
+    intel-compiler-2020 = callPackage ./bsc/intel-compiler/default.nix {
+    };
 
     fftw = callPackage ./bsc/fftw/default.nix {
       mpi = mpi;
