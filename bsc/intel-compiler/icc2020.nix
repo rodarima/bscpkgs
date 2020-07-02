@@ -6,11 +6,11 @@
 }:
 
 stdenv.mkDerivation rec {
-  version = "2019.1.217";
+  version = "${year}.${v_a}.${v_b}";
   name = "intel-compiler-${version}";
 
   # From Arch Linux PKGBUILD
-  dir_nr="16526";
+  dir_nr="16527";
   year="2020";
   v_a="1";
   v_b="217";

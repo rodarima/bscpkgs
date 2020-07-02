@@ -43,11 +43,15 @@ let
       enableDebug = false;
     };
 
-    icc-unwrapped = callPackage ./bsc/intel-compiler/icc.nix {
+    # By default we use Intel compiler 2020 update 1
+    icc-unwrapped = icc2020-unwrapped;
+    icc2020-unwrapped = callPackage ./bsc/intel-compiler/icc2020.nix {
     };
 
+    # A wrapper script that puts all the flags and environment vars properly and
+    # calls the intel compiler binary
     icc = callPackage bsc/intel-compiler/default.nix {
-      intel-license = icc-license;
+      inherit icc-unwrapped icc-license;
     };
 
     icc-license = callPackage bsc/intel-compiler/license.nix {
