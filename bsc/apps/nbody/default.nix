@@ -18,7 +18,7 @@ stdenv.mkDerivation rec {
 
   patchPhase = ''
     sed -i 's/gcc/icc/g'  Makefile
-    export NIX_DEBUG=6
+    #export NIX_DEBUG=6
   '';
 
   buildInputs = [
