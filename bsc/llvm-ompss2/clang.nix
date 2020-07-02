@@ -36,6 +36,8 @@ stdenv.mkDerivation rec {
     pkg-config
   ];
 
+  hardeningDisable = [ "fortify" ];
+
   cmakeBuildType = if enableDebug then "Debug" else "Release";
 
   dontUseCmakeBuildDir = true;
@@ -49,7 +51,7 @@ stdenv.mkDerivation rec {
       "-DCMAKE_CXX_FLAGS_DEBUG=-g -ggnu-pubnames"
       "-DCMAKE_EXE_LINKER_FLAGS_DEBUG=-Wl,-gdb-index"
       "-DLLVM_LIT_ARGS=-sv --xunit-xml-output=xunit.xml"
-      "-DLLVM_ENABLE_PROJECTS=clang;openmp"
+      "-DLLVM_ENABLE_PROJECTS=clang;openmp;compiler-rt"
       "-DLLVM_ENABLE_ASSERTIONS=ON"
       "-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON"
     )
@@ -62,7 +64,7 @@ stdenv.mkDerivation rec {
 
   src = builtins.fetchGit {
     url = "ssh://git@bscpm02.bsc.es/llvm-ompss/llvm-mono.git";
-    rev = "38e2e6aac04d40b6b2823751ce25f6b414f52263";
+    rev = "e1c73c3691d2685a99d99e14c6110d2c880662c6";
     ref = "master";
   };
 }
