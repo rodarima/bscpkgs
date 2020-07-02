@@ -9,7 +9,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  name = "nbody";
+  name = "saiph";
 
   src = builtins.fetchGit {
     url = "ssh://git@bscpm02.bsc.es/DSLs/saiph.git";
@@ -17,11 +17,9 @@ stdenv.mkDerivation rec {
     ref = "VectorisationSupport";
   };
 
-  #dontStrip = true;
 
-#  preBuild = ''
-#    cd saiphv2/cpp/src
-#  '';
+  enableParallelBuilding = true;
+  dontStrip = true;
 
   buildInputs = [
     nanos6
@@ -35,11 +33,17 @@ stdenv.mkDerivation rec {
   buildPhase = ''
     pwd
     cd saiphv2/cpp/src
-    make -f Makefile.clang apps=ExHeat
+    export VTK_VERSION=8.2
+    export VTK_HOME=${vtk}
+    export SAIPH_HOME=.
+    make -f Makefile.clang
+    make -f Makefile.clang apps APP=ExHeat -j
   '';
 
   installPhase = ''
+    mkdir -p $out/lib
     mkdir -p $out/bin
-    #cp nbody_* $out/bin/
+    cp obj/libsaiphv2.so $out/lib/
+    cp bin/ExHeat $out/bin/
   '';
 }
