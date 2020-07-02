@@ -11,12 +11,13 @@
 stdenv.mkDerivation rec {
   name = "saiph";
 
-  src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/DSLs/saiph.git";
-    #rev = "a8372abf9fc7cbc2db0778de80512ad4af244c29";
-    ref = "VectorisationSupport";
-  };
+#  src = builtins.fetchGit {
+#    url = "ssh://git@bscpm02.bsc.es/DSLs/saiph.git";
+#    #rev = "a8372abf9fc7cbc2db0778de80512ad4af244c29";
+#    ref = "VectorisationSupport";
+#  };
 
+  src = /tmp/saiph;
 
   enableParallelBuilding = true;
   dontStrip = true;
@@ -30,15 +31,18 @@ stdenv.mkDerivation rec {
     boost
   ];
 
-  buildPhase = ''
-    pwd
+  preBuild = ''
     cd saiphv2/cpp/src
     export VTK_VERSION=8.2
     export VTK_HOME=${vtk}
     export SAIPH_HOME=.
-    make -f Makefile.clang
-    make -f Makefile.clang apps APP=ExHeat -j
   '';
+
+  makeFlags = [
+    "-f" "Makefile.clang"
+    "apps"
+    "APP=ExHeat"
+  ];
 
   installPhase = ''
     mkdir -p $out/lib
