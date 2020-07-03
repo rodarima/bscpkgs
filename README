@@ -1,0 +1,348 @@
+
+
+                      BSC Nixpkgs: User guide
+
+
+1 Introduction
+
+  This repository contains a set of nix packages used in the Barcelona
+  Supercomputing Center by the Programming Models group.
+
+  Some preliminary steps must be done manually to be able to build and 
+  install packages (derivations in nix jargon).
+
+1.1 Network access
+
+  In order to use nix you need to be able to download the sources from 
+  Internet. Usually the download requires the ports 22, 80 and 443 to be 
+  open for outgoing traffic.
+
+  Unfortunately, in some clusters (as is the case in xeon07) access to 
+  Internet is disabled. However you can tunnel the connection by SSH to 
+  your local machine, and then reach the Internet.
+
+  There are some guides on how to prepare the proxy server and the 
+  tunnel in SSH such as:
+
+    https://www.seniorlinuxadmin.co.uk/ssh-over-proxy.html
+
+  In order to instruct nix to use the proxy connection, you will need to 
+  export the https_proxy and http_proxy variables. In the xeon07 node is 
+  already configured and you can automatically set those variables to 
+  the correct address by loading:
+
+    $ . /scratch/nix/internet
+
+  Consider adding the command to your ~/.bashrc file so you don't need 
+  to do it every time you want to use nix.
+
+  Now you should be able to reach the outside world by running:
+
+    $ curl google.com
+    <HTML><HEAD><meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <TITLE>301 Moved</TITLE></HEAD><BODY>
+    <H1>301 Moved</H1>
+    The document has moved
+    <A HREF="http://www.google.com/">here</A>.
+    </BODY></HTML>
+
+1.1 Prepare SSH keys
+
+  Package sources are usually downloaded directly from the git server, 
+  so you must be able to access all repositories without a password 
+  prompt.
+
+  Most repositories at https://pm.bsc.es/gitlab are open to read for 
+  logged users, but there are some exceptions for example the nanos6 
+  repository where you must have explicitly granted read access.
+
+  If you don't have a ssh key at ~/.ssh/*.pub create a new one without 
+  password protection by running:
+
+    $ ssh-keygen
+    Generating public/private rsa key pair.
+    Enter file in which to save the key (~/.ssh/id_rsa):
+    Enter passphrase (empty for no passphrase):
+    Enter same passphrase again:
+    Your identification has been saved in ~/.ssh/id_rsa.
+    Your public key has been saved in ~/.ssh/id_rsa.pub.
+    ...
+
+  By default it will create the private key at ~/.ssh/id_rsa. Copy the 
+  contents of your public ssh key in ~/.ssh/id_rsa.pub and paste it in 
+  GitLab at:
+
+    https://pm.bsc.es/gitlab/profile/keys
+
+  If you want to select another key rather than the default 
+  ~/.ssh/id_rsa then you must configure it for use in the ~/.ssh/config 
+  file, adding:
+
+    Host bscpm02.bsc.es
+      IdentityFile ~/.ssh/your-private-key
+
+  Finally verify the SSH connection to the server works and you get a 
+  greeting from the GitLab server with your username:
+
+    $ ssh git@bscpm02.bsc.es
+    PTY allocation request failed on channel 0
+    Welcome to GitLab, @rarias!
+    Connection to bscpm02.bsc.es closed.
+
+  Verify that you can access rarias/nanos6 repository (otherwise you 
+  first need to ask to be granted read access), at:
+
+    https://pm.bsc.es/gitlab/rarias/nanos6
+  
+  Finally, you should be able to download the rarias/nanos6 git 
+  repository without any password interaction by running:
+
+    $ git clone git@bscpm02-bsc-es:rarias/nanos6.git
+
+1.3 Prepare the bsc-nixpkgs repo
+
+  Once you have Internet and you have granted access to the PM GitLab 
+  repositories you can begin down the rabbit hole of nix. First ensure 
+  that the nix binaries are available in your machine:
+
+    $ nix --version
+    nix (Nix) 2.3.6
+
+  Now you are set to install packages with nix. Clone the bsc-nixpkgs 
+  repository:
+
+    $ git clone git@bscpm02-bsc-es:rarias/bsc-nixpkgs.git
+
+  Nix looks in the current folder for a file named "default.nix" for 
+  packages, so go to the repo:
+
+    $ cd bsc-nixpkgs
+
+  Now you should be able to build nanos6 from the git repository:
+
+    $ nix-build -A bsc.nanos6-git
+
+  The output is placed in the "result" symlink.
+
+
+2. Basic usage of nix
+
+  Nix is a package manager which handles easily reproducibility and 
+  configuration of packages and dependencies. See more info here:
+
+    https://nixos.org/nix/manual/
+
+  We will only cover the basic usage of nix for the BSC packages.
+
+2.1 The user environment
+
+  All nix packages are stored under the /nix directory. When you need to 
+  "install" some binary from nix, a symlink is added to a folder 
+  included in the $PATH variable. In particular, you should have the 
+  something similar added to your $PATH:
+
+    $ echo $PATH | sed 's/:/\n/g' | grep nix
+    /home/Computational/rarias/.nix-profile/bin
+    /nix/var/nix/profiles/default/bin
+
+  The first one is your custom installation of packages that are stored 
+  in your home directory and the second one is the default installation 
+  which contains the nix tools (which are installed in the /nix 
+  directory as well).
+
+  When you need a program that is not available in your environment, 
+  much like when you use "module load ..." you can use nix-env to modify 
+  what is currently loaded. For example:
+
+    $ nix-env -iA nixpkgs.cowsay
+
+  The command will download (if not found already in the nix store), 
+  compile (if necessary) and load the program `cowsay` from the nixpkgs 
+  repository in the environment. You should be able to run it as:
+
+    $ cowsay "hello world"
+     _____________
+    < hello world >
+     -------------
+            \   ^__^
+             \  (oo)\_______
+                (__)\       )\/\
+                    ||----w |
+                    ||     ||
+
+  You can inspect now the ~/.nix-profile/bin folder, and see that a new 
+  symlink was added to the actual installation of the binary:
+
+    $ file ~/.nix-profile/bin/cowsay
+    /home/Computational/rarias/.nix-profile/bin/cowsay: symbolic link to 
+    `/nix/store/673gczmhr5b449521srz2n7g1klykz6n-cowsay-3.03+dfsg2/bin/cowsay'
+
+  You can list the current packages installed in your environment by 
+  running:
+
+    $ nix-env -q
+    cowsay-3.03+dfsg2
+    nix-2.3.6
+
+  Notice that this setup only affects your user environment. Also, it is 
+  permanent for any new session until you modify the environment again 
+  and is immediate, all sessions will have the new environment 
+  instantaneously.
+
+  You can remove any package from the environment using:
+
+    $ nix-env -e cowsay
+
+  See the manual with `nix-env --help` if you want to know more details.
+
+2.2 Building packages
+
+  Usually, all official packages are already compiled and distributed 
+  from a cache server so you don't need to rebuild them again. However, 
+  BSC packages are distributed only in source code form as we don't have 
+  any binary cache server yet.
+  
+  Nix will handle the build process without any user interaction (with a 
+  few exceptions stated later, which you shouldn't have to worry). If 
+  any other user has already built the package then the build process is 
+  not needed, and the package is used as is.
+
+  In order to build a BSC package go to the `bsc-nixpkgs` directory, and 
+  run:
+
+    $ nix-build -A bsc.dummy
+
+  The package will be built and installed in the /nix directory, then a 
+  symlink is placed in the result directory:
+
+    $ find result/ -type f
+    result/
+    result/bin
+    result/bin/dummy
+
+  The way in which nix handles the packages and dependencies ensures 
+  that the output of a compilation of any package is exactly the same.  
+  You can check the reproducibility of the build by adding the "--check" 
+  flag, which will rebuild the package and compare the checksum of every 
+  file with the ones installed:
+
+    $ nix-build -A bsc.dummy --check
+    ...
+    $ echo $?
+    0
+
+  A return code of zero ensures the output is bit by bit identical to 
+  the one installed. There are some packages that try to include 
+  non-reproducible information in the build process as the timestamp 
+  which will produce an error. Those packages must be patched to ensure 
+  the output is deterministic.
+
+  Notice that if you "cd" into the result/ directory you will be at /nix 
+  directory (as you follow the symlink) where you don't have write 
+  permission. Therefore if your program attempts to write to the current 
+  directory it will fail. It is recommended to instead run your program 
+  from the top directory:
+
+    $ result/bin/dummy
+    Hello world!
+
+  Or you can install it in the environment:
+
+    $ nix-env -i ./result
+
+  And "cd" into any directory where you want to output some files and 
+  just run it by the name:
+
+    $ cd /tmp
+    $ dummy
+    Hello world!
+
+  Finally, you can remove it from the environment if you don't need it:
+
+    $ nix-env -e dummy
+
+  If you want to know more details use "nix-build --help" to see the 
+  manual.
+
+2.3 The build process
+
+  Each package is built following a programmable configuration 
+  description in the nix language. Build in nix are performed under very 
+  strict conditions. No access any file in the file system is allowed, 
+  unless stated in the dependencies of the package which are then 
+  available in the build environment.
+
+  There is no network access in the build process and other restrictions 
+  are enforced that the build is deterministic. See more details here:
+
+    https://nixos.wiki/wiki/Nix#Sandboxing
+
+  In the "default.nix" file of the bsc-nixpkgs you can see the 
+  definition for each package, for example the nbody app:
+
+    nbody = callPackage ./bsc/apps/nbody/default.nix {
+      stdenv = pkgs.gcc9Stdenv;
+      mpi = intel-mpi;
+      icc = icc;
+      tampi = tampi;
+      nanos6 = nanos6-git;
+    };
+
+  The compilation details are specified in the 
+  "bsc/apps/nbody/default.nix" file.  You can configure the package by 
+  changing the inputs, for example, what specific implementation of 
+  nanos6 or MPI you want to use. To change the MPI implementation to the 
+  official MPICH package use:
+
+    nbody = callPackage ./bsc/apps/nbody/default.nix {
+      stdenv = pkgs.gcc9Stdenv;
+      mpi = pkgs.mpich; # Notice pkgs prefix for official packages
+      icc = icc;
+      tampi = tampi;
+      nanos6 = nanos6-git;
+    };
+
+  Then you can rebuild the nbody package:
+
+    $ nix-build -A bsc.nbody
+    ...
+
+  And verify that the binary is indeed linked to MPICH now:
+
+    $ ldd result/bin/nbody_mpi.N2.2048.exe | grep mpi
+        libmpi.so.12 => /nix/store/dwkkcv78a5bs8smflpx9ppp3klhz3i98-mpich-3.3.2/lib/libmpi.so.12 (0x00007f6be0f07000)
+
+  If you modify a package which another package requires as a 
+  dependency, nix will rebuild all required packages to propagate your 
+  changes on demand.
+
+  However, if you come back to the original configuration, the package 
+  will still be in the /nix store (unless the garbage collector was 
+  manually run and removed your old build), so you don't need to rebuild 
+  it again.
+
+  For example if nbody is configured back to use Intel MPI:
+
+    nbody = callPackage ./bsc/apps/nbody/default.nix {
+      stdenv = pkgs.gcc9Stdenv;
+      mpi = intel-mpi;
+      icc = icc;
+      tampi = tampi;
+      nanos6 = nanos6-git;
+    };
+
+  The build process now is not required:
+
+    $ nix-build -A bsc.nbody
+    /nix/store/rbq7wrjcmg6fzd6yhrlnkfvzcavdbdpc-nbody
+    $ ldd result/bin/nbody_mpi.N2.2048.exe | grep mpi
+        libmpifort.so.12 => /nix/store/jvsjvxj2a08340fpdrqbqix9z3mpp3bd-intel-mpi-2019.7.217/lib/libmpifort.so.12 (0x00007f3a00402000)
+        libmpi.so.12 => /nix/store/jvsjvxj2a08340fpdrqbqix9z3mpp3bd-intel-mpi-2019.7.217/lib/libmpi.so.12 (0x00007f39fed34000)
+
+  Take a look at the different package description files in the 
+  bsc-nixpkgs repository if you want to understand more details. Also 
+  the nix pills are a very good reference:
+
+    https://nixos.org/nixos/nix-pills/
+
+/* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
