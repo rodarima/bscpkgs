@@ -11,16 +11,16 @@
 stdenv.mkDerivation rec {
   name = "saiph";
 
-#  src = builtins.fetchGit {
-#    url = "ssh://git@bscpm02.bsc.es/DSLs/saiph.git";
-#    #rev = "a8372abf9fc7cbc2db0778de80512ad4af244c29";
-#    ref = "VectorisationSupport";
-#  };
+  src = builtins.fetchGit {
+    url = "ssh://git@bscpm02.bsc.es/DSLs/saiph.git";
+    ref = "VectorisationSupport";
+  };
 
-  src = /tmp/saiph;
+  #src = /tmp/saiph;
 
   enableParallelBuilding = true;
   dontStrip = true;
+  enableDebugging = true;
 
   buildInputs = [
     nanos6
@@ -33,9 +33,12 @@ stdenv.mkDerivation rec {
 
   preBuild = ''
     cd saiphv2/cpp/src
+
+    sed -i s/skylake-avx512/core-avx2/g Makefile*
     export VTK_VERSION=8.2
     export VTK_HOME=${vtk}
     export SAIPH_HOME=.
+    export NIX_CFLAGS_COMPILE+=" -fsanitize=address"
   '';
 
   makeFlags = [
