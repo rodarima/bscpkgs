@@ -8,10 +8,17 @@
 
       src = null;
       dontUnpack = true;
+      dontBuild = true;
 
-      buildPhase = ''
-        ls -l /
-        echo "${stdenv}"
+      installPhase = ''
+        mkdir -p $out/bin
+
+        cat > $out/bin/dummy <<EOF
+        #!/bin/sh
+        echo Hello world!
+        EOF
+
+        chmod +x $out/bin/dummy
       '';
     };
 }
