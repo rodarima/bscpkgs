@@ -58,6 +58,12 @@ stdenv.mkDerivation rec {
     )
   '';
 
+  # Remove support for GNU and Intel Openmp
+  postInstall = ''
+    rm $out/lib/libgomp*
+    rm $out/lib/libiomp*
+  '';
+
 # About "-DCLANG_DEFAULT_NANOS6_HOME=${nanos6}", we could specify a default
 # nanos6 installation, but this is would require a recompilation of clang each
 # time nanos6 is changed. Better to use the environment variable NANOS6_HOME,
