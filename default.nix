@@ -92,6 +92,7 @@ let
 
     clang-ompss2-unwrapped = callPackage ./bsc/llvm-ompss2/clang.nix {
       stdenv = pkgs.llvmPackages_10.stdenv;
+      enableDebug = false;
     };
 
     clang-ompss2 = callPackage bsc/llvm-ompss2/default.nix {
