@@ -118,6 +118,13 @@ let
       nanos6 = nanos6-git;
     };
 
+    gauss-seidel = callPackage ./bsc/apps/gauss-seidel/default.nix {
+      stdenv = pkgs.gcc7Stdenv;
+      mpi = intel-mpi;
+      tampi = tampi;
+      nanos6 = nanos6-git;
+    };
+
     saiph = callPackage ./bsc/apps/saiph/default.nix {
       stdenv = stdenv-nanos6;
       mpi = intel-mpi;
