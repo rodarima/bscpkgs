@@ -26,13 +26,6 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  # Use full path for the backend compilers
-  preConfigure = ''
-    export GCC=${gcc}/bin/gcc
-    export GXX=${gcc}/bin/g++
-    export GFORTRAN=${gfortran}/bin/gfortran
-  '';
-
   buildInputs = [
     autoreconfHook
     nanos6
