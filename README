@@ -111,7 +111,7 @@
   Finally, you should be able to download the rarias/nanos6 git 
   repository without any password interaction by running:
 
-    xeon07$ git clone git@bscpm02-bsc-es:rarias/nanos6.git
+    xeon07$ git clone git@bscpm02.bsc.es:rarias/nanos6.git
 
 1.3 Prepare the bsc-nixpkgs repo
 
@@ -125,7 +125,7 @@
   Now you are set to install packages with nix. Clone the bsc-nixpkgs 
   repository:
 
-    xeon07$ git clone git@bscpm02-bsc-es:rarias/bsc-nixpkgs.git
+    xeon07$ git clone git@bscpm02.bsc.es:rarias/bsc-nixpkgs.git
 
   Nix looks in the current folder for a file named "default.nix" for 
   packages, so go to the repo:
