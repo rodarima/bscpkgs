@@ -13,7 +13,6 @@ let
   inherit gcc;
 in wrapCCWith rec {
   cc = icc-unwrapped;
-  extraPackages = [ libstdcxxHook ];
   extraBuildCommands = ''
     echo "-B${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-cflags
     echo "-L${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-ldflags
