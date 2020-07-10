@@ -15,6 +15,8 @@ in wrapCCWith rec {
   cc = icc-unwrapped;
   extraBuildCommands = ''
     echo "-B${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-cflags
+    echo "-isystem ${icc-unwrapped}/include" >> $out/nix-support/cc-cflags
+    echo "-isystem ${icc-unwrapped}/include/intel64" >> $out/nix-support/cc-cflags
     echo "-L${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-ldflags
     echo "-L${gcc.cc.lib}/lib" >> $out/nix-support/cc-ldflags
 
@@ -24,5 +26,6 @@ in wrapCCWith rec {
     # Create the wrappers for icc and icpc
     wrap icc  $wrapper $ccPath/icc
     wrap icpc $wrapper $ccPath/icpc
+    wrap ifort $wrapper $ccPath/ifort
   '';
 }

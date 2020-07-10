@@ -44,6 +44,7 @@ stdenv.mkDerivation rec {
       cp -a bin/intel64/* $out/bin/
       cp -a compiler/include/* $out/include/
       cp -a compiler/lib/intel64_lin/* $out/lib/
+      ln -s lib $out/lib_lin
       rm $out/lib/*.dbg
     popd
   '';
