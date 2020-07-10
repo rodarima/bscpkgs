@@ -16,12 +16,6 @@ stdenv.mkDerivation rec {
     ref = "master";
   };
 
-  patchPhase = ''
-    sed -i 's/gcc/icc/g'  Makefile
-    export NIX_DEBUG=6
-    g++ --version
-  '';
-
   buildInputs = [
     nanos6
     mpi
