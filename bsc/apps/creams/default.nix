@@ -5,7 +5,6 @@
 , tampi
 , mcxx
 , icc
-, strace
 }:
 
 stdenv.mkDerivation rec {
@@ -22,13 +21,11 @@ stdenv.mkDerivation rec {
     icc
     tampi
     mcxx
-    strace
   ];
 
   hardeningDisable = [ "all" ];
 
-  preBuild = ''
-    #export NIX_DEBUG=6
+  configurePhase = ''
     export TAMPI_HOME=${tampi}
     . etc/bashrc
   '';
