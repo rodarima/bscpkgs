@@ -36,6 +36,7 @@ let
     };
 
     # Default Intel MPI version is 2019 (the last one)
+    impi = intel-mpi;
     intel-mpi = intel-mpi-2019;
     intel-mpi-2019 = callPackage ./bsc/intel-mpi/default.nix {
       # Intel MPI provides a debug version of the MPI library, but
@@ -70,6 +71,7 @@ let
     };
 
     mcxx = callPackage ./bsc/mcxx/default.nix {
+      icc = icc;
       stdenv = pkgs.gcc9Stdenv;
       nanos6 = nanos6-git;
     };

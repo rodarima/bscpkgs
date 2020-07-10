@@ -10,6 +10,7 @@
 , flex
 , bison
 , gcc
+, icc
 }:
 
 stdenv.mkDerivation rec {
@@ -37,6 +38,7 @@ stdenv.mkDerivation rec {
     bison
     flex
     gcc
+    icc
   ];
 
   configureFlags = [
