@@ -136,6 +136,15 @@ let
       boost = pkgs.boost;
     };
 
+    creams = callPackage ./bsc/apps/creams/default.nix {
+      stdenv = pkgs.gcc9Stdenv;
+      mpi = intel-mpi;
+      tampi = tampi.override {
+        mpi = intel-mpi;
+      };
+      nanos6 = nanos6-git;
+    };
+
     # Patched nix for deep cluster
     inherit (callPackage ./bsc/nix/default.nix {
         storeDir = "/nix/store";
