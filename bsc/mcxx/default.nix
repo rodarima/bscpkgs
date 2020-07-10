@@ -10,7 +10,6 @@
 , flex
 , bison
 , gcc
-, icc
 }:
 
 stdenv.mkDerivation rec {
@@ -38,12 +37,18 @@ stdenv.mkDerivation rec {
     bison
     flex
     gcc
-    icc
   ];
+
+  patches = [ ./intel.patch ];
+
+  preConfigure = ''
+    export ICC=icc
+    export ICPC=icpc
+    export IFORT=ifort
+  '';
 
   configureFlags = [
     "--enable-ompss-2"
     "--with-nanos6=${nanos6}"
   ];
-    
 }

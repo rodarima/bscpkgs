@@ -1,0 +1,19 @@
+--- a/configure.ac	2020-07-10 16:15:11.431606455 +0200
++++ b/configure.ac	2020-07-10 16:15:24.291586572 +0200
+@@ -367,16 +367,6 @@
+   [ enable_intel_compilers="yes"])
+ AC_MSG_RESULT([$enable_intel_compilers])
+ 
+-
+-IFORT=
+-ICC=
+-ICPC=
+-if test x"$enable_intel_compilers" = x"yes";
+-then
+-   AC_CHECK_PROG([IFORT], [ifort], [ifort])
+-   AC_CHECK_PROG([ICC], [icc], [icc])
+-   AC_CHECK_PROG([ICPC], [icpc], [icpc])
+-fi
+ dnl --------------- END Intel Compilers ---------------------
+ 
+ mic_compilation="no"
