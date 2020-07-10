@@ -3,6 +3,7 @@
 , rpmextract
 , autoPatchelfHook
 , gcc
+, intel-mpi
 }:
 
 stdenv.mkDerivation rec {
@@ -27,6 +28,7 @@ stdenv.mkDerivation rec {
     rpmextract
     autoPatchelfHook
     gcc.cc.lib
+    intel-mpi
   ];
 
   installPhase = ''
@@ -34,6 +36,7 @@ stdenv.mkDerivation rec {
     rpmextract rpm/intel-comp-*.rpm
     rpmextract rpm/intel-c-comp-*.rpm
     rpmextract rpm/intel-openmp*.rpm
+    rpmextract rpm/intel-ifort*.rpm
 
     mkdir -p $out/{bin,lib,include}
 

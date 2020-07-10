@@ -47,15 +47,16 @@ let
     # By default we use Intel compiler 2020 update 1
     icc-unwrapped = icc2020-unwrapped;
     icc2020-unwrapped = callPackage ./bsc/intel-compiler/icc2020.nix {
+      intel-mpi = intel-mpi-2019;
     };
 
     # A wrapper script that puts all the flags and environment vars properly and
     # calls the intel compiler binary
     icc = callPackage bsc/intel-compiler/default.nix {
-      inherit icc-unwrapped icc-license;
+      inherit icc-unwrapped intel-license;
     };
 
-    icc-license = callPackage bsc/intel-compiler/license.nix {
+    intel-license = callPackage bsc/intel-compiler/license.nix {
     };
 
     fftw = callPackage ./bsc/fftw/default.nix {

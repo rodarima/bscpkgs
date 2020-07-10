@@ -5,7 +5,7 @@
 , icc-unwrapped
 , wrapCCWith
 , libstdcxxHook
-, icc-license
+, intel-license
 }:
 
 let
@@ -18,7 +18,7 @@ in wrapCCWith rec {
     echo "-L${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-ldflags
     echo "-L${gcc.cc.lib}/lib" >> $out/nix-support/cc-ldflags
 
-    echo "export INTEL_LICENSE_FILE=${icc-license}" \
+    echo "export INTEL_LICENSE_FILE=${intel-license}" \
       >> $out/nix-support/setup-hook
 
     # Create the wrappers for icc and icpc
