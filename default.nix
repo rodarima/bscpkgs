@@ -147,6 +147,7 @@ let
 
     lulesh = callPackage ./bsc/apps/lulesh/default.nix {
       mpi = intel-mpi;
+      nanos6 = nanos6-git;
     };
 
     # Patched nix for deep cluster
