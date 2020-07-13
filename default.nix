@@ -150,6 +150,14 @@ let
       nanos6 = nanos6-git;
     };
 
+    hpcg = callPackage ./bsc/apps/hpcg/default.nix {
+      mpi = intel-mpi;
+      nanos6 = nanos6-git;
+      tampi = tampi.override {
+        mpi = intel-mpi;
+      };
+    };
+
     # Patched nix for deep cluster
     inherit (callPackage ./bsc/nix/default.nix {
         storeDir = "/nix/store";
