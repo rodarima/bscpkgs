@@ -20,6 +20,9 @@ in wrapCCWith rec {
     echo "-L${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-ldflags
     echo "-L${gcc.cc.lib}/lib" >> $out/nix-support/cc-ldflags
 
+    cat "${icc-unwrapped}/nix-support/propagated-build-inputs" >> \
+      $out/nix-support/propagated-build-inputs
+
     echo "export INTEL_LICENSE_FILE=${intel-license}" \
       >> $out/nix-support/setup-hook
 

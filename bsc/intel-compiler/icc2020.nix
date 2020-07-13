@@ -28,8 +28,12 @@ stdenv.mkDerivation rec {
     rpmextract
     autoPatchelfHook
     gcc.cc.lib
+    gcc
     intel-mpi
   ];
+
+  # The gcc package is required for building other programs
+  propagatedBuildInputs = [ gcc ];
 
   installPhase = ''
     rpmextract rpm/intel-icc-*.rpm
