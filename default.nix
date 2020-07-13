@@ -145,6 +145,10 @@ let
       nanos6 = nanos6-git;
     };
 
+    lulesh = callPackage ./bsc/apps/lulesh/default.nix {
+      mpi = intel-mpi;
+    };
+
     # Patched nix for deep cluster
     inherit (callPackage ./bsc/nix/default.nix {
         storeDir = "/nix/store";
