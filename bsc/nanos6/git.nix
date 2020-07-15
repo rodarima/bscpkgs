@@ -16,30 +16,26 @@ with stdenv.lib;
 
 stdenv.mkDerivation rec {
   pname = "nanos6";
-  version = "2.4+nix_526b0e14";
+  version = "2.4-${src.shortRev}";
   branch = "master";
   cacheline-width = "64";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/rarias/nanos6";
-    rev = "a8372abf9fc7cbc2db0778de80512ad4af244c29";
+    url = "ssh://git@bscpm02.bsc.es/nanos6/nanos6";
     ref = branch;
   };
 
   enableParallelBuilding = true;
-  patchPhase = ''
-    export NANOS6_GIT_VERSION=${src.rev}
-    export NANOS6_GIT_BRANCH=${branch}
-    scripts/gen-version.sh
-  '';
 
   preConfigure = ''
     export CACHELINE_WIDTH=${cacheline-width}
+    export NANOS6_GIT_VERSION=${src.rev}
+    export NANOS6_GIT_BRANCH=${branch}
   '';
 
-  configureFlags = [
-    "--with-symbol-resolution=indirect"
-  ];
+  # The "bindnow" flags are incompatible with ifunc resolution mechanism. We
+  # disable all by default, which includes bindnow.
+  hardeningDisable = [ "all" ];
 
   buildInputs = [
     autoreconfHook
@@ -52,5 +48,4 @@ stdenv.mkDerivation rec {
     hwloc
     papi ]
     ++ (if (extrae != null) then [extrae] else []);
-
 }
