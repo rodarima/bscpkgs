@@ -2,7 +2,6 @@
 , requireFile
 , rpmextract
 , libfabric
-, patchelf
 , gcc
 , zlib
 , autoPatchelfHook
@@ -36,7 +35,6 @@ stdenv.mkDerivation rec {
   buildInputs = [
     rpmextract
     libfabric
-    patchelf
     autoPatchelfHook
     gcc.cc.lib
     zlib
@@ -54,9 +52,12 @@ stdenv.mkDerivation rec {
   ];
 
   postPatch = ''
-    for i in bin/mpi* ; do
-      sed -i "s:I_MPI_SUBSTITUTE_INSTALLDIR:$out:g" $i
-    done     
+    pushd opt/intel/compilers_and_libraries_2020.1.217/linux/mpi/intel64/bin
+      for i in mpi* ; do
+        echo "Fixing paths in $i"
+        sed -i "s:I_MPI_SUBSTITUTE_INSTALLDIR:$out:g" "$i"
+      done     
+    popd
   '';
 
   dontBuild = true;
@@ -70,6 +71,7 @@ stdenv.mkDerivation rec {
     mkdir $out/lib
     cp -a lib/lib* $out/lib
     cp -a lib/${lib_variant}_mt/lib* $out/lib
+    ln -s . $out/intel64
     rm $out/lib/libmpi.dbg
   '';
 }
