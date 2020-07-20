@@ -5,7 +5,7 @@
      case "${compiler_short_name}" in
      icc)    $dir/mpiicc -cc=$compiler_name "$@" ;;
 -    cc|*gcc*) $dir/mpigcc -cc=$compiler_name "$@" ;;
-+    cc|*gcc*|mcc|clang) $dir/mpigcc -cc=$compiler_name "$@" ;;
++    cc|*gcc*|mcc|clang|echo) $dir/mpigcc -cc=$compiler_name "$@" ;;
      mpicc)  $dir/mpigcc "$@" ;;    
      *)  
              echo "Error: unsupported compiler name '$compiler_name'."
@@ -14,7 +14,7 @@
      case "${compiler_short_name}" in
      icc)    $dir/mpiicc -cc=$compiler_name "$@" $opt_args ;;
 -    cc|*gcc*) $dir/mpigcc -cc=$compiler_name "$@" $opt_args ;;
-+    cc|*gcc*|mcc|clang) $dir/mpigcc -cc=$compiler_name "$@" $opt_args ;;
++    cc|*gcc*|mcc|clang|echo) $dir/mpigcc -cc=$compiler_name "$@" $opt_args ;;
      mpicc)  $dir/mpigcc "$@" $opt_args ;;    
      *)  
              echo "Error: unsupported compiler name '$compiler_name'."
