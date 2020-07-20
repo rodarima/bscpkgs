@@ -39,5 +39,6 @@ stdenv.mkDerivation rec {
 
   installPhase = ''
     mkdir -p $out/bin
+    cp test_HPCCG* $out/bin
   '';
 }
