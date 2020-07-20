@@ -1,0 +1,13 @@
+--- a/setup/Make.MPI_ICPC_OSS	2020-07-13 16:02:33.272257865 +0200
++++ b/setup/Make.MPI_ICPC_OSS	2020-07-13 16:04:34.344413390 +0200
+@@ -91,8 +91,8 @@
+ # - HPCG includes / libraries / specifics -------------------------------
+ # ----------------------------------------------------------------------
+ #
+-HPCG_INCLUDES = -I$(INCdir) -I$(INCdir)/$(arch) $(MPinc) -I{TAMPI_HOME}/include
+-HPCG_LIBS     = ${TAMPI_HOME}/lib/libtampi.a
++HPCG_INCLUDES = -I$(INCdir) -I$(INCdir)/$(arch) $(MPinc) -I$(TAMPI_HOME)/include
++HPCG_LIBS     = -l:libtampi.a 
+ #
+ # - Compile time options -----------------------------------------------
+ #
