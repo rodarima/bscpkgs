@@ -28,6 +28,7 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
     sed -i 's/mpic++/mpiicpc/g' Makefile
+    sed -i 's/g++/icpc/g' Makefile
     mkdir obj
   '';
 
