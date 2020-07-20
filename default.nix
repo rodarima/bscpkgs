@@ -157,6 +157,9 @@ let
     hpccg = callPackage ./bsc/apps/hpccg/default.nix {
     };
 
+    fwi = callPackage ./bsc/apps/fwi/default.nix {
+    };
+
     # Patched nix for deep cluster
     inherit (callPackage ./bsc/nix/default.nix {
         storeDir = "/nix/store";
