@@ -11,20 +11,23 @@ let
     # Load the default implementation
     #mpi = pkgs.mpich;
     #mpi = pkgs.openmpi;
-    mpi = openmpi; # Our OpenMPI variant
-    #mpi = intel-mpi;
+    #mpi = openmpi; # Our OpenMPI variant
+    mpi = intel-mpi;
 
     # Load the default compiler
     #stdenv = pkgs.gcc10Stdenv;
-    #stdenv = pkgs.gcc9Stdenv;
+    stdenv = pkgs.gcc9Stdenv;
     #stdenv = pkgs.gcc7Stdenv;
-    stdenv = pkgs.llvmPackages_10.stdenv;
+    #stdenv = pkgs.llvmPackages_10.stdenv;
     #stdenv = pkgs.llvmPackages_9.stdenv;
     #stdenv = pkgs.llvmPackages_8.stdenv;
     #stdenv = pkgs.llvmPackages_7.stdenv;
 
     binutils = pkgs.binutils;
     coreutils = pkgs.coreutils;
+    gcc = stdenv.cc;
+
+    nanos6 = nanos6-git;
 
     # --------------------------------------------------------- #
     #  BSC Packages
@@ -72,15 +75,20 @@ let
     };
 
     mcxx = callPackage ./bsc/mcxx/default.nix {
-      stdenv = pkgs.gcc9Stdenv;
-      nanos6 = nanos6-git;
     };
 
-    nanos6 = callPackage ./bsc/nanos6/default.nix {
+    mcxx-rarias = callPackage ./bsc/mcxx/rarias.nix {
+    };
+
+    nanos6-latest = callPackage ./bsc/nanos6/default.nix {
       extrae = extrae;
     };
 
     nanos6-git = callPackage ./bsc/nanos6/git.nix {
+      extrae = extrae;
+    };
+
+    nanos6-rarias = callPackage ./bsc/nanos6/rarias.nix {
       extrae = extrae;
     };
 
@@ -98,7 +106,6 @@ let
     };
 
     clang-ompss2 = callPackage bsc/llvm-ompss2/default.nix {
-      nanos6 = nanos6-git;
       inherit clang-ompss2-unwrapped;
     };
 
@@ -108,7 +115,6 @@ let
 
     cpic = callPackage ./bsc/apps/cpic/default.nix {
       stdenv = stdenv-nanos6;
-      nanos6 = nanos6-git;
       inherit mpi tampi;
     };
 
@@ -117,21 +123,18 @@ let
       stdenv = pkgs.gcc9Stdenv;
       mpi = intel-mpi;
       tampi = tampi;
-      nanos6 = nanos6-git;
     };
 
     gauss-seidel = callPackage ./bsc/apps/gauss-seidel/default.nix {
       stdenv = pkgs.gcc7Stdenv;
       mpi = intel-mpi;
       tampi = tampi;
-      nanos6 = nanos6-git;
     };
 
     saiph = callPackage ./bsc/apps/saiph/default.nix {
       stdenv = stdenv-nanos6;
       mpi = intel-mpi;
       tampi = tampi;
-      nanos6 = nanos6-git;
       inherit vtk;
       boost = pkgs.boost;
     };
@@ -142,20 +145,13 @@ let
       tampi = tampi.override {
         mpi = intel-mpi;
       };
-      nanos6 = nanos6-git;
     };
 
     lulesh = callPackage ./bsc/apps/lulesh/default.nix {
       mpi = intel-mpi;
-      nanos6 = nanos6-git;
     };
 
     hpcg = callPackage ./bsc/apps/hpcg/default.nix {
-      mpi = intel-mpi;
-      nanos6 = nanos6-git;
-      tampi = tampi.override {
-        mpi = intel-mpi;
-      };
     };
 
     # Patched nix for deep cluster
@@ -175,7 +171,6 @@ let
 
       clang-ompss2 = callPackage ./test/compilers/clang-ompss2.nix {
         stdenv = stdenv-nanos6;
-        nanos6 = nanos6-git;
         inherit clang-ompss2;
       };
     };
