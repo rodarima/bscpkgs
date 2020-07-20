@@ -88,10 +88,6 @@ let
       extrae = extrae;
     };
 
-    nanos6-rarias = callPackage ./bsc/nanos6/rarias.nix {
-      extrae = extrae;
-    };
-
     vtk = callPackage ./bsc/vtk/default.nix {
       mpi = mpi;
       inherit (pkgs.xorg) libX11 xorgproto libXt;
