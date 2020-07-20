@@ -156,6 +156,12 @@ let
     fwi = callPackage ./bsc/apps/fwi/default.nix {
     };
 
+    garlic = pkgs.buildEnv {
+      name = "garlic";
+      paths = [ nbody gauss-seidel saiph creams lulesh hpcg hpccg fwi ];
+    };
+
+
     # Patched nix for deep cluster
     inherit (callPackage ./bsc/nix/default.nix {
         storeDir = "/nix/store";
