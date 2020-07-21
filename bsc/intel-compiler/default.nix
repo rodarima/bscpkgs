@@ -4,7 +4,6 @@
 , nanos6
 , icc-unwrapped
 , wrapCCWith
-, libstdcxxHook
 , intel-license
 }:
 

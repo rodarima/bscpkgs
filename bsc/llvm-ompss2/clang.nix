@@ -18,7 +18,7 @@ stdenv.mkDerivation rec {
   version = "11.0.0";
   pname = "clang-ompss2";
   enableParallelBuilding = true;
-  #isClang = true;
+  isClang = true;
   #isGNU = true;
 
   isClangWithOmpss = true;
