@@ -114,6 +114,9 @@ let
       inherit mpi tampi;
     };
 
+    mpptest = callPackage ./bsc/mpptest/default.nix {
+    };
+
     # Apps for Garlic
     nbody = callPackage ./bsc/apps/nbody/default.nix {
       stdenv = pkgs.gcc9Stdenv;
