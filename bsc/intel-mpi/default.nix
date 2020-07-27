@@ -15,7 +15,7 @@ stdenv.mkDerivation rec {
   lib_variant = (if enableDebug then "debug" else "release");
 
   src = builtins.fetchTarball {
-    url = "http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/${dir_nr}/l_mpi_${version}.tgz";
+    url = "http://registrationcenter-download.intel.com/akdlm/IRC_NAS/tec/${dir_nr}/l_mpi_${version}.tgz";
     sha256 = "19l995aavbn5lkiz9sxl6iwmjsrvjgjp14nn0qi1hjqs705db5li";
   };
 
