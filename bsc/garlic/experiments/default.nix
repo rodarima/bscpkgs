@@ -7,6 +7,7 @@
 
 stdenv.mkDerivation {
   name = "garlic-experiments";
+  preferLocalBuild = true;
 
   src = ./.;
 
