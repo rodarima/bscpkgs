@@ -47,7 +47,7 @@ let
             cflags = [ "-march=core-avx2" "-xCORE-AVX2" ];
           }) ++ ( genConfigs {
             cc = [ bsc.clang-ompss2 ];
-            cflags = [ "-march=core-avx2" ];
+            cflags = [ "-march=core-avx2 -Rpass-analysis=loop-vectorize" ];
           }));
       };
     };
