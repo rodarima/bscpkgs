@@ -124,7 +124,7 @@ let
       tampi = tampi;
     };
 
-    gauss-seidel = callPackage ./bsc/apps/gauss-seidel/default.nix {
+    heat = callPackage ./bsc/apps/heat/default.nix {
       stdenv = pkgs.gcc7Stdenv;
       mpi = intel-mpi;
       tampi = tampi;
