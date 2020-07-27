@@ -8,7 +8,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  name = "gauss-seidel";
+  name = "heat";
 
   src = builtins.fetchGit {
     url = "ssh://git@bscpm02.bsc.es/benchmarks/ompss-2/heat-conflict-kevin.git";
