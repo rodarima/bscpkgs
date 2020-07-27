@@ -21,6 +21,11 @@ stdenv.mkDerivation rec {
   isClang = true;
   #isGNU = true;
 
+  passthru = {
+    CC = "clang";
+    CXX = "clang++";
+  };
+
   isClangWithOmpss = true;
 
   buildInputs = [

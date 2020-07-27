@@ -10,6 +10,11 @@ stdenv.mkDerivation rec {
   version = "${year}.${v_a}.${v_b}";
   name = "intel-compiler-${version}";
 
+  passthru = {
+    CC = "icc";
+    CXX = "icpc";
+  };
+
   # From Arch Linux PKGBUILD
   dir_nr="16526";
   year="2020";

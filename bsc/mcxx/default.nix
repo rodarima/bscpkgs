@@ -17,6 +17,11 @@ stdenv.mkDerivation rec {
   #version attribute ignored when using fetchgit:
   #version = "2.2.0-70a299cf";
 
+  passthru = {
+    CC = "mcc";
+    CXX = "mcxx";
+  };
+
   # Use patched Extrae version
   src = fetchgit {
     url = "https://github.com/bsc-pm/mcxx";
