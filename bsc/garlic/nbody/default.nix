@@ -21,7 +21,7 @@ stdenv.mkDerivation {
   ];
 
   preBuild = (if cflags != null then ''
-    makeFlagsArray+=(CFLAGS=${cflags})
+    makeFlagsArray+=(CFLAGS="${cflags}")
   '' else "");
 
   makeFlags = [
