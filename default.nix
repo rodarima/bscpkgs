@@ -38,6 +38,10 @@ let
       enableCxx = true;
     };
 
+    # ParaStation MPI
+    pscom = callPackage ./bsc/parastation/pscom.nix { };
+    psmpi = callPackage ./bsc/parastation/psmpi.nix { };
+
     # Default Intel MPI version is 2019 (the last one)
     impi = intel-mpi;
     intel-mpi = intel-mpi-2019;
