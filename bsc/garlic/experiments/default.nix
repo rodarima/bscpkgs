@@ -31,6 +31,7 @@ stdenv.mkDerivation {
     #!/bin/bash
 
     for app in $out/apps/*; do
+      echo "running \$app"
       \$app/bin/run
     done
     EOF
