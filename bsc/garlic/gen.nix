@@ -23,7 +23,7 @@ let
     genConfigs = (config: lib.foldl mergeConfig [{}] (attrToList config));
 
     # Generate multiple app versions by override with each config
-    genApp = (app: configs: map (conf: app.override conf) configs);
+    genApp = (app: configs: map (conf: app.override conf // {conf=conf;}) configs);
 
     # Generate app version from an array of apps
     genApps = (apps: configs:

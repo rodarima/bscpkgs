@@ -8,7 +8,7 @@ let
   callPackages = pkgs.lib.callPackagesWith (pkgs // bsc // garlic);
 
   # Load some helper functions to generate app variants
-  inherit (import ./gen.nix) genApps genConfigs;
+  inherit (import ./gen.nix) genApps genApp genConfigs;
 
   garlic = rec {
 
@@ -21,6 +21,10 @@ let
       gitBranch = "garlic/seq";
     };
 
+    runner = callPackage ./runner.nix {
+      app = null;
+    };
+
     exp = {
       mpiImpl = callPackage ./experiments {
         apps = genApps [ ppong ] (
@@ -31,12 +35,20 @@ let
       };
 
       nbody = callPackage ./experiments {
-        apps = genApps [ nbody ] (
+        apps = genApp nbody [
+          { cc=bsc.icc;
+            cflags="-march=core-avx2"; }
+          { cc=bsc.clang-ompss2;
+            cflags="-O3 -march=core-avx2 -ffast-math -Rpass-analysis=loop-vectorize"; }
+        ];
+      };
+
+      nbody-blocksize = callPackage ./experiments {
+        apps = genApp nbody (
           genConfigs {
-            cc = [ pkgs.gcc7 pkgs.gcc9 ];
-            gitBranch = [ "garlic/seq" ];
-          }
-        );
+            cc = [ bsc.icc ];
+            blocksize = [ "1024" "2048" ];
+          });
       };
 
       # Test if there is any difference between intel -march and -xCORE
@@ -47,7 +59,7 @@ let
             cflags = [ "-march=core-avx2" "-xCORE-AVX2" ];
           }) ++ ( genConfigs {
             cc = [ bsc.clang-ompss2 ];
-            cflags = [ "-march=core-avx2 -Rpass-analysis=loop-vectorize" ];
+            cflags = [ "-O3 -march=core-avx2 -Rpass-analysis=loop-vectorize" ];
           }));
       };
     };
