@@ -14,16 +14,18 @@ let
 
     mpptest = callPackage ./mpptest { };
 
-    ppong = callPackage ./ppong { };
+    ppong = callPackage ./ppong {
+      mpi = bsc.mpi;
+    };
 
     nbody = callPackage ./nbody {
       cc = pkgs.gcc7;
       gitBranch = "garlic/seq";
     };
 
-    runner = callPackage ./runner.nix {
-      app = null;
-    };
+    srunner = callPackage ./srunner.nix { };
+
+    ppong-job = srunner { app=ppong; };
 
     exp = {
       mpiImpl = callPackage ./experiments {
