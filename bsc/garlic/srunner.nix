@@ -9,7 +9,7 @@
 , binary ? "/bin/run"
 , ntasks ? null
 , exclusive ? true # By default we run in exclusive mode
-, workdir ? "."
+, chdir ? "."
 , qos ? null
 , time ? null
 , output ? "job_%j.out"
@@ -42,14 +42,13 @@ stdenv.mkDerivation rec {
   dontBuild = true;
 
   installPhase = ''
-    mkdir -p $out/bin
-    cat > $out/bin/run <<EOF
+    mkdir -p $out
+    cat > $out/job <<EOF
     #!/bin/bash
     #SBATCH --job-name="${name}"
     ''
     + sbatchOpt "ntasks" ntasks
-    + sbatchOpt "ntasks" ntasks
-    + sbatchOpt "workdir" workdir
+    + sbatchOpt "chdir" chdir
     + sbatchOpt "output" output
     + sbatchOpt "error" error
     + sbatchEnable "exclusive" exclusive
@@ -62,7 +61,5 @@ stdenv.mkDerivation rec {
 
     srun ${app}${binary} ${argv}
     EOF
-
-    chmod +x $out/bin/run
   '';
 }

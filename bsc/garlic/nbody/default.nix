@@ -3,9 +3,9 @@
 , cc
 , cflags ? null
 , gitBranch
-, blocksize ? "2048"
-, particles ? "16384"
-, timesteps ? "10"
+, blocksize ? 2048
+, particles ? 16384
+, timesteps ? 10
 }:
 
 stdenv.mkDerivation {
@@ -26,7 +26,7 @@ stdenv.mkDerivation {
 
   makeFlags = [
     "CC=${cc.cc.CC}"
-    "BS=${blocksize}"
+    "BS=${toString blocksize}"
   ];
 
   installPhase = ''
@@ -35,7 +35,7 @@ stdenv.mkDerivation {
 
     cat > $out/bin/run <<EOF
     #!/bin/bash
-    exec $out/bin/nbody -p ${particles} -t ${timesteps}
+    exec $out/bin/nbody -p ${toString particles} -t ${toString timesteps}
     EOF
 
     chmod +x $out/bin/run

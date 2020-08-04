@@ -28,6 +28,7 @@ let
     ppong-job = srunner { app=ppong; };
 
     exp = {
+
       jobs = callPackage ./experiments {
         apps = map (app: srunner {app=app;}) (
           genApps [ ppong ] (
@@ -46,7 +47,7 @@ let
         );
       };
 
-      nbody = callPackage ./experiments {
+      nbodyExp = callPackage ./experiments {
         apps = genApp nbody [
           { cc=bsc.icc;
             cflags="-march=core-avx2"; }
@@ -55,13 +56,25 @@ let
         ];
       };
 
-      nbody-blocksize = callPackage ./experiments {
+      nbodyBS = callPackage ./experiments {
         apps = genApp nbody (
           genConfigs {
             cc = [ bsc.icc ];
-            blocksize = [ "1024" "2048" ];
+            blocksize = [ 1024 2048 4096 ];
           });
       };
+
+      nbodyBSjob = callPackage ./dispatcher.nix {
+        jobs = map (app: srunner {app=app;}) (
+          genApp nbody (
+            genConfigs {
+              cc = [ bsc.icc ];
+              blocksize = [ 1024 2048 4096 ];
+            }
+          )
+        );
+      };
+
 
       # Test if there is any difference between intel -march and -xCORE
       # with target avx2.
