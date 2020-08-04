@@ -1,5 +1,6 @@
 {
   stdenv
+, numactl
 }:
 
 {
@@ -41,7 +42,8 @@ stdenv.mkDerivation rec {
   dontBuild = true;
 
   installPhase = ''
-    cat > $out <<EOF
+    mkdir -p $out/bin
+    cat > $out/bin/run <<EOF
     #!/bin/bash
     #SBATCH --job-name="${name}"
     ''
@@ -56,13 +58,11 @@ stdenv.mkDerivation rec {
     + optionalString (extra!=null) extra
     +''
     
-    numactl -s
+    ${numactl}/bin/numactl -s
 
-    #!/bin/bash
-    exec ${app}${binary} ${argv}
-    done
+    srun ${app}${binary} ${argv}
     EOF
 
-    chmod +x $out
+    chmod +x $out/bin/run
   '';
 }

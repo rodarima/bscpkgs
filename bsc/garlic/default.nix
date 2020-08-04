@@ -28,6 +28,16 @@ let
     ppong-job = srunner { app=ppong; };
 
     exp = {
+      jobs = callPackage ./experiments {
+        apps = map (app: srunner {app=app;}) (
+          genApps [ ppong ] (
+            genConfigs {
+              mpi = [ bsc.intel-mpi pkgs.mpich pkgs.openmpi ];
+            }
+          )
+        );
+      };
+
       mpiImpl = callPackage ./experiments {
         apps = genApps [ ppong ] (
           genConfigs {
