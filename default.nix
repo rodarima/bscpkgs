@@ -66,6 +66,8 @@ let
     intel-license = callPackage bsc/intel-compiler/license.nix {
     };
 
+    slurm17 = callPackage ./bsc/slurm/default.nix { };
+
     fftw = callPackage ./bsc/fftw/default.nix {
       mpi = mpi;
     };
