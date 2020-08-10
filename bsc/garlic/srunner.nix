@@ -5,6 +5,7 @@
 
 {
   app
+, prefix ? ""
 , argv ? ""
 , binary ? "/bin/run"
 , ntasks ? null
@@ -55,11 +56,9 @@ stdenv.mkDerivation rec {
     + sbatchOpt "time" time
     + sbatchOpt "qos" qos
     + optionalString (extra!=null) extra
-    +''
-    
-    ${numactl}/bin/numactl -s
-
-    srun ${app}${binary} ${argv}
+    +
+    ''
+    srun ${prefix}${app}${binary} ${argv}
     EOF
   '';
 }

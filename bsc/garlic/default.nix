@@ -65,7 +65,13 @@ let
       };
 
       nbodyBSjob = callPackage ./dispatcher.nix {
-        jobs = map (app: srunner {app=app;}) (
+        jobs = map (app: srunner {
+            app=app;
+            prefix="/gpfs/projects/bsc15/nix";
+            exclusive=false;
+            ntasks = "1";
+          }
+        ) (
           genApp nbody (
             genConfigs {
               cc = [ bsc.icc ];

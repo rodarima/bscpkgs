@@ -19,7 +19,7 @@ stdenv.mkDerivation {
 
     mkdir -p $out/bin
     cat > $out/bin/execute-all-jobs <<EOF
-    #!/bin/bash
+    #!/bin/sh
 
     for j in $out/jobs/*; do
       echo "sbatch \$j"
