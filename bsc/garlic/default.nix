@@ -24,7 +24,7 @@ let
     };
 
     sbatch = callPackage ./sbatch.nix { };
-    sbatchLauncher = callPackage ./sbatch-launcher.nix { };
+    launcher = callPackage ./launcher.nix { };
 
     exp = {
       nbody = {

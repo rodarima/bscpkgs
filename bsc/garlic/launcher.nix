@@ -2,29 +2,29 @@
   stdenv
 }:
 
-jobs:
+apps:
 
 stdenv.mkDerivation {
   name = "launcher";
   preferLocalBuild = true;
 
-  buildInputs = [] ++ jobs;
-  jobs = jobs;
+  buildInputs = [] ++ apps;
+  apps = apps;
   phases = [ "installPhase" ];
+  dontPatchShebangs = true;
 
   installPhase = ''
-    mkdir -p $out/jobs
-    for j in $jobs; do
-      ln -s $j/job $out/jobs/$(basename $j)
+    mkdir -p $out/apps
+    for j in $apps; do
+      ln -s $j $out/apps/$(basename $j)
     done
 
     mkdir -p $out/bin
     cat > $out/bin/run <<EOF
     #!/bin/sh
 
-    for j in $out/jobs/*; do
-      echo "sbatch \$j"
-      sbatch \$j
+    for j in $out/apps/*; do
+      \$j/bin/run
     done
     EOF
 

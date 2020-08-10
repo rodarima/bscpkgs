@@ -4,7 +4,7 @@
 , genApp
 , genConfigs
 , sbatch
-, sbatchLauncher
+, launcher
 }:
 
 let
@@ -23,16 +23,17 @@ let
   genJobs = map (app:
     sbatch {
       app = app;
-      prefix = "/gpfs/projects/bsc15/nix";
+      nixPrefix = "/gpfs/projects/bsc15/nix";
       exclusive = false;
       ntasks = "1";
+      chdirPrefix = "/home/bsc15/bsc15557/bsc-nixpkgs/out";
     }
   );
 
   # Generate one job for each app variant
   jobList = genJobs appList;
 
-  # And merge all jobs in a script to lauch them all with sbatch
-  launcher = sbatchLauncher jobList;
+  # And execute them all
+  main = launcher jobList;
 in
-  launcher
+  main

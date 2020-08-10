@@ -5,12 +5,12 @@
 
 {
   app
-, prefix ? ""
+, chdirPrefix
+, nixPrefix ? ""
 , argv ? ""
 , binary ? "/bin/run"
 , ntasks ? null
 , exclusive ? true # By default we run in exclusive mode
-, chdir ? "."
 , qos ? null
 , time ? null
 , output ? "job_%j.out"
@@ -41,15 +41,16 @@ stdenv.mkDerivation rec {
   #SBATCH --ntasks-per-socket=24
   #SBATCH --cpus-per-task=1
   dontBuild = true;
+  dontPatchShebangs = true;
 
   installPhase = ''
     mkdir -p $out
     cat > $out/job <<EOF
-    #!/bin/bash
+    #!/bin/sh
     #SBATCH --job-name="${name}"
     ''
     + sbatchOpt "ntasks" ntasks
-    + sbatchOpt "chdir" chdir
+    + sbatchOpt "chdir" "${chdirPrefix}/$(basename $out)"
     + sbatchOpt "output" output
     + sbatchOpt "error" error
     + sbatchEnable "exclusive" exclusive
@@ -58,7 +59,20 @@ stdenv.mkDerivation rec {
     + optionalString (extra!=null) extra
     +
     ''
-    srun ${prefix}${app}${binary} ${argv}
+    srun ${nixPrefix}${app}${binary} ${argv}
     EOF
+    
+    mkdir -p $out/bin
+    cat > $out/bin/run <<EOF
+    #!/bin/sh
+    if [ -e "${chdirPrefix}/$(basename $out)" ]; then
+      >&2 echo "Execution aborted: '${chdirPrefix}/$(basename $out)' already exists"
+      exit 1
+    fi
+    mkdir -p "${chdirPrefix}/$(basename $out)"
+    echo sbatch ${nixPrefix}$out/job
+    sbatch ${nixPrefix}$out/job
+    EOF
+    chmod +x $out/bin/run
   '';
 }
