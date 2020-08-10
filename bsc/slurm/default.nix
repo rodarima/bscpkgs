@@ -2,6 +2,7 @@
 , python, munge, perl, pam, openssl
 , ncurses, libmysqlclient, gtk2, lua, hwloc, numactl
 , readline, freeipmi, libssh2, xorg
+, pmix
 # enable internal X11 support via libssh2
 , enableX11 ? true
 }:
@@ -37,6 +38,7 @@ stdenv.mkDerivation rec {
     curl python munge perl pam openssl
       libmysqlclient ncurses gtk2
       lua hwloc numactl readline freeipmi
+      pmix
   ] ++ stdenv.lib.optionals enableX11 [ libssh2 xorg.xauth ];
 
   configureFlags = with stdenv.lib;
@@ -45,6 +47,7 @@ stdenv.mkDerivation rec {
       "--with-hwloc=${hwloc.dev}"
       "--with-freeipmi=${freeipmi}"
       "--sysconfdir=/etc/slurm"
+      "--with-pmix=${pmix}"
     ] ++ (optional (gtk2 == null)  "--disable-gtktest")
       ++ (optional enableX11 "--with-libssh2=${libssh2.dev}");
 
@@ -52,6 +55,7 @@ stdenv.mkDerivation rec {
   preConfigure = ''
     patchShebangs ./doc/html/shtml2html.py
     patchShebangs ./doc/man/man2html.py
+    patchShebangs ./configure
   '';
 
   postInstall = ''
