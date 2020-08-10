@@ -1,10 +1,11 @@
 {
   stdenv
-, jobs
 }:
 
+jobs:
+
 stdenv.mkDerivation {
-  name = "slurm-dispatcher";
+  name = "launcher";
   preferLocalBuild = true;
 
   buildInputs = [] ++ jobs;
@@ -18,7 +19,7 @@ stdenv.mkDerivation {
     done
 
     mkdir -p $out/bin
-    cat > $out/bin/execute-all-jobs <<EOF
+    cat > $out/bin/run <<EOF
     #!/bin/sh
 
     for j in $out/jobs/*; do
@@ -27,6 +28,6 @@ stdenv.mkDerivation {
     done
     EOF
 
-    chmod +x $out/bin/execute-all-jobs
+    chmod +x $out/bin/run
   '';
 }
