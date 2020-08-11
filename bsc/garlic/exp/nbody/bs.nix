@@ -5,6 +5,8 @@
 , genConfigs
 , sbatch
 , launcher
+, control
+, nixsetup
 }:
 
 let
@@ -22,7 +24,7 @@ let
   # Job generator helper function
   genJobs = map (app:
     sbatch {
-      app = app;
+      app = (nixsetup (control app));
       nixPrefix = "/gpfs/projects/bsc15/nix";
       exclusive = false;
       ntasks = "1";

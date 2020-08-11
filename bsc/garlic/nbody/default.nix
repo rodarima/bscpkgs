@@ -38,16 +38,6 @@ stdenv.mkDerivation {
     cat > $out/bin/run <<EOF
     #!/bin/sh
 
-    # We need to enter the nix namespace first, in order to have /nix
-    # available, so we use this hack:
-    if [ ! -e /nix ]; then
-      echo "running nix-setup \$0"
-      exec nix-setup \$0
-    fi
-
-    ls -l /nix
-    pwd
-
     exec $out/bin/nbody -p ${toString particles} -t ${toString timesteps}
     EOF
 

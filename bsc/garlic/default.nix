@@ -25,6 +25,8 @@ let
 
     sbatch = callPackage ./sbatch.nix { };
     launcher = callPackage ./launcher.nix { };
+    control = callPackage ./control.nix { };
+    nixsetup = callPackage ./nix-setup.nix { };
 
     exp = {
       nbody = {
