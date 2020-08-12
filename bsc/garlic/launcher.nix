@@ -2,7 +2,7 @@
   stdenv
 }:
 
-apps:
+apps: # Each app must be unique
 
 stdenv.mkDerivation {
   name = "launcher";
@@ -16,7 +16,16 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/apps
     for j in $apps; do
-      ln -s $j $out/apps/$(basename $j)
+      target=$out/apps/$(basename $j)
+      if [ -e $target ]; then
+        echo "Duplicated app: $j"
+        echo
+        echo "Provided apps: "
+        printf "%s\n" $apps
+        echo
+        exit 1
+      fi
+      ln -s $j $target
     done
 
     mkdir -p $out/bin

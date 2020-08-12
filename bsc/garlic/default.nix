@@ -23,10 +23,11 @@ let
       gitBranch = "garlic/seq";
     };
 
-    sbatch = callPackage ./sbatch.nix { };
-    launcher = callPackage ./launcher.nix { };
-    control = callPackage ./control.nix { };
-    nixsetup = callPackage ./nix-setup.nix { };
+    sbatchWrapper = callPackage ./sbatch.nix { };
+    launcherWrapper = callPackage ./launcher.nix { };
+    controlWrapper = callPackage ./control.nix { };
+    nixsetupWrapper = callPackage ./nix-setup.nix { };
+    argvWrapper = callPackage ./argv.nix { };
 
     exp = {
       nbody = {
