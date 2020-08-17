@@ -1,5 +1,5 @@
---- a/opt/intel/compilers_and_libraries_2020.1.217/linux/mpi/intel64/bin/mpicxx	2020-06-30 14:26:14.619723932 +0200
-+++ b/opt/intel/compilers_and_libraries_2020.1.217/linux/mpi/intel64/bin/mpicxx	2020-06-30 14:27:56.644687134 +0200
+--- a/opt/intel/compilers_and_libraries_2020.2.254/linux/mpi/intel64/bin/mpicxx	2020-06-30 14:26:14.619723932 +0200
++++ b/opt/intel/compilers_and_libraries_2020.2.254/linux/mpi/intel64/bin/mpicxx	2020-06-30 14:27:56.644687134 +0200
 @@ -49,9 +49,9 @@
  
  if [ x"$opt_args" == x"" ]; then

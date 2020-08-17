@@ -1,5 +1,5 @@
---- a/opt/intel/compilers_and_libraries_2020.1.217/linux/mpi/intel64/bin/mpicc	2020-06-30 14:22:04.510566478 +0200
-+++ b/opt/intel/compilers_and_libraries_2020.1.217/linux/mpi/intel64/bin/mpicc	2020-06-30 14:24:58.250998988 +0200
+--- a/opt/intel/compilers_and_libraries_2020.2.254/linux/mpi/intel64/bin/mpicc	2020-06-30 14:22:04.510566478 +0200
++++ b/opt/intel/compilers_and_libraries_2020.2.254/linux/mpi/intel64/bin/mpicc	2020-06-30 14:24:58.250998988 +0200
 @@ -50,7 +50,7 @@
  if [ x"$opt_args" == x"" ]; then
      case "${compiler_short_name}" in
