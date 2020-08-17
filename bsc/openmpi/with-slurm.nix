@@ -1,6 +1,6 @@
 { stdenv, fetchurl, fetchpatch, gfortran, perl, libnl
 , rdma-core, zlib, numactl, libevent, hwloc, targetPackages, symlinkJoin
-, libpsm2, libfabric, pmix, pmi2, ucx
+, libpsm2, libfabric
 
 # Enable CUDA support
 , cudaSupport ? false, cudatoolkit ? null
@@ -17,12 +17,14 @@
 # Enable mpi_cxx.so
 , enableCxx ? false
 
+, slurm
+
 }:
 
 assert !cudaSupport || cudatoolkit != null;
 
 let
-  version = "4.0.4";
+  version = "4.0.3";
 
   cudatoolkit_joined = symlinkJoin {
     name = "${cudatoolkit.name}-unsplit";
@@ -34,7 +36,7 @@ in stdenv.mkDerivation rec {
 
   src = with stdenv.lib.versions; fetchurl {
     url = "https://www.open-mpi.org/software/ompi/v${major version}.${minor version}/downloads/${pname}-${version}.tar.bz2";
-    sha256 = "1i0slg2dxjdgw513aml1n9dsbdxn2fimi2b5712d5r9z4ar4xqj7";
+    sha256 = "00zxcw99gr5n693cmcmn4f6a47vx1ywna895p0x7p163v37gw0hl";
   };
 
   postPatch = ''
@@ -49,22 +51,18 @@ in stdenv.mkDerivation rec {
   '';
 
   buildInputs = with stdenv; [ gfortran zlib ]
-    ++ lib.optionals isLinux [ libnl numactl pmix ucx ]
+    ++ lib.optionals isLinux [ libnl numactl ]
     ++ lib.optionals cudaSupport [ cudatoolkit ]
     ++ [ libevent hwloc ]
     ++ lib.optional (isLinux || isFreeBSD) rdma-core
-    ++ lib.optional fabricSupport [ libpsm2 libfabric ];
+    ++ lib.optional fabricSupport [ libpsm2 libfabric ]
+    ++ [ slurm ];
 
   nativeBuildInputs = [ perl ];
 
   configureFlags = with stdenv; lib.optional (!cudaSupport) "--disable-mca-dso"
-    ++ lib.optionals isLinux  [
-      "--with-libnl=${libnl.dev}"
-      "--with-pmix=${pmix}"
-      "--with-pmix-libdir=${pmix}/lib"
-      "--with-pmi=${pmi2}"
-      "--with-pmi-libdir=${pmi2}/lib"
-    ] ++ lib.optional enableSGE "--with-sge"
+    ++ lib.optional isLinux  "--with-libnl=${libnl.dev}"
+    ++ lib.optional enableSGE "--with-sge"
     ++ lib.optional enablePrefix "--enable-mpirun-prefix-by-default"
     # TODO: add UCX support, which is recommended to use with cuda for the most robust OpenMPI build
     # https://github.com/openucx/ucx
@@ -72,6 +70,7 @@ in stdenv.mkDerivation rec {
     ++ lib.optionals cudaSupport [ "--with-cuda=${cudatoolkit_joined}" "--enable-dlopen" ]
     ++ lib.optionals fabricSupport [ "--with-psm2=${libpsm2}" "--with-libfabric=${libfabric}" ]
     ++ lib.optional enableCxx "--enable-mpi-cxx"
+    ++ [ "--with-slurm=${slurm}" "--with-pmi" "--enable-static" "--disable-dlopen" ]
     ;
 
   enableParallelBuilding = true;

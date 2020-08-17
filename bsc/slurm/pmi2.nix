@@ -8,7 +8,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  name = "slurm-${version}";
+  name = "slurm-libpmi2-${version}";
   version = "17.11.9-2";
 
   # N.B. We use github release tags instead of https://www.schedmd.com/downloads.php
@@ -21,7 +21,7 @@ stdenv.mkDerivation rec {
     sha256 = "1lq4ac6yjai6wh979dciw8v3d99zbd3w36rfh0vpncqm672fg1qy";
   };
 
-  outputs = [ "out" "dev" ];
+  outputs = [ "out" ];
 
   prePatch = stdenv.lib.optional enableX11 ''
     substituteInPlace src/common/x11_util.c \
@@ -58,11 +58,13 @@ stdenv.mkDerivation rec {
     patchShebangs ./configure
   '';
 
-#  postBuild = ''
-#    pushd contrib/pmi2
-#      make -j install
-#    popd
-#  '';
+  preBuild = ''cd contribs/pmi2'';
+
+  #buildPhase = ''
+  #  pushd contrib/pmi2
+  #    make -j install SHELL=${SHELL}
+  #  popd
+  #'';
 
   postInstall = ''
     rm -f $out/lib/*.la $out/lib/slurm/*.la

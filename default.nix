@@ -33,11 +33,6 @@ let
     #  BSC Packages
     # --------------------------------------------------------- #
 
-    # Custom OpenMPI with mpi_cxx enabled for TAMPI
-    openmpi = callPackage ./bsc/openmpi/default.nix {
-      enableCxx = true;
-    };
-
     # ParaStation MPI
     pscom = callPackage ./bsc/parastation/pscom.nix { };
     psmpi = callPackage ./bsc/parastation/psmpi.nix { };
@@ -66,7 +61,23 @@ let
     intel-license = callPackage bsc/intel-compiler/license.nix {
     };
 
-    slurm17 = callPackage ./bsc/slurm/default.nix { };
+    pmix2 = callPackage ./bsc/pmix/pmix2.nix { };
+
+    slurm17 = callPackage ./bsc/slurm/default.nix {
+      pmix = pmix2;
+    };
+
+    slurm17-libpmi2 = callPackage ./bsc/slurm/pmi2.nix {
+      pmix = pmix2;
+    };
+
+    openmpi-mn4 = callPackage ./bsc/openmpi/default.nix {
+      pmix = pmix2;
+      pmi2 = slurm17-libpmi2;
+      enableCxx = true;
+    };
+
+    openmpi = openmpi-mn4;
 
     fftw = callPackage ./bsc/fftw/default.nix {
       mpi = mpi;
