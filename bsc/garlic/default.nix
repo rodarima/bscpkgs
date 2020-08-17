@@ -11,6 +11,7 @@ let
 
     # Load some helper functions to generate app variants
     inherit (import ./gen.nix) genApps genApp genConfigs;
+    inherit bsc;
 
     mpptest = callPackage ./mpptest { };
 
@@ -24,16 +25,16 @@ let
     };
 
     sbatchWrapper = callPackage ./sbatch.nix { };
-    launcherWrapper = callPackage ./launcher.nix { };
+    srunWrapper = callPackage ./srun.nix { };
+    launchWrapper = callPackage ./launcher.nix { };
     controlWrapper = callPackage ./control.nix { };
     nixsetupWrapper = callPackage ./nix-setup.nix { };
     argvWrapper = callPackage ./argv.nix { };
 
     exp = {
       nbody = {
-        bs = callPackage ./exp/nbody/bs.nix {
-          inherit bsc;
-        };
+        bs = callPackage ./exp/nbody/bs.nix { };
+        mpi = callPackage ./exp/nbody/mpi.nix { };
       };
     };
   };

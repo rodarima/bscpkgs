@@ -10,6 +10,7 @@
 , argv ? ""
 , binary ? "/bin/run"
 , ntasks ? null
+, nodes ? null
 , exclusive ? true # By default we run in exclusive mode
 , qos ? null
 , time ? null
@@ -50,6 +51,7 @@ stdenv.mkDerivation rec {
     #SBATCH --job-name="${name}"
     ''
     + sbatchOpt "ntasks" ntasks
+    + sbatchOpt "nodes" nodes
     + sbatchOpt "chdir" "${chdirPrefix}/$(basename $out)"
     + sbatchOpt "output" output
     + sbatchOpt "error" error
@@ -59,7 +61,7 @@ stdenv.mkDerivation rec {
     + optionalString (extra!=null) extra
     +
     ''
-    srun ${nixPrefix}${app}${binary} ${argv}
+    exec ${nixPrefix}${app}${binary} ${argv}
     EOF
     
     mkdir -p $out/bin
