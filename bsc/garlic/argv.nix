@@ -7,6 +7,7 @@
   app
 , env ? ""
 , argv # bash array as string, example: argv=''(-f "file with spaces" -t 10)''
+, program ? "bin/run"
 }:
 
 stdenv.mkDerivation {
@@ -23,7 +24,7 @@ stdenv.mkDerivation {
     ${env}
 
     argv=${argv}
-    exec ${app}/bin/run \''${argv[@]}
+    exec ${app}/${program} \''${argv[@]}
     EOF
     chmod +x $out/bin/run
   '';

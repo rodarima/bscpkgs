@@ -10,6 +10,7 @@
 , argv ? ""
 , binary ? "/bin/run"
 , ntasks ? null
+, ntasksPerNode ? null
 , nodes ? null
 , exclusive ? true # By default we run in exclusive mode
 , qos ? null
@@ -51,6 +52,7 @@ stdenv.mkDerivation rec {
     #SBATCH --job-name="${name}"
     ''
     + sbatchOpt "ntasks" ntasks
+    + sbatchOpt "ntasks-per-node" ntasksPerNode
     + sbatchOpt "nodes" nodes
     + sbatchOpt "chdir" "${chdirPrefix}/$(basename $out)"
     + sbatchOpt "output" output

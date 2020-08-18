@@ -9,9 +9,8 @@ let
   self.bsc = rec {
 
     # Load the default implementation
-    #mpi = pkgs.mpich;
-    #mpi = pkgs.openmpi;
-    #mpi = openmpi; # Our OpenMPI variant
+    #mpi = mpich;
+    #mpi = openmpi;
     mpi = intel-mpi;
 
     # Load the default compiler
@@ -36,6 +35,10 @@ let
     # ParaStation MPI
     pscom = callPackage ./bsc/parastation/pscom.nix { };
     psmpi = callPackage ./bsc/parastation/psmpi.nix { };
+
+    osumb = callPackage ./bsc/osu/default.nix { };
+
+    mpich = pkgs.mpich;
 
     # Default Intel MPI version is 2019 (the last one)
     impi = intel-mpi;

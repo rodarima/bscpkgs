@@ -1,6 +1,5 @@
 {
   bsc
-, nbody
 , genApp
 , genConfigs
 
@@ -16,22 +15,14 @@
 let
   # Set the configuration for the experiment
   config = {
-    cc = [ bsc.icc ];
-    blocksize = [ 2048 ];
     mpi = [ bsc.impi bsc.openmpi bsc.mpich ];
   };
 
   extraConfig = {
-    particles = 32*1024;
-    timesteps = 10;
-    ntasksPerNode = 2;
-    nodes = 1;
+    ntasksPerNode = 1;
+    nodes = 2;
     time = "00:10:00";
     qos = "debug";
-    #mpi = bsc.impi;
-    #mpi = bsc.openmpi;
-    gitBranch = "garlic/mpi+send";
-    gitURL = "ssh://git@bscpm02.bsc.es/garlic/apps/nbody.git";
   };
 
   # Compute the cartesian product of all configurations
@@ -53,31 +44,22 @@ let
     nixPrefix = "/gpfs/projects/bsc15/nix";
   };
 
-  argv = conf: app:
-    with conf;
+  argv = app:
     argvWrapper {
       app = app;
-      argv = ''(-t ${toString timesteps} -p ${toString particles})'';
+      program = "bin/osu_latency";
+      argv = "()";
       env = ''
         export I_MPI_THREAD_SPLIT=1
       '';
     };
 
-  nbodyFn = conf:
+  osumbFn = conf:
     with conf;
-    nbody.override { inherit cc mpi blocksize gitBranch gitURL; };
+    bsc.osumb.override { inherit mpi; };
 
-  pipeline = conf:
-    sbatch conf (
-      srun (
-        nixsetupWrapper (
-          argv conf (
-            nbodyFn conf
-          )
-        )
-      )
-    )
-    ;
+  pipeline = conf: srun (nixsetupWrapper (argv (osumbFn conf)));
+  #pipeline = conf: sbatch conf (srun (nixsetupWrapper (argv bsc.osumb)));
 
   # Ideally it should look like this:
   #pipeline = sbatch nixsetup control argv nbodyFn;
