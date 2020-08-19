@@ -4,6 +4,7 @@ let
   inherit (pkgs.lib) callPackageWith;
   inherit (pkgs.lib) callPackagesWith;
   callPackage = callPackageWith (pkgs // self.bsc);
+  callPackageStatic = callPackageWith (pkgs.pkgsStatic);
   callPackages = callPackagesWith (pkgs // self.bsc);
 
   self.bsc = rec {
@@ -193,6 +194,14 @@ let
       nix
       nixUnstable
       nixFlakes;
+
+    nixStatic = (callPackageStatic ./bsc/nix/static.nix {
+        callPackage = callPackageWith (pkgs.pkgsStatic);
+        storeDir = "/nix/store";
+        stateDir = "/nix/var";
+        sandbox-shell = "/bin/sh";
+        boehmgc = pkgs.pkgsStatic.boehmgc.override { enableLargeConfig = true; };
+        }).nix;
 
     test = {
       chroot = callPackage ./test/chroot.nix { };
