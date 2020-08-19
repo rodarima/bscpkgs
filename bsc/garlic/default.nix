@@ -36,8 +36,12 @@ let
         bs = callPackage ./exp/nbody/bs.nix { };
         mpi = callPackage ./exp/nbody/mpi.nix { };
       };
-      osu = {
-        latency = callPackage ./exp/osu/latency.nix { };
+      osu = rec {
+        latency-internode = callPackage ./exp/osu/latency.nix { };
+        latency-intranode = callPackage ./exp/osu/latency.nix {
+          interNode = false;
+        };
+        latency = latency-internode;
       };
     };
   };

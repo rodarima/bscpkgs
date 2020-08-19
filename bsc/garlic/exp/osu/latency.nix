@@ -10,6 +10,12 @@
 , argvWrapper
 , controlWrapper
 , nixsetupWrapper
+
+# Should we test the network (true) or the shared memory (false)?
+, interNode ? true
+
+# Enable multiple threads?
+, multiThread ? false
 }:
 
 let
@@ -19,8 +25,8 @@ let
   };
 
   extraConfig = {
-    ntasksPerNode = 1;
-    nodes = 2;
+    nodes = if interNode then 2 else 1;
+    ntasksPerNode = if interNode then 1 else 2;
     time = "00:10:00";
     qos = "debug";
   };
@@ -31,7 +37,7 @@ let
   sbatch = conf: app: sbatchWrapper {
     app = app;
     nixPrefix = "/gpfs/projects/bsc15/nix";
-    exclusive = false;
+    exclusive = true;
     ntasksPerNode = "${toString conf.ntasksPerNode}";
     nodes = "${toString conf.nodes}";
     time = conf.time;
@@ -58,7 +64,7 @@ let
     with conf;
     bsc.osumb.override { inherit mpi; };
 
-  pipeline = conf: srun (nixsetupWrapper (argv (osumbFn conf)));
+  pipeline = conf: sbatch conf (srun (nixsetupWrapper (argv (osumbFn conf))));
   #pipeline = conf: sbatch conf (srun (nixsetupWrapper (argv bsc.osumb)));
 
   # Ideally it should look like this:
