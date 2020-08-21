@@ -9,6 +9,9 @@ let
 
   self.bsc = rec {
 
+    nixpkgs = pkgs;
+
+
     # Load the default implementation
     #mpi = mpich;
     #mpi = openmpi;
@@ -194,6 +197,8 @@ let
       nix
       nixUnstable
       nixFlakes;
+
+    clsync = callPackage ./bsc/clsync/default.nix { };
 
     nixStatic = (callPackageStatic ./bsc/nix/static.nix {
         callPackage = callPackageWith (pkgs.pkgsStatic);
