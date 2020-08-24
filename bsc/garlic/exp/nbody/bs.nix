@@ -37,7 +37,6 @@ let
     nixPrefix = "/gpfs/projects/bsc15/nix";
     exclusive = false;
     ntasks = "${toString conf.ntasks}";
-    chdirPrefix = "/home/bsc15/bsc15557/bsc-nixpkgs/out";
   };
 
   srun = app: srunWrapper {

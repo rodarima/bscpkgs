@@ -5,7 +5,7 @@
 
 {
   app
-, chdirPrefix
+, chdirPrefix ? "."
 , nixPrefix ? ""
 , argv ? ""
 , binary ? "/bin/run"
