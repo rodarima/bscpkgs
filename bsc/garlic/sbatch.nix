@@ -5,7 +5,7 @@
 
 {
   app
-, chdirPrefix
+, chdirPrefix ? "."
 , nixPrefix ? ""
 , argv ? ""
 , binary ? "/bin/run"
@@ -14,6 +14,7 @@
 , nodes ? null
 , exclusive ? true # By default we run in exclusive mode
 , qos ? null
+, reservation ? null
 , time ? null
 , output ? "job_%j.out"
 , error ? "job_%j.err"
@@ -60,6 +61,7 @@ stdenv.mkDerivation rec {
     + sbatchEnable "exclusive" exclusive
     + sbatchOpt "time" time
     + sbatchOpt "qos" qos
+    + sbatchOpt "reservation" reservation
     + optionalString (extra!=null) extra
     +
     ''
