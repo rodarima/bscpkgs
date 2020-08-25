@@ -18,7 +18,6 @@ stdenv.mkDerivation {
     # We need to enter the nix namespace first, in order to have /nix
     # available, so we use this hack:
     if [ ! -e /nix ]; then
-      >&2 echo "running nix-setup \$0"
       exec nix-setup \$0
     fi
 
