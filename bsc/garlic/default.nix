@@ -20,7 +20,8 @@ let
     };
 
     nbody = callPackage ./nbody {
-      cc = pkgs.gcc7;
+      cc = bsc.icc;
+      mpi = bsc.impi;
       gitBranch = "garlic/seq";
     };
 
