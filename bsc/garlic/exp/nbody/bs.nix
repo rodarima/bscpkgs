@@ -17,14 +17,18 @@ let
   # Set the configuration for the experiment
   config = {
     cc = [ bsc.icc ];
-    blocksize = [ 1024 2048 4096 8192 ];
+    blocksize = [ 1024 ];
   };
 
   extraConfig = {
-    particles = 16384;
+    gitBranch = "garlic/mpi+send";
+    mpi = bsc.impi;
+    particles = 1024*128;
     timesteps = 10;
-    ntasks = 1;
-    nnodes = 1;
+    ntasksPerNode = "48";
+    nodes = "1";
+    time = "02:00:00";
+    qos = "debug";
   };
 
   # Compute the cartesian product of all configurations
@@ -32,11 +36,11 @@ let
   filteredConfigs = with builtins; filter (c: c.blocksize <= 4096) allConfigs;
   configs = map (conf: conf // extraConfig) filteredConfigs;
 
-  sbatch = conf: app: sbatchWrapper {
+  sbatch = conf: app: with conf; sbatchWrapper {
     app = app;
     nixPrefix = "/gpfs/projects/bsc15/nix";
-    exclusive = false;
-    ntasks = "${toString conf.ntasks}";
+    exclusive = true;
+    inherit ntasksPerNode nodes time qos;
   };
 
   srun = app: srunWrapper {
@@ -48,20 +52,25 @@ let
     with conf;
     argvWrapper {
       app = app;
+      env = ''
+        set -e
+        export I_MPI_THREAD_SPLIT=1
+      '';
       argv = ''(-t ${toString timesteps} -p ${toString particles})'';
     };
 
   nbodyFn = conf:
     with conf;
-    nbody.override { inherit cc blocksize; };
+    nbody.override { inherit cc mpi blocksize gitBranch; };
 
   pipeline = conf:
     sbatch conf (
-      srun (
-        nixsetupWrapper (
-          controlWrapper (
-            argv conf (
-              nbodyFn conf)))));
+      nixsetupWrapper (
+        controlWrapper (
+          srun (
+            nixsetupWrapper (
+              argv conf (
+                nbodyFn conf))))));
 
   # Ideally it should look like this:
   #pipeline = sbatch nixsetup control argv nbodyFn;
