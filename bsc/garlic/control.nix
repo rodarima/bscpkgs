@@ -14,6 +14,7 @@ stdenv.mkDerivation {
     mkdir -p $out/bin
     cat > $out/bin/run <<EOF
     #!/bin/sh
+    set -e
     for n in {1..30}; do
       $program/bin/run
     done
