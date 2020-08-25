@@ -383,4 +383,40 @@
 
     https://nixos.org/nixos/nix-pills/
 
+2.4 Debugging the build process
+
+  It may happen that the build process fails in an unexpected way. Most 
+  problems are related to missing dependencies and can be easily found 
+  by looking at the error messages.
+
+  Other build problems are more subtle and require more debugging time.  
+  One way of inspecting a build problem is by adding the breakpointHook 
+  hook to the nativeBuildInputs array in a nix derivation (see
+  https://nixos.org/nixpkgs/manual/#ssec-setup-hooks for more info), 
+  which will stop the build process and allow a shell to be attached to 
+  the sandbox.
+
+    xeon07$ nix-build -A bsc.nbody
+    ...
+    /nix/store/gvqm2yc9xx4vh3nglgckz8siya66jnkx-stdenv-linux/setup: line 
+    83: fake-missing-command: command not found
+    build failed in buildPhase with exit code 127
+    To attach install cntr and run the following command as root:
+
+      cntr attach -t command \
+        cntr-/nix/store/sk2nsj7xfr62cjk6m3725ydfyswqz7n1-nbody
+
+  The command must run as root user, so you can use `sudo -i` to run it, 
+  (the -i option is required to load the shell profile which provides 
+  the nix path containing the cntr tool):
+
+    xeon$ sudo -i cntr attach -t command \
+      cntr-/nix/store/sk2nsj7xfr62cjk6m3725ydfyswqz7n1-nbody
+    nixbld@localhost:/var/lib/cntr> ls
+    bin  build  dev  etc  nix  proc  tmp  var
+
+  Then you can inspect the build environment to see why the build 
+  failed. Source the build/env-vars file to get the same environment 
+  variables (which include the $PATH) of the build process.
+
 /* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
