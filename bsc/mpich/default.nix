@@ -1,12 +1,15 @@
 {
-  stdenv,
-  fetchurl,
-  perl,
-  gfortran,
-  openssh,
-  hwloc,
-  libfabric
+  stdenv
+, fetchurl
+, perl
+, gfortran
+, openssh
+, hwloc
+, libfabric
+, enableDebug ? false
 }:
+
+with stdenv.lib;
 
 stdenv.mkDerivation  rec {
   pname = "mpich";
@@ -22,7 +25,8 @@ stdenv.mkDerivation  rec {
     "--enable-sharedlib"
     "--with-device=ch4:ofi"
     "--with-libfabric=${libfabric}"
-  ];
+  ]
+  ++ optional enableDebug "--enable-g=dbg,log";
 
   enableParallelBuilding = true;
 

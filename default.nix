@@ -43,6 +43,7 @@ let
     osumb = callPackage ./bsc/osu/default.nix { };
 
     mpich = callPackage ./bsc/mpich/default.nix { };
+    mpichDbg = callPackage ./bsc/mpich/default.nix { enableDebug = true; };
 
     # Default Intel MPI version is 2019 (the last one)
     impi = intel-mpi;
