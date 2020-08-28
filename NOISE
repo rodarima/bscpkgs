@@ -1,0 +1,85 @@
+
+                    Known sources of noise
+                       in MareNostrum 4
+
+
+ABSTRACT
+
+  The experiments run at MareNostrum 4 show that there are several 
+  factors that can affect the execution time. Some may even become the 
+  dominant part of the time, rendering the experiment invalid.
+
+  This document lists all known sources of variability and tries to give 
+  an overview on how to detect and correct the problems.
+
+1. Notable sources of variability
+
+  Usually all sources were found in the MareNostrum 4 cluster, but they 
+  may apply to other machines. Some may have a detection mechanism so 
+  the effect can be neglected, but others don't. Also, some problems 
+  only occur with low probability.
+
+  Other sources of variability with a low effect, say lower than 1% of 
+  the mean time, are not listed here.
+
+1.1 The daemon slurmstepd eats sys CPU in a new thread
+
+  For a period of about 10 seconds a thread is created from the 
+  slurmstepd process when a job is running, which uses quite a lot of 
+  CPU. This event happens from time to time with unknown frequency. It 
+  was first observed in the nbody program, as it almost doubles the time 
+  per iteration, as the other processes are waiting for the one with 
+  slow CPU to continue to the next iteration. The SLURM version was 
+  17.11.7 and the program was executed with sbatch+srun. See the issue 
+  for more details:
+
+    https://pm.bsc.es/gitlab/rarias/bsc-nixpkgs/-/issues/19
+
+  It can be detected by looking at the cycles per us view with Extrae, 
+  with the PAPI counters enabled. It shows a slowdown in one process 
+  when the problem occurs. Also, perf-sched(1) can be used to trace 
+  context switches to other programs but requires access to the debugfs.
+
+1.2 MPICH uses ethernet rather than infiniband
+
+  Some MPI implementations (like MPICH) can silently use non-optimal 
+  fabrics like the ethernet rather than infiniband because the are 
+  misconfigured.
+
+  Can be detected by running latency benchmarks like the OSU micro 
+  benchmark, which should report a low latency. It can also be reported 
+  by using strace to ensure which network card is being used.
+
+1.3 CPU binding
+
+  A thread may switch between CPUs when running, leading to a drop in 
+  performance. To ensure that it remains in the same process it can be 
+  binded with srun(1) or sbatch(1) using the --cpu-bind option, or using 
+  taskset(1).
+
+  It can be detected by running the program with Extrae and using the 
+  General/view/executing_cpu.cfg configuration in Paraver. After 
+  adjusting the scale, all processes must have a different color from 
+  each other (the assigned CPU) and keep it constant. Otherwise changes 
+  of CPUs are happening.
+
+1.4 Libraries that use dlopen(3)
+
+  Some libraries or programs try to determine which components are 
+  available in a system by looking for specific libraries in the search 
+  path determined at runtime.
+
+  This behavior can cause a program to change the execution time 
+  depending on the environment variables like LD_LIBRARY_PATH.
+
+  It can be detected by setting LD_DEBUG=all (see ld.so(8)) or using 
+  strace(1) when running the program.
+
+1.5 Intel MPI library selection
+
+  The Intel MPI library has several variants which are loaded at run 
+  time: debug, release, debug_mt and release_mt. Of which the 
+  I_MPI_THREAD_SPLIT controls whether the multithread capabilities are 
+  enabled or not.
+
+/* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
