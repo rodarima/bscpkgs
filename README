@@ -3,17 +3,19 @@
                         BSC Nixpkgs: User guide
 
 
-1 Introduction
+ABSTRACT
 
   This repository contains a set of nix packages used in the Barcelona
   Supercomputing Center by the Programming Models group.
 
+  The current setup uses the xeon07 machine to build packages, which are 
+  automatically uploaded to MareNostrum4, due to lack of permissions in 
+  the latter to perform the build safely.
+
   Some preliminary steps must be done manually to be able to build and 
   install packages (derivations in nix jargon).
 
-  This guide is specific for the nix installation in the xeon07 node, 
-  accessed by the ssfhead.bsc.es login node, but it may be used in other 
-  machines as well.
+1. Introduction
 
   To easily connect to xeon07 in one step, setup the SSH (for version 
   7.3 and upwards) configuration file in ~/.ssh/config adding these 
@@ -30,39 +32,22 @@
 
   You should be able to connect with:
 
-    $ ssh xeon07
+    laptop$ ssh xeon07
 
 1.1 Network access
 
-  In order to use nix would you need to be able to download the sources 
+  In order to use nix you would need to be able to download the sources 
   from Internet. Usually the download requires the ports 22, 80 and 443 
   to be open for outgoing traffic.
 
-  Unfortunately, in some clusters (as is the case in xeon07) access to 
-  Internet is disabled. However you can tunnel the connection by SSH to 
-  your local machine, and then reach the Internet.
+  Check that you have network access in xeon07 provided by the 
+  environment variables "http_proxy" and "https_proxy". Try to fetch a 
+  webpage with curl, to ensure the proxy is working:
 
-  In order to tell nix to use the proxy connection, you will need to 
-  export the "https_proxy" and "http_proxy" variables. A proxy 
-  connection is already configured in xeon07 and you can automatically 
-  set those variables to the correct address by loading:
+    xeon07$ curl x.com
+    x
 
-    xeon07$ . /scratch/nix/internet
-
-  Consider adding the command to your ~/.bashrc file so you don't need 
-  to do it every time you want to use nix.
-
-  Now you should be able to reach the outside world by running:
-
-    xeon07$ curl google.com
-    <HTML><HEAD><meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <TITLE>301 Moved</TITLE></HEAD><BODY>
-    <H1>301 Moved</H1>
-    The document has moved
-    <A HREF="http://www.google.com/">here</A>.
-    </BODY></HTML>
-
-1.1 Prepare SSH keys
+1.2 SSH keys
 
   Package sources are usually downloaded directly from the git server, 
   so you must be able to access all repositories without a password 
@@ -103,41 +88,76 @@
     Welcome to GitLab, @rarias!
     Connection to bscpm02.bsc.es closed.
 
-  Verify that you can access rarias/nanos6 repository (otherwise you 
+  Verify that you can access nanos6/nanos6 repository (otherwise you 
   first need to ask to be granted read access), at:
 
-    https://pm.bsc.es/gitlab/rarias/nanos6
+    https://pm.bsc.es/gitlab/nanos6/nanos6
   
-  Finally, you should be able to download the rarias/nanos6 git 
+  Finally, you should be able to download the nanos6/nanos6 git 
   repository without any password interaction by running:
 
-    xeon07$ git clone git@bscpm02.bsc.es:rarias/nanos6.git
+    xeon07$ git clone git@bscpm02.bsc.es:nanos6/nanos6.git
 
-1.3 Prepare the bsc-nixpkgs repo
+1.3 The bscpkgs repo
 
   Once you have Internet and you have granted access to the PM GitLab 
-  repositories you can begin down the rabbit hole of nix. First ensure 
+  repositories you can begin building software with nix. First ensure 
   that the nix binaries are available from your shell in xeon07:
 
     xeon07$ nix --version
     nix (Nix) 2.3.6
 
-  Now you are set to install packages with nix. Clone the bsc-nixpkgs 
-  repository:
+  Now you are ready to build and install packages with nix. Clone the 
+  bscpkgs repository:
 
-    xeon07$ git clone git@bscpm02.bsc.es:rarias/bsc-nixpkgs.git
+    xeon07$ git clone git@bscpm02.bsc.es:nanos6/bscpkgs.git
 
   Nix looks in the current folder for a file named "default.nix" for 
-  packages, so go to the repo:
+  packages, so go to the repo directory:
 
-    xeon07$ cd bsc-nixpkgs
+    xeon07$ cd bscpkgs
 
   Now you should be able to build nanos6 from the git repository:
 
-    xeon07$ nix-build -A bsc.nanos6-git
+    xeon07$ nix-build -A bsc.nanos6
+    ..
+    /nix/store/3i0qkdywm9xjv2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
 
-  The output is placed in the "result" symbolic link.
+  The installation is placed in the nix store, with the "result" 
+  symbolic link pointing to the same location:
 
+    xeon07$ readlink result
+    /nix/store/3i0qkdywm9xjv2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
+
+1.4 Configuration of mn4 (MareNostrum 4)
+
+  In order to execute the programs built at xeon07, you first need to 
+  enter nix environment. To do so, add to the end of the file ~/.profile 
+  in mn4 the following line:
+
+    export PATH=/gpfs/projects/bsc15/nix/bin:$PATH
+
+  Then logout and login again (our source the ~/.profile file) and you 
+  will now have the `nix-setup` command available. This command executes 
+  a new shell where the /nix store is available. To execute it:
+
+    mn4$ nix-setup
+
+  Now you will see a new shell, where you can access the nix store:
+
+    nix|mn4$ ls /nix
+    gcroots  profiles  store  var
+
+  The last build of nanos6 can be also found in mn4 at the same 
+  location:
+
+    /nix/store/3i0qkdywm9xjv2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
+
+  Remember to enter the nix environment by running `nix-setup` when you 
+  need something from the nix store.
+
+  You cannot perform any build operations from mn4: to do so use the 
+  xeon07 machine.
 
 2. Basic usage of nix
 
@@ -239,7 +259,7 @@
   has already built the package then the build process is not needed, 
   and the package is used as is.
 
-  In order to build a BSC package go to the `bsc-nixpkgs` directory, and 
+  In order to build a BSC package go to the `bscpkgs` directory, and 
   run:
 
     xeon07$ nix-build -A bsc.dummy
@@ -314,7 +334,7 @@
 
     https://nixos.wiki/wiki/Nix#Sandboxing
 
-  The top level "default.nix" file of the bsc-nixpkgs serves as a index 
+  The top level "default.nix" file of the bscpkgs serves as a index 
   of all BSC packages. You can see the definition for each package, for 
   example the nbody app:
 
@@ -378,7 +398,7 @@
         libmpi.so.12 => /nix/store/jvsjvxj2a08340fpdrqbqix9z3mpp3bd-intel-mpi-2019.7.217/lib/libmpi.so.12 (0x00007f39fed34000)
 
   Take a look at the different package description files in the 
-  bsc-nixpkgs repository if you want to understand more details. Also 
+  bscpkgs repository if you want to understand more details. Also 
   the nix pills are a very good reference:
 
     https://nixos.org/nixos/nix-pills/
@@ -418,5 +438,22 @@
   Then you can inspect the build environment to see why the build 
   failed. Source the build/env-vars file to get the same environment 
   variables (which include the $PATH) of the build process.
+
+3. Running programs in MN4
+
+  
+
+  After a successful build, the result is automatically uploaded to MN4, 
+  and is ready to be used. You could see a line stating that the upload 
+  process was successful, and were the output was placed:
+
+  xeon07$ nix-build -A bsc.dummy
+  ...
+  running post-build-hook '/etc/nix/upload.sh'...
+  post-build-hook:  Upload complete   
+  /nix/store/pk1pzhnciynh8k6w5fhdn70zxq06k5kh-dummy
+  /nix/store/pk1pzhnciynh8k6w5fhdn70zxq06k5kh-dummy
+
+  .
 
 /* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
