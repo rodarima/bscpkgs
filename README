@@ -110,21 +110,22 @@ ABSTRACT
   Now you are ready to build and install packages with nix. Clone the 
   bscpkgs repository:
 
-    xeon07$ git clone git@bscpm02.bsc.es:nanos6/bscpkgs.git
+    xeon07$ git clone git@bscpm02.bsc.es:rarias/bscpkgs.git
 
   Nix looks in the current folder for a file named "default.nix" for 
   packages, so go to the repo directory:
 
     xeon07$ cd bscpkgs
 
-  Now you should be able to build nanos6 from the git repository:
+  Now you should be able to build nanos6:
 
     xeon07$ nix-build -A bsc.nanos6
     ..
     /nix/store/3i0qkdywm9xjv2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
 
-  The installation is placed in the nix store, with the "result" 
-  symbolic link pointing to the same location:
+  The installation is placed in the nix store (with the path stated in 
+  the last line of the build process), with the "result" symbolic link 
+  pointing to the same location:
 
     xeon07$ readlink result
     /nix/store/3i0qkdywm9xjv2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
@@ -132,12 +133,12 @@ ABSTRACT
 1.4 Configuration of mn4 (MareNostrum 4)
 
   In order to execute the programs built at xeon07, you first need to 
-  enter nix environment. To do so, add to the end of the file ~/.profile 
+  enter nix environment. To do so, add to the end of the file ~/.bashrc 
   in mn4 the following line:
 
     export PATH=/gpfs/projects/bsc15/nix/bin:$PATH
 
-  Then logout and login again (our source the ~/.profile file) and you 
+  Then logout and login again (our source the ~/.bashrc file) and you 
   will now have the `nix-setup` command available. This command executes 
   a new shell where the /nix store is available. To execute it:
 
