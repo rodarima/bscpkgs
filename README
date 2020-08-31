@@ -439,21 +439,4 @@ ABSTRACT
   failed. Source the build/env-vars file to get the same environment 
   variables (which include the $PATH) of the build process.
 
-3. Running programs in MN4
-
-  
-
-  After a successful build, the result is automatically uploaded to MN4, 
-  and is ready to be used. You could see a line stating that the upload 
-  process was successful, and were the output was placed:
-
-  xeon07$ nix-build -A bsc.dummy
-  ...
-  running post-build-hook '/etc/nix/upload.sh'...
-  post-build-hook:  Upload complete   
-  /nix/store/pk1pzhnciynh8k6w5fhdn70zxq06k5kh-dummy
-  /nix/store/pk1pzhnciynh8k6w5fhdn70zxq06k5kh-dummy
-
-  .
-
 /* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
