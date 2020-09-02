@@ -2,23 +2,21 @@
   stdenv
 }:
 {
-  app
+  program
 , nixPrefix ? ""
 , srunOptions ? ""
 }:
 
 stdenv.mkDerivation rec {
-  name = "${app.name}-srun";
+  name = "srun";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
-  buildInputs = [ app ];
   dontPatchShebangs = true;
   installPhase = ''
-    mkdir -p $out/bin
-    cat > $out/bin/run <<EOF
+    cat > $out <<EOF
     #!/bin/sh
-    exec srun --mpi=pmi2 ${srunOptions} ${nixPrefix}${app}/bin/run
+    exec srun --mpi=pmi2 ${srunOptions} ${nixPrefix}${program}
     EOF
-    chmod +x $out/bin/run
+    chmod +x $out
   '';
 }

@@ -4,28 +4,25 @@
 }:
 
 {
-  app
+  program
 , env ? ""
 , argv # bash array as string, example: argv=''(-f "file with spaces" -t 10)''
-, program ? "bin/run"
 }:
 
 stdenv.mkDerivation {
-  inherit argv;
-  name = "${app.name}-argv";
+  name = "argv";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
   installPhase = ''
-    mkdir -p $out/bin
-    cat > $out/bin/run <<EOF
+    cat > $out <<EOF
     #!${bash}/bin/bash
     # Requires /nix to use bash
     
     ${env}
 
     argv=${argv}
-    exec ${app}/${program} \''${argv[@]}
+    exec ${program} \''${argv[@]}
     EOF
-    chmod +x $out/bin/run
+    chmod +x $out
   '';
 }

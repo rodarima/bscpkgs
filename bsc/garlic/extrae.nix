@@ -2,29 +2,36 @@
   stdenv
 , bash
 , extrae
+#, writeShellScriptBin
 }:
 
 {
-  app
-, traceLib ? "mpi"
+  program
 , configFile
-, program ? "bin/run"
+, traceLib
 }:
 
+#writeShellScriptBin "extraeWrapper" ''
+#  export EXTRAE_HOME=${extrae}
+#  export LD_PRELOAD=${extrae}/lib/lib${traceLib}trace.so:$LD_PRELOAD
+#  export EXTRAE_CONFIG_FILE=${configFile}
+#  exec ${program}
+#''
+
 stdenv.mkDerivation {
-  name = "${app.name}-extrae";
+  name = "extrae";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
   installPhase = ''
-    mkdir -p $out/bin
-    cat > $out/bin/run <<EOF
+    cat > $out <<EOF
     #!${bash}/bin/bash
-
+    # Requires /nix to use bash
+    
     export EXTRAE_HOME=${extrae}
     export LD_PRELOAD=${extrae}/lib/lib${traceLib}trace.so:$LD_PRELOAD
     export EXTRAE_CONFIG_FILE=${configFile}
-    exec ${app}/${program}
+    exec ${program}
     EOF
-    chmod +x $out/bin/run
+    chmod +x $out
   '';
 }

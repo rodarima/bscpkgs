@@ -4,10 +4,10 @@
 }:
 
 {
-  app
+  program
+, jobName
 , chdirPrefix ? "."
 , nixPrefix ? ""
-, argv ? ""
 , binary ? "/bin/run"
 , ntasks ? null
 , ntasksPerNode ? null
@@ -33,12 +33,9 @@ let
 in
 
 stdenv.mkDerivation rec {
-  name = "${app.name}-job";
+  name = "sbatch";
   preferLocalBuild = true;
 
-  src = ./.;
-
-  buildInputs = [ app ];
   phases = [ "installPhase" ];
 
   #SBATCH --tasks-per-node=48
@@ -46,12 +43,13 @@ stdenv.mkDerivation rec {
   #SBATCH --cpus-per-task=1
   dontBuild = true;
   dontPatchShebangs = true;
+  programPath = "/${name}";
 
   installPhase = ''
     mkdir -p $out
     cat > $out/job <<EOF
     #!/bin/sh
-    #SBATCH --job-name="${name}"
+    #SBATCH --job-name="${jobName}"
     ''
     + sbatchOpt "ntasks" ntasks
     + sbatchOpt "ntasks-per-node" ntasksPerNode
@@ -66,11 +64,10 @@ stdenv.mkDerivation rec {
     + optionalString (extra!=null) extra
     +
     ''
-    exec ${nixPrefix}${app}${binary} ${argv}
+    exec ${nixPrefix}${program}
     EOF
     
-    mkdir -p $out/bin
-    cat > $out/bin/run <<EOF
+    cat > $out/${name} <<EOF
     #!/bin/sh
     if [ -e "${chdirPrefix}/$(basename $out)" ]; then
       >&2 echo "Execution aborted: '${chdirPrefix}/$(basename $out)' already exists"
@@ -80,6 +77,6 @@ stdenv.mkDerivation rec {
     echo sbatch ${nixPrefix}$out/job
     sbatch ${nixPrefix}$out/job
     EOF
-    chmod +x $out/bin/run
+    chmod +x $out/${name}
   '';
 }

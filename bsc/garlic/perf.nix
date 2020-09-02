@@ -5,22 +5,20 @@
 }:
 
 {
-  app
+  program
 , perfArgs ? "record -a"
-, program ? "bin/run"
 }:
 
 stdenv.mkDerivation {
-  name = "${app.name}-perf";
+  name = "perfWrapper";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
   installPhase = ''
-    mkdir -p $out/bin
-    cat > $out/bin/run <<EOF
+    cat > $out <<EOF
     #!${bash}/bin/bash
 
-    exec ${perf}/bin/perf ${perfArgs} ${app}/${program}
+    exec ${perf}/bin/perf ${perfArgs} ${program}
     EOF
-    chmod +x $out/bin/run
+    chmod +x $out
   '';
 }

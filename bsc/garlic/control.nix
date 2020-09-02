@@ -2,23 +2,23 @@
   stdenv
 }:
 
-program:
+{
+  program
+}:
 
 stdenv.mkDerivation {
-  inherit program;
-  name = "${program.name}-control";
+  name = "control";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
   dontPatchShebangs = true;
   installPhase = ''
-    mkdir -p $out/bin
-    cat > $out/bin/run <<EOF
+    cat > $out <<EOF
     #!/bin/sh
     #set -e
     for n in {1..30}; do
-      $program/bin/run
+      ${program}
     done
     EOF
-    chmod +x $out/bin/run
+    chmod +x $out
   '';
 }

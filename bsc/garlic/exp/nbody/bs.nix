@@ -1,114 +1,130 @@
 {
   bsc
+, stdenv
 , nbody
 , genApp
 , genConfigs
-
-# Wrappers
-, launchWrapper
-, sbatchWrapper
-, srunWrapper
-, argvWrapper
-, controlWrapper
-, nixsetupWrapper
-, statspyWrapper
-, extraeWrapper
-, perfWrapper
+, runWrappers
 }:
 
+with stdenv.lib;
+
 let
-  # Set the configuration for the experiment
-  config = {
+  # Set variable configuration for the experiment
+  varConfig = {
     cc = [ bsc.icc ];
     blocksize = [ 1024 ];
   };
 
-  extraConfig = {
+  # Common configuration
+  common = {
+    # Compile time nbody config
     gitBranch = "garlic/mpi+send";
     mpi = bsc.impi;
+
+    # nbody runtime options
     particles = 1024*128;
-    timesteps = 100;
+    timesteps = 20;
+
+    # Resources
     ntasksPerNode = "48";
     nodes = "1";
-    time = "02:00:00";
-    qos = "debug";
+
+    # Stage configuration
+    enableSbatch = true;
+    enableControl = true;
+    enableExtrae = false;
+    enablePerf = false;
+
+    # MN4 path
+    nixPrefix = "/gpfs/projects/bsc15/nix";
   };
 
   # Compute the cartesian product of all configurations
-  allConfigs = genConfigs config;
-  filteredConfigs = with builtins; filter (c: c.blocksize <= 4096) allConfigs;
-  configs = map (conf: conf // extraConfig) filteredConfigs;
+  configs = map (conf: conf // common) (genConfigs varConfig);
 
-  sbatch = conf: app: with conf; sbatchWrapper {
-    app = app;
-    nixPrefix = "/gpfs/projects/bsc15/nix";
+  stageProgram = stage:
+    if stage ? programPath
+    then "${stage}${stage.programPath}" else "${stage}";
+
+  w = runWrappers;
+
+  sbatch = {stage, conf, ...}: with conf; w.sbatch {
+    program = stageProgram stage;
     exclusive = true;
-    inherit ntasksPerNode nodes time qos;
+    time = "02:00:00";
+    qos = "debug";
+    jobName = "nbody-bs";
+    inherit nixPrefix nodes ntasksPerNode;
   };
 
-  srun = app: srunWrapper {
-    app = app;
-    nixPrefix = "/gpfs/projects/bsc15/nix";
+  control = {stage, conf, ...}: with conf; w.control {
+    program = stageProgram stage;
+  };
+
+  srun = {stage, conf, ...}: with conf; w.srun {
+    program = stageProgram stage;
     srunOptions = "--cpu-bind=verbose,rank";
+    inherit nixPrefix;
   };
 
-  argv = conf: app:
-    with conf;
-    argvWrapper {
-      app = app;
-      env = ''
-        set -e
-        export I_MPI_THREAD_SPLIT=1
-      '';
-      argv = ''(-t ${toString timesteps} -p ${toString particles})'';
-    };
+  statspy = {stage, conf, ...}: with conf; w.statspy {
+    program = stageProgram stage;
+  };
 
-  statspy = app:
-    statspyWrapper {
-      app = app;
-    };
+  perf = {stage, conf, ...}: with conf; w.perf {
+    program = stageProgram stage;
+    perfArgs = "sched record -a";
+  };
 
-  extrae = app:
-    extraeWrapper {
-      app = app;
-      traceLib = "mpi";
-      configFile = ./extrae.xml;
-    };
+  nixsetup = {stage, conf, ...}: with conf; w.nixsetup {
+    program = stageProgram stage;
+  };
 
-  perf = app:
-    perfWrapper {
-      app = app;
-      perfArgs = "sched record -a";
-    };
+  extrae = {stage, conf, ...}: w.extrae {
+    program = stageProgram stage;
+    traceLib = "mpi"; # mpi -> libtracempi.so
+    configFile = ./extrae.xml;
+  };
 
-  nbodyFn = conf:
-    with conf;
-    nbody.override { inherit cc mpi blocksize gitBranch; };
+  argv = {stage, conf, ...}: w.argv {
+    program = stageProgram stage;
+    env = ''
+      set -e
+      export I_MPI_THREAD_SPLIT=1
+    '';
+    argv = ''( -t ${toString conf.timesteps}
+      -p ${toString conf.particles} )'';
+  };
 
-  pipeline = conf:
-#   sbatch conf (
-#     nixsetupWrapper (
-#       controlWrapper (
-          srun (
-            nixsetupWrapper (
-#             extrae (
-#               perf (
-                  argv conf (
-                    nbodyFn conf
-                  )
-#               )
-#             )
-            )
-          )
-#       )
-#     )
-#   )
-  ;
+  nbodyFn = {stage, conf, ...}: with conf; nbody.override {
+    inherit cc blocksize mpi gitBranch;
+  };
 
-  # Ideally it should look like this:
-  #pipeline = sbatch nixsetup control argv nbodyFn;
+  stages = with common; []
+    # Use sbatch to request resources first
+    ++ optional enableSbatch sbatch
 
-  jobs = map pipeline configs;
+    # Repeats the next stages N times
+    ++ optionals enableControl [ nixsetup control ]
+
+    # Executes srun to launch the program in the requested nodes, and
+    # immediately after enters the nix environment again, as slurmstepd launches
+    # the next stages from outside the namespace.
+    ++ [ srun nixsetup ]
+
+    # Intrumentation with extrae
+    ++ optional enableExtrae extrae
+
+    # Optionally profile the next stages with perf
+    ++ optional enablePerf perf
+
+    # Execute the nbody app with the argv and env vars
+    ++ [ argv nbodyFn ];
+
+  # List of actual programs to be executed
+  jobs = map (conf: w.stagen { inherit conf stages; }) configs;
 
 in
-  launchWrapper jobs
+  # We simply run each program one after another
+  w.launch jobs

@@ -25,14 +25,17 @@ let
       gitBranch = "garlic/seq";
     };
 
-    sbatchWrapper = callPackage ./sbatch.nix { };
-    srunWrapper = callPackage ./srun.nix { };
-    launchWrapper = callPackage ./launcher.nix { };
-    controlWrapper = callPackage ./control.nix { };
-    nixsetupWrapper = callPackage ./nix-setup.nix { };
-    argvWrapper = callPackage ./argv.nix { };
-    statspyWrapper = callPackage ./statspy.nix { };
-    extraeWrapper = callPackage ./extrae.nix { };
+    runWrappers = {
+      sbatch  = callPackage ./sbatch.nix { };
+      srun    = callPackage ./srun.nix { };
+      launch  = callPackage ./launcher.nix { };
+      control = callPackage ./control.nix { };
+      nixsetup= callPackage ./nix-setup.nix { };
+      argv    = callPackage ./argv.nix { };
+      statspy = callPackage ./statspy.nix { };
+      extrae  = callPackage ./extrae.nix { };
+      stagen  = callPackage ./stagen.nix { };
+    };
 
     # Perf is tied to a linux kernel specific version
     linuxPackages = bsc.linuxPackages_4_4;

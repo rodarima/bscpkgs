@@ -4,26 +4,26 @@
 }:
 
 {
-  app
+  program
 , outputDir ? "."
-, program ? "bin/run"
 }:
 
 stdenv.mkDerivation {
-  name = "${app.name}-statspy";
+  name = "statspy";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
+  programPath = "/bin/${name}";
   installPhase = ''
     mkdir -p $out/bin
-    cat > $out/bin/run <<EOF
+    cat > $out/bin/${name} <<EOF
     #!${bash}/bin/bash
 
     mkdir -p ${outputDir}
     cat /proc/[0-9]*/stat | sort -n > ${outputDir}/statspy.\$(date +%s.%3N).begin
-    ${app}/${program}
+    ${program}
     cat /proc/[0-9]*/stat | sort -n > ${outputDir}/statspy.\$(date +%s.%3N).end
 
     EOF
-    chmod +x $out/bin/run
+    chmod +x $out/bin/${name}
   '';
 }

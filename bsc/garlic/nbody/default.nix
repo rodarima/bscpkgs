@@ -12,12 +12,13 @@ with stdenv.lib;
 stdenv.mkDerivation rec {
   name = "nbody";
 
-  src = /home/Computational/rarias/bsc-nixpkgs/manual/nbody;
+  src = /home/Computational/rarias/bscpkgs/manual/nbody;
 
   #src = builtins.fetchGit {
   #  url = "${gitURL}";
   #  ref = "${gitBranch}";
   #};
+  programPath = "/bin/nbody";
 
   buildInputs = [
     cc
@@ -38,7 +39,6 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out/bin
     cp nbody* $out/bin/${name}
-    ln -s $out/bin/${name} $out/bin/run
   '';
 
 }
