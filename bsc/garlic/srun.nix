@@ -1,7 +1,11 @@
 {
   stdenv
 }:
-{ app , nixPrefix ? "" }:
+{
+  app
+, nixPrefix ? ""
+, srunOptions ? ""
+}:
 
 stdenv.mkDerivation rec {
   name = "${app.name}-srun";
@@ -13,7 +17,7 @@ stdenv.mkDerivation rec {
     mkdir -p $out/bin
     cat > $out/bin/run <<EOF
     #!/bin/sh
-    exec srun --mpi=pmi2 ${nixPrefix}${app}/bin/run
+    exec srun --mpi=pmi2 ${srunOptions} ${nixPrefix}${app}/bin/run
     EOF
     chmod +x $out/bin/run
   '';

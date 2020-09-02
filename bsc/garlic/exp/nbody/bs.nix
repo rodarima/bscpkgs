@@ -11,6 +11,9 @@
 , argvWrapper
 , controlWrapper
 , nixsetupWrapper
+, statspyWrapper
+, extraeWrapper
+, perfWrapper
 }:
 
 let
@@ -24,7 +27,7 @@ let
     gitBranch = "garlic/mpi+send";
     mpi = bsc.impi;
     particles = 1024*128;
-    timesteps = 10;
+    timesteps = 100;
     ntasksPerNode = "48";
     nodes = "1";
     time = "02:00:00";
@@ -46,6 +49,7 @@ let
   srun = app: srunWrapper {
     app = app;
     nixPrefix = "/gpfs/projects/bsc15/nix";
+    srunOptions = "--cpu-bind=verbose,rank";
   };
 
   argv = conf: app:
@@ -59,18 +63,47 @@ let
       argv = ''(-t ${toString timesteps} -p ${toString particles})'';
     };
 
+  statspy = app:
+    statspyWrapper {
+      app = app;
+    };
+
+  extrae = app:
+    extraeWrapper {
+      app = app;
+      traceLib = "mpi";
+      configFile = ./extrae.xml;
+    };
+
+  perf = app:
+    perfWrapper {
+      app = app;
+      perfArgs = "sched record -a";
+    };
+
   nbodyFn = conf:
     with conf;
     nbody.override { inherit cc mpi blocksize gitBranch; };
 
   pipeline = conf:
-    sbatch conf (
-      nixsetupWrapper (
-        controlWrapper (
+#   sbatch conf (
+#     nixsetupWrapper (
+#       controlWrapper (
           srun (
             nixsetupWrapper (
-              argv conf (
-                nbodyFn conf))))));
+#             extrae (
+#               perf (
+                  argv conf (
+                    nbodyFn conf
+                  )
+#               )
+#             )
+            )
+          )
+#       )
+#     )
+#   )
+  ;
 
   # Ideally it should look like this:
   #pipeline = sbatch nixsetup control argv nbodyFn;

@@ -31,6 +31,14 @@ let
     controlWrapper = callPackage ./control.nix { };
     nixsetupWrapper = callPackage ./nix-setup.nix { };
     argvWrapper = callPackage ./argv.nix { };
+    statspyWrapper = callPackage ./statspy.nix { };
+    extraeWrapper = callPackage ./extrae.nix { };
+
+    # Perf is tied to a linux kernel specific version
+    linuxPackages = bsc.linuxPackages_4_4;
+    perfWrapper = callPackage ./perf.nix {
+      perf = linuxPackages.perf;
+    };
 
     exp = {
       nbody = {

@@ -1,23 +1,25 @@
 {
   stdenv
+, bash
+, perf
 }:
 
-program:
+{
+  app
+, perfArgs ? "record -a"
+, program ? "bin/run"
+}:
 
 stdenv.mkDerivation {
-  inherit program;
-  name = "${program.name}-control";
+  name = "${app.name}-perf";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
-  dontPatchShebangs = true;
   installPhase = ''
     mkdir -p $out/bin
     cat > $out/bin/run <<EOF
-    #!/bin/sh
-    #set -e
-    for n in {1..30}; do
-      $program/bin/run
-    done
+    #!${bash}/bin/bash
+
+    exec ${perf}/bin/perf ${perfArgs} ${app}/${program}
     EOF
     chmod +x $out/bin/run
   '';

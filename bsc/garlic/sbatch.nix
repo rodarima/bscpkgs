@@ -39,6 +39,7 @@ stdenv.mkDerivation rec {
   src = ./.;
 
   buildInputs = [ app ];
+  phases = [ "installPhase" ];
 
   #SBATCH --tasks-per-node=48
   #SBATCH --ntasks-per-socket=24

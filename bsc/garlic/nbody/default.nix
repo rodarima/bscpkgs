@@ -12,10 +12,12 @@ with stdenv.lib;
 stdenv.mkDerivation rec {
   name = "nbody";
 
-  src = builtins.fetchGit {
-    url = "${gitURL}";
-    ref = "${gitBranch}";
-  };
+  src = /home/Computational/rarias/bsc-nixpkgs/manual/nbody;
+
+  #src = builtins.fetchGit {
+  #  url = "${gitURL}";
+  #  ref = "${gitBranch}";
+  #};
 
   buildInputs = [
     cc

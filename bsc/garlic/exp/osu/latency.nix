@@ -64,7 +64,17 @@ let
     with conf;
     bsc.osumb.override { inherit mpi; };
 
-  pipeline = conf: sbatch conf (srun (nixsetupWrapper (argv (osumbFn conf))));
+
+  pipeline = conf:
+    sbatch conf (
+      nixsetupWrapper (
+        controlWrapper (
+          srun (
+            nixsetupWrapper (
+              argv (
+                osumbFn conf))))));
+
+  #pipeline = conf: sbatch conf (srun (nixsetupWrapper (argv (osumbFn conf))));
   #pipeline = conf: sbatch conf (srun (nixsetupWrapper (argv bsc.osumb)));
 
   # Ideally it should look like this:
