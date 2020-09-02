@@ -36,6 +36,11 @@ let
     #  BSC Packages
     # --------------------------------------------------------- #
 
+    perf = callPackage ./bsc/perf/default.nix {
+      kernel = pkgs.linuxPackages_4_9.kernel;
+      systemtap = pkgs.linuxPackages_4_9.systemtap;
+    };
+
     # ParaStation MPI
     pscom = callPackage ./bsc/parastation/pscom.nix { };
     psmpi = callPackage ./bsc/parastation/psmpi.nix { };
