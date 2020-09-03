@@ -44,6 +44,7 @@ let
     };
 
     exp = {
+      noise = callPackage ./exp/noise.nix { };
       nbody = {
         bs = callPackage ./exp/nbody/bs.nix { };
         mpi = callPackage ./exp/nbody/mpi.nix { };
