@@ -20,6 +20,7 @@
 , error ? "job_%j.err"
 , contiguous ? null
 , extra ? null
+, acctgFreq ? null
 }:
 
 with stdenv.lib;
@@ -61,6 +62,7 @@ stdenv.mkDerivation rec {
     + sbatchOpt "time" time
     + sbatchOpt "qos" qos
     + sbatchOpt "reservation" reservation
+    + sbatchOpt "acctg-freq" acctgFreq
     + optionalString (extra!=null) extra
     +
     ''
