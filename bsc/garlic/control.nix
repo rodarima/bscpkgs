@@ -4,6 +4,7 @@
 
 {
   program
+, loops ? 30
 }:
 
 stdenv.mkDerivation {
@@ -15,7 +16,7 @@ stdenv.mkDerivation {
     cat > $out <<EOF
     #!/bin/sh
     #set -e
-    for n in {1..30}; do
+    for n in {1..${toString loops}}; do
       ${program}
     done
     EOF
