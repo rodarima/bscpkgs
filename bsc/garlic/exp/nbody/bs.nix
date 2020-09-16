@@ -1,7 +1,7 @@
 {
-  bsc
-, stdenv
-, nbody
+  stdenv
+, nixpkgs
+, pkgs
 , genApp
 , genConfigs
 , runWrappers
@@ -12,7 +12,7 @@ with stdenv.lib;
 let
   # Set variable configuration for the experiment
   varConfig = {
-    cc = [ bsc.icc ];
+    cc = [ pkgs.bsc.icc ];
     blocksize = [ 1024 ];
   };
 
@@ -20,7 +20,7 @@ let
   common = {
     # Compile time nbody config
     gitBranch = "garlic/mpi+send";
-    mpi = bsc.impi;
+    mpi = pkgs.bsc.impi;
 
     # nbody runtime options
     particles = 1024*128;
@@ -97,9 +97,30 @@ let
       -p ${toString conf.particles} )'';
   };
 
-  nbodyFn = {stage, conf, ...}: with conf; nbody.override {
-    inherit cc blocksize mpi gitBranch;
+  bscOverlay = import ../../../../overlay.nix;
+
+  genPkgs = newOverlay: nixpkgs {
+    overlays = [
+      bscOverlay
+      newOverlay
+    ];
   };
+
+  # We may be able to use overlays by invoking the fix function directly, but we
+  # have to get the definition of the bsc packages and the garlic ones as
+  # overlays.
+
+  nbodyFn = {stage, conf, ...}: with conf;
+    let
+      # We set the mpi implementation to the one specified in the conf, so all
+      # packages in bsc will use that one.
+      customPkgs = genPkgs (self: super: {
+        bsc = super.bsc // { mpi = conf.mpi; };
+      });
+    in
+    customPkgs.bsc.garlic.nbody.override {
+      inherit cc blocksize mpi gitBranch;
+    };
 
   stages = with common; []
     # Use sbatch to request resources first

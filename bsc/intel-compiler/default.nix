@@ -2,27 +2,27 @@
   stdenv
 , gcc
 , nanos6
-, icc-unwrapped
+, iccUnwrapped
 , wrapCCWith
-, intel-license
+, intelLicense
 }:
 
 let
   targetConfig = stdenv.targetPlatform.config;
   inherit gcc;
 in wrapCCWith rec {
-  cc = icc-unwrapped;
+  cc = iccUnwrapped;
   extraBuildCommands = ''
     echo "-B${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-cflags
-    echo "-isystem ${icc-unwrapped}/include" >> $out/nix-support/cc-cflags
-    echo "-isystem ${icc-unwrapped}/include/intel64" >> $out/nix-support/cc-cflags
+    echo "-isystem ${iccUnwrapped}/include" >> $out/nix-support/cc-cflags
+    echo "-isystem ${iccUnwrapped}/include/intel64" >> $out/nix-support/cc-cflags
     echo "-L${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-ldflags
     echo "-L${gcc.cc.lib}/lib" >> $out/nix-support/cc-ldflags
 
-    cat "${icc-unwrapped}/nix-support/propagated-build-inputs" >> \
+    cat "${iccUnwrapped}/nix-support/propagated-build-inputs" >> \
       $out/nix-support/propagated-build-inputs
 
-    echo "export INTEL_LICENSE_FILE=${intel-license}" \
+    echo "export INTEL_LICENSE_FILE=${intelLicense}" \
       >> $out/nix-support/setup-hook
 
     # Create the wrappers for icc and icpc

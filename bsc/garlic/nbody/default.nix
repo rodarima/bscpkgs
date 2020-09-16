@@ -1,6 +1,7 @@
 {
   stdenv
 , cc
+, tampi ? null
 , mpi ? null
 , cflags ? null
 , gitBranch
@@ -37,6 +38,7 @@ stdenv.mkDerivation rec {
   dontPatchShebangs = true;
 
   installPhase = ''
+    echo ${tampi}
     mkdir -p $out/bin
     cp nbody* $out/bin/${name}
   '';

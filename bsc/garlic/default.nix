@@ -1,27 +1,26 @@
 {
   pkgs
-, bsc
+, callPackage
+, callPackages
 }:
 
 let
-  callPackage = pkgs.lib.callPackageWith (pkgs // bsc // garlic);
-  callPackages = pkgs.lib.callPackagesWith (pkgs // bsc // garlic);
 
-  garlic = rec {
+  garlic = {
 
     # Load some helper functions to generate app variants
     inherit (import ./gen.nix) genApps genApp genConfigs;
-    inherit bsc;
 
     mpptest = callPackage ./mpptest { };
 
     ppong = callPackage ./ppong {
-      mpi = bsc.mpi;
+      mpi = pkgs.mpi;
     };
 
     nbody = callPackage ./nbody {
-      cc = bsc.icc;
-      mpi = bsc.impi;
+      cc = pkgs.icc;
+      mpi = pkgs.impi;
+      tampi = pkgs.tampi;
       gitBranch = "garlic/seq";
     };
 
@@ -38,15 +37,17 @@ let
     };
 
     # Perf is tied to a linux kernel specific version
-    linuxPackages = bsc.linuxPackages_4_4;
+    linuxPackages = pkgs.linuxPackages_4_4;
     perfWrapper = callPackage ./perf.nix {
-      perf = linuxPackages.perf;
+      perf = pkgs.linuxPackages.perf;
     };
 
     exp = {
       noise = callPackage ./exp/noise.nix { };
       nbody = {
-        bs = callPackage ./exp/nbody/bs.nix { };
+        bs = callPackage ./exp/nbody/bs.nix {
+          pkgs = pkgs // garlic;
+        };
         mpi = callPackage ./exp/nbody/mpi.nix { };
       };
       osu = rec {
