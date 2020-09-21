@@ -12,7 +12,7 @@ with stdenv.lib;
 let
   # Set variable configuration for the experiment
   varConfig = {
-    numComm = [ 1 ];
+    numComm = [ 1 2 3 4 ];
   };
 
   # Common configuration
