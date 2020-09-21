@@ -14,7 +14,8 @@ stdenv.mkDerivation rec {
 
     cat > $out/bin/dummy <<EOF
     #!/bin/sh
-    echo Hello world!
+    echo Hello worlda!
+
     EOF
 
     chmod +x $out/bin/dummy

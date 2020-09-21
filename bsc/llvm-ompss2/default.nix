@@ -2,7 +2,7 @@
   stdenv
 , gcc
 , nanos6
-, clang-ompss2-unwrapped
+, clangOmpss2Unwrapped
 , wrapCCWith
 }:
 
@@ -11,7 +11,7 @@ let
   targetConfig = stdenv.targetPlatform.config;
   inherit gcc nanos6;
 in wrapCCWith rec {
-  cc = clang-ompss2-unwrapped;
+  cc = clangOmpss2Unwrapped;
   extraBuildCommands = ''
     echo "-target ${targetConfig}" >> $out/nix-support/cc-cflags
     echo "-B${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-cflags

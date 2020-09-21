@@ -6,6 +6,8 @@
 , mcxx
 , vtk
 , boost
+, gitBranch ? "master"
+, numComm ? null
 }:
 
 stdenv.mkDerivation rec {
@@ -13,12 +15,14 @@ stdenv.mkDerivation rec {
 
   src = builtins.fetchGit {
     url = "ssh://git@bscpm02.bsc.es/DSLs/saiph.git";
-    ref = "VectorisationSupport";
+    ref = "${gitBranch}";
   };
 
   #src = /tmp/saiph;
+  
+  programPath = "/bin/ExHeat3D";
 
-  enableParallelBuilding = true;
+  enableParallelBuilding = false;
   dontStrip = true;
   enableDebugging = true;
 
@@ -31,26 +35,36 @@ stdenv.mkDerivation rec {
     boost
   ];
 
+  hardeningDisable = [ "all" ];
+  
+  hardeningEnable = [ "stackprotector" ];
+
+  postPatch = ''
+    
+    sed -i 's/^SANITIZE_FLAGS=/SANITIZE_FLAGS=$(DEBUG_FLAGS)/g' \
+      saiphv2/cpp/src/Makefile.clang
+  '';
+
   preBuild = ''
     cd saiphv2/cpp/src
 
-    sed -i s/skylake-avx512/core-avx2/g Makefile*
     export VTK_VERSION=8.2
     export VTK_HOME=${vtk}
+    export BOOST_HOME=${boost}
     export SAIPH_HOME=.
-    export NIX_CFLAGS_COMPILE+=" -fsanitize=address"
   '';
 
   makeFlags = [
     "-f" "Makefile.clang"
     "apps"
-    "APP=ExHeat"
+    "APP=ExHeat3D"
+    ( if (numComm != null) then "NUM_COMM=${toString numComm}" else "" )
   ];
 
   installPhase = ''
     mkdir -p $out/lib
     mkdir -p $out/bin
     cp obj/libsaiphv2.so $out/lib/
-    cp bin/ExHeat $out/bin/
+    cp bin/ExHeat3D $out/bin/
   '';
 }

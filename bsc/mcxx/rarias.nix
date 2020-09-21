@@ -49,6 +49,7 @@ stdenv.mkDerivation rec {
   configureFlags = [
     "--enable-ompss-2"
     "--with-nanos6=${nanos6}"
+#    "--enable-bison-regeneration"
   ];
 
   # Regenerate ia32 builtins to add the ones for gcc9

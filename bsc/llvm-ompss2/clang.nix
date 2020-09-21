@@ -76,7 +76,6 @@ stdenv.mkDerivation rec {
 
   src = builtins.fetchGit {
     url = "ssh://git@bscpm02.bsc.es/llvm-ompss/llvm-mono.git";
-    rev = "e1c73c3691d2685a99d99e14c6110d2c880662c6";
     ref = "master";
   };
 }

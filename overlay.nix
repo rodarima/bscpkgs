@@ -92,10 +92,9 @@ let
     mcxx = self.bsc.mcxxGit;
 
     # Use nanos6 git by default
-    nanos6 = self.bsc.nanos6-git;
-    nanos6-latest = callPackage ./bsc/nanos6/default.nix { };
-
-    nanos6-git = callPackage ./bsc/nanos6/git.nix { };
+    nanos6 = self.bsc.nanos6Git;
+    nanos6Latest = callPackage ./bsc/nanos6/default.nix { };
+    nanos6Git = callPackage ./bsc/nanos6/git.nix { };
 
     vtk = callPackage ./bsc/vtk/default.nix {
       inherit (self.xorg) libX11 xorgproto libXt;
@@ -103,17 +102,17 @@ let
 
     dummy = callPackage ./bsc/dummy/default.nix { };
 
-    clang-ompss2-unwrapped = callPackage ./bsc/llvm-ompss2/clang.nix {
+    clangOmpss2Unwrapped = callPackage ./bsc/llvm-ompss2/clang.nix {
       stdenv = self.llvmPackages_10.stdenv;
       enableDebug = false;
     };
 
-    clang-ompss2 = callPackage bsc/llvm-ompss2/default.nix {
-      clang-ompss2-unwrapped = self.bsc.clang-ompss2-unwrapped;
+    clangOmpss2 = callPackage bsc/llvm-ompss2/default.nix {
+      clangOmpss2Unwrapped = self.bsc.clangOmpss2Unwrapped;
     };
 
     stdenvOmpss2 = self.clangStdenv.override {
-      cc = self.bsc.clang-ompss2;
+      cc = self.bsc.clangOmpss2;
     };
 
     cpic = callPackage ./bsc/apps/cpic/default.nix {
@@ -141,6 +140,10 @@ let
         tampi = self.bsc.tampi;
         mcxx = self.bsc.mcxx;
         gitBranch = "garlic/seq";
+      };
+
+      saiph = callPackage ./garlic/saiph {
+        stdenv = self.bsc.stdenvOmpss2;
       };
 
       # Execution wrappers
@@ -183,6 +186,17 @@ let
           };
 #          mpi = callPackage ./bsc/garlic/exp/nbody/mpi.nix { };
         };
+
+        saiph = {
+          numcomm = callPackage ./garlic/exp/saiph/numcomm.nix {
+            pkgs = self // self.bsc.garlic;
+            nixpkgs = import <nixpkgs>;
+            genApp = self.bsc.garlic.genApp;
+            genConfigs = self.bsc.garlic.genConfigs;
+            runWrappers = self.bsc.garlic.runWrappers;
+          };
+        };
+
         osu = rec {
           latency-internode = callPackage ./garlic/exp/osu/latency.nix { };
           latency-intranode = callPackage ./garlic/exp/osu/latency.nix {

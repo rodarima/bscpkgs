@@ -11,6 +11,7 @@
 , binary ? "/bin/run"
 , ntasks ? null
 , ntasksPerNode ? null
+, ntasksPerSocket ? null
 , nodes ? null
 , exclusive ? true # By default we run in exclusive mode
 , qos ? null
@@ -54,6 +55,7 @@ stdenv.mkDerivation rec {
     ''
     + sbatchOpt "ntasks" ntasks
     + sbatchOpt "ntasks-per-node" ntasksPerNode
+    + sbatchOpt "ntasks-per-socket" ntasksPerSocket
     + sbatchOpt "nodes" nodes
     + sbatchOpt "chdir" "${chdirPrefix}/$(basename $out)"
     + sbatchOpt "output" output
