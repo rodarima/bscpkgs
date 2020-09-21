@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
   
   programPath = "/bin/ExHeat3D";
 
-  enableParallelBuilding = false;
+  enableParallelBuilding = true;
   dontStrip = true;
   enableDebugging = true;
 
@@ -35,15 +35,14 @@ stdenv.mkDerivation rec {
     boost
   ];
 
-  hardeningDisable = [ "all" ];
+  # Required for nanos6
+  hardeningDisable = [ "bindnow" ];
   
-  hardeningEnable = [ "stackprotector" ];
-
-  postPatch = ''
-    
-    sed -i 's/^SANITIZE_FLAGS=/SANITIZE_FLAGS=$(DEBUG_FLAGS)/g' \
-      saiphv2/cpp/src/Makefile.clang
-  '';
+#  Enable debug
+#  postPatch = ''
+#    sed -i 's/^SANITIZE_FLAGS=/SANITIZE_FLAGS=$(DEBUG_FLAGS)/g' \
+#      saiphv2/cpp/src/Makefile.clang
+#  '';
 
   preBuild = ''
     cd saiphv2/cpp/src

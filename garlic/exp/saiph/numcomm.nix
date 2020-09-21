@@ -22,7 +22,7 @@ let
     mpi = pkgs.bsc.impi;
 
     # Resources
-    ntasksPerSocket = "1";
+    ntasksPerNode = "2";
     nodes = "2";
 
     # Stage configuration
@@ -50,7 +50,7 @@ let
     time = "02:00:00";
     qos = "debug";
     jobName = "saiph";
-    inherit nixPrefix nodes ntasksPerSocket;
+    inherit nixPrefix nodes ntasksPerNode;
   };
 
   control = {stage, conf, ...}: with conf; w.control {
