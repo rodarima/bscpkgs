@@ -10,17 +10,19 @@
 with stdenv.lib;
 
 let
+  bsc = pkgs.bsc;
+
   # Set variable configuration for the experiment
   varConfig = {
-    cc = [ pkgs.bsc.icc ];
+    cc = [ bsc.icc ];
+    mpi = [ bsc.impi bsc.openmpi ];
     blocksize = [ 1024 ];
   };
 
   # Common configuration
   common = {
     # Compile time nbody config
-    gitBranch = "garlic/mpi+send";
-    mpi = pkgs.bsc.impi;
+    gitBranch = "garlic/tampi+send+oss+task";
 
     # nbody runtime options
     particles = 1024*128;
@@ -35,6 +37,7 @@ let
     enableControl = true;
     enableExtrae = false;
     enablePerf = false;
+    enableCtf = false;
 
     # MN4 path
     nixPrefix = "/gpfs/projects/bsc15/nix";
@@ -87,6 +90,14 @@ let
     configFile = ./extrae.xml;
   };
 
+  ctf = {stage, conf, ...}: w.argv {
+    program = stageProgram stage;
+    env = ''
+      export NANOS6=ctf
+      export NANOS6_CTF2PRV=0
+    '';
+  };
+
   argv = {stage, conf, ...}: w.argv {
     program = stageProgram stage;
     env = ''
@@ -97,7 +108,7 @@ let
       -p ${toString conf.particles} )'';
   };
 
-  bscOverlay = import ../../../../overlay.nix;
+  bscOverlay = import ../../../overlay.nix;
 
   genPkgs = newOverlay: nixpkgs {
     overlays = [
@@ -139,6 +150,9 @@ let
 
     # Optionally profile the next stages with perf
     ++ optional enablePerf perf
+
+    # Optionally profile nanos6 with the new ctf
+    ++ optional enableCtf ctf
 
     # Execute the nbody app with the argv and env vars
     ++ [ argv nbodyFn ];

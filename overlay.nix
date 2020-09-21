@@ -2,19 +2,18 @@ self:  /* Future last stage */
 super: /* Previous stage */
 
 let
-  #callPackage = self.callPackage;
   inherit (self.lib) callPackageWith;
   inherit (self.lib) callPackagesWith;
   callPackage = callPackageWith (self // self.bsc);
+
+  # --------------------------------------------------------- #
+  #  BSC Packages
+  # --------------------------------------------------------- #
 
   bsc = {
     # Default MPI implementation to use. Will be overwritten by the
     # experiments.
     mpi = self.bsc.openmpi;
-
-    # --------------------------------------------------------- #
-    #  BSC Packages
-    # --------------------------------------------------------- #
 
     perf = callPackage ./bsc/perf/default.nix {
       kernel = self.linuxPackages_4_9.kernel;
@@ -76,34 +75,29 @@ let
 
     openmpi = self.bsc.openmpi-mn4;
 
-    fftw = callPackage ./bsc/fftw/default.nix {
-      mpi = self.bsc.mpi;
+    fftw = callPackage ./bsc/fftw/default.nix { };
+
+    extrae = callPackage ./bsc/extrae/default.nix { };
+
+    tampi = callPackage ./bsc/tampi/default.nix { };
+
+    mcxxGit = callPackage ./bsc/mcxx/default.nix {
+      bison = self.bison_3_5;
     };
 
-    extrae = callPackage ./bsc/extrae/default.nix {
-      mpi = self.bsc.mpi;
+    mcxxRarias = callPackage ./bsc/mcxx/rarias.nix {
+      bison = self.bison_3_5;
     };
 
-    tampi = callPackage ./bsc/tampi/default.nix {
-      mpi = self.bsc.mpi;
-    };
-
-    mcxx = callPackage ./bsc/mcxx/default.nix { };
-
-    mcxx-rarias = callPackage ./bsc/mcxx/rarias.nix { };
+    mcxx = self.bsc.mcxxGit;
 
     # Use nanos6 git by default
-    nanos6 = self.nanos6-git;
-    nanos6-latest = callPackage ./bsc/nanos6/default.nix {
-      extrae = self.bsc.extrae;
-    };
+    nanos6 = self.bsc.nanos6-git;
+    nanos6-latest = callPackage ./bsc/nanos6/default.nix { };
 
-    nanos6-git = callPackage ./bsc/nanos6/git.nix {
-      extrae = self.bsc.extrae;
-    };
+    nanos6-git = callPackage ./bsc/nanos6/git.nix { };
 
     vtk = callPackage ./bsc/vtk/default.nix {
-      mpi = self.bsc.mpi;
       inherit (self.xorg) libX11 xorgproto libXt;
     };
 
@@ -130,47 +124,57 @@ let
 
     mpptest = callPackage ./bsc/mpptest/default.nix { };
 
-
     garlic = {
 
       # Load some helper functions to generate app variants
-      inherit (import ./bsc/garlic/gen.nix) genApps genApp genConfigs;
+      inherit (import ./garlic/gen.nix) genApps genApp genConfigs;
 
-      mpptest = callPackage ./bsc/garlic/mpptest { };
+      mpptest = callPackage ./garlic/mpptest { };
 
-      ppong = callPackage ./bsc/garlic/ppong {
+      ppong = callPackage ./garlic/ppong {
         mpi = self.bsc.mpi;
       };
 
-      nbody = callPackage ./bsc/garlic/nbody {
+      nbody = callPackage ./garlic/nbody {
         cc = self.bsc.icc;
-        mpi = self.bsc.impi;
+        mpi = self.bsc.mpi;
         tampi = self.bsc.tampi;
+        mcxx = self.bsc.mcxx;
         gitBranch = "garlic/seq";
       };
 
+      # Execution wrappers
       runWrappers = {
-        sbatch  = callPackage ./bsc/garlic/sbatch.nix { };
-        srun    = callPackage ./bsc/garlic/srun.nix { };
-        launch  = callPackage ./bsc/garlic/launcher.nix { };
-        control = callPackage ./bsc/garlic/control.nix { };
-        nixsetup= callPackage ./bsc/garlic/nix-setup.nix { };
-        argv    = callPackage ./bsc/garlic/argv.nix { };
-        statspy = callPackage ./bsc/garlic/statspy.nix { };
-        extrae  = callPackage ./bsc/garlic/extrae.nix { };
-        stagen  = callPackage ./bsc/garlic/stagen.nix { };
+        sbatch    = callPackage ./garlic/stages/sbatch.nix { };
+        srun      = callPackage ./garlic/stages/srun.nix { };
+        launch    = callPackage ./garlic/stages/launcher.nix { };
+        control   = callPackage ./garlic/stages/control.nix { };
+        nixsetup  = callPackage ./garlic/stages/nix-setup.nix { };
+        argv      = callPackage ./garlic/stages/argv.nix { };
+        statspy   = callPackage ./garlic/stages/statspy.nix { };
+        extrae    = callPackage ./garlic/stages/extrae.nix { };
+        stagen    = callPackage ./garlic/stages/stagen.nix { };
+        perf      = callPackage ./garlic/stages/perf.nix { };
       };
 
       # Perf is tied to a linux kernel specific version
-      linuxPackages = self.linuxPackages_4_4;
-      perfWrapper = callPackage ./bsc/garlic/perf.nix {
-        perf = self.linuxPackages.perf;
-      };
+      #linuxPackages = self.linuxPackages_4_4;
+      #perfWrapper = callPackage ./garlic/perf.nix {
+      #  perf = self.linuxPackages.perf;
+      #};
 
       exp = {
-        noise = callPackage ./bsc/garlic/exp/noise.nix { };
+        noise = callPackage ./garlic/exp/noise.nix { };
         nbody = {
-          bs = callPackage ./bsc/garlic/exp/nbody/bs.nix {
+          bs = callPackage ./garlic/exp/nbody/bs.nix {
+            pkgs = self // self.bsc.garlic;
+            nixpkgs = import <nixpkgs>;
+            genApp = self.bsc.garlic.genApp;
+            genConfigs = self.bsc.garlic.genConfigs;
+            runWrappers = self.bsc.garlic.runWrappers;
+          };
+
+          tampi = callPackage ./garlic/exp/nbody/tampi.nix {
             pkgs = self // self.bsc.garlic;
             nixpkgs = import <nixpkgs>;
             genApp = self.bsc.garlic.genApp;
@@ -180,8 +184,8 @@ let
 #          mpi = callPackage ./bsc/garlic/exp/nbody/mpi.nix { };
         };
         osu = rec {
-          latency-internode = callPackage ./bsc/garlic/exp/osu/latency.nix { };
-          latency-intranode = callPackage ./bsc/garlic/exp/osu/latency.nix {
+          latency-internode = callPackage ./garlic/exp/osu/latency.nix { };
+          latency-intranode = callPackage ./garlic/exp/osu/latency.nix {
             interNode = false;
           };
           latency = latency-internode;
@@ -193,4 +197,10 @@ let
 in
   {
     bsc = bsc;
+
+    # Alias
+    garlic = bsc.garlic;
+
+    # Alias
+    exp = bsc.garlic.exp;
   }

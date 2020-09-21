@@ -6,7 +6,9 @@
 {
   program
 , env ? ""
-, argv # bash array as string, example: argv=''(-f "file with spaces" -t 10)''
+
+# bash array as string, example: argv=''(-f "file with spaces" -t 10)''
+, argv ? "()"
 }:
 
 stdenv.mkDerivation {
