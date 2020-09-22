@@ -152,7 +152,7 @@ let
     # Optionally profile the next stages with perf
     ++ optional enablePerf perf
 
-    # Execute the nbody app with the argv and env vars
+    # Execute the saiph example app
     ++ [ saiphFn ];
 
   # List of actual programs to be executed
