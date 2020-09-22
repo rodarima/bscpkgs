@@ -7,16 +7,16 @@
 }:
 
 stdenv.mkDerivation {
-  name = "argv";
+  name = "envRecord";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
   installPhase = ''
     cat > $out <<EOF
     #!/bin/sh
     
-    echo ----- ENV BEGIN -------
-    /usr/bin/env
-    echo ----- ENV END -------
+    >&2 echo ----- ENV BEGIN -------
+    >&2 /usr/bin/env
+    >&2 echo ----- ENV END -------
 
     exec ${program} \''${argv[@]}
     EOF
