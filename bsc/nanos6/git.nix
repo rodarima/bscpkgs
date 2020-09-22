@@ -16,7 +16,7 @@ with stdenv.lib;
 
 stdenv.mkDerivation rec {
   pname = "nanos6";
-  version = "2.4-${src.shortRev}";
+  version = "${src.shortRev}";
   branch = "master";
   cacheline-width = "64";
 
