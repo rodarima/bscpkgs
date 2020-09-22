@@ -12,7 +12,7 @@ with stdenv.lib;
 let
   # Set variable configuration for the experiment
   varConfig = {
-    numComm = [ 1 2 3 4 ];
+    numComm = [ 1 ];
   };
 
   # Common configuration
@@ -27,8 +27,8 @@ let
 
     # Stage configuration
     enableSbatch = true;
-    enableControl = true;
-    enableExtrae = false;
+    enableControl = false;
+    enableExtrae = true;
     enablePerf = false;
 
     # MN4 path
@@ -76,11 +76,22 @@ let
     program = stageProgram stage;
   };
 
-  extrae = {stage, conf, ...}: w.extrae {
-    program = stageProgram stage;
-    traceLib = "mpi"; # mpi -> libtracempi.so
-    configFile = ./extrae.xml;
-  };
+  extrae = {stage, conf, ...}:
+    let
+      # We set the mpi implementation to the one specified in the conf, so all
+      # packages in bsc will use that one.
+      customPkgs = genPkgs (self: super: {
+        bsc = super.bsc // { mpi = conf.mpi; };
+      });
+
+      extrae = customPkgs.bsc.extrae;
+    in
+      w.extrae {
+        program = stageProgram stage;
+        extrae = extrae;
+        traceLib = "nanosmpi"; # mpi -> libtracempi.so
+        configFile = ./extrae.xml;
+      };
 
   bscOverlay = import ../../../overlay.nix;
 

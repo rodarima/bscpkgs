@@ -1,7 +1,6 @@
 {
   stdenv
 , bash
-, extrae
 #, writeShellScriptBin
 }:
 
@@ -9,6 +8,7 @@
   program
 , configFile
 , traceLib
+, extrae
 }:
 
 #writeShellScriptBin "extraeWrapper" ''
