@@ -23,8 +23,8 @@ let
     mpi = pkgs.bsc.impi;
 
     # nbody runtime options
-    particles = 1024*128;
-    timesteps = 20;
+    particles = 1024*64;
+    timesteps = 10;
 
     # Resources
     ntasksPerNode = "48";
@@ -79,13 +79,25 @@ let
 
   nixsetup = {stage, conf, ...}: with conf; w.nixsetup {
     program = stageProgram stage;
+    nixsetup = "${nixPrefix}/bin/nix-setup";
   };
 
-  extrae = {stage, conf, ...}: w.extrae {
-    program = stageProgram stage;
-    traceLib = "mpi"; # mpi -> libtracempi.so
-    configFile = ./extrae.xml;
-  };
+  extrae = {stage, conf, ...}:
+    let
+      # We set the mpi implementation to the one specified in the conf, so all
+      # packages in bsc will use that one.
+      customPkgs = genPkgs (self: super: {
+        bsc = super.bsc // { mpi = conf.mpi; };
+      });
+
+      extrae = customPkgs.bsc.extrae;
+    in
+      w.extrae {
+        program = stageProgram stage;
+        extrae = extrae;
+        traceLib = "mpi"; # mpi -> libtracempi.so
+        configFile = ./extrae.xml;
+      };
 
   argv = {stage, conf, ...}: w.argv {
     program = stageProgram stage;
@@ -106,6 +118,14 @@ let
     ];
   };
 
+  # Print the environment to ensure we don't get anything nasty
+  envRecord = {stage, conf, ...}: w.envRecord {
+    program = stageProgram stage;
+  };
+
+  broom = {stage, conf, ...}: w.broom {
+    program = stageProgram stage;
+  };
   # We may be able to use overlays by invoking the fix function directly, but we
   # have to get the definition of the bsc packages and the garlic ones as
   # overlays.
@@ -123,11 +143,18 @@ let
     };
 
   stages = with common; []
-    # Use sbatch to request resources first
-    ++ optional enableSbatch sbatch
+    # Cleans ALL environment variables
+    ++ [ broom ]
 
-    # Repeats the next stages N times
-    ++ optionals enableControl [ nixsetup control ]
+    # Use sbatch to request resources first
+    ++ optionals enableSbatch [ sbatch nixsetup ]
+
+    # Record the current env vars set by SLURM to verify we don't have something
+    # nasty (like sourcing .bashrc). Take a look at #26
+    ++ [ envRecord ]
+
+    # Repeats the next stages N=30 times
+    ++ optional enableControl control
 
     # Executes srun to launch the program in the requested nodes, and
     # immediately after enters the nix environment again, as slurmstepd launches
