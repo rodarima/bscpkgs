@@ -1,23 +1,22 @@
 {
   stdenv
-, bash
-, perf
 }:
 
 {
   program
-, perfArgs ? "record -a"
 }:
 
+# This stage provides a clean environment to run experiments
 stdenv.mkDerivation {
-  name = "perfWrapper";
+  name = "broom";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
   installPhase = ''
     cat > $out <<EOF
     #!/bin/sh
 
-    exec ${perf}/bin/perf ${perfArgs} ${program}
+    # Removes all environment variables
+    /usr/bin/env -i ${program}
     EOF
     chmod +x $out
   '';

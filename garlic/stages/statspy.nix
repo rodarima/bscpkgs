@@ -16,7 +16,7 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/bin
     cat > $out/bin/${name} <<EOF
-    #!${bash}/bin/bash
+    #!/bin/sh
 
     mkdir -p ${outputDir}
     cat /proc/[0-9]*/stat | sort -n > ${outputDir}/statspy.\$(date +%s.%3N).begin

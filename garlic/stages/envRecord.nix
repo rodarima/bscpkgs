@@ -1,23 +1,24 @@
 {
   stdenv
-, bash
-, perf
 }:
 
 {
   program
-, perfArgs ? "record -a"
 }:
 
 stdenv.mkDerivation {
-  name = "perfWrapper";
+  name = "argv";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
   installPhase = ''
     cat > $out <<EOF
     #!/bin/sh
+    
+    echo ----- ENV BEGIN -------
+    /usr/bin/env
+    echo ----- ENV END -------
 
-    exec ${perf}/bin/perf ${perfArgs} ${program}
+    exec ${program} \''${argv[@]}
     EOF
     chmod +x $out
   '';

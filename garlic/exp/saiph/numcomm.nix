@@ -74,6 +74,7 @@ let
 
   nixsetup = {stage, conf, ...}: with conf; w.nixsetup {
     program = stageProgram stage;
+    nixsetup = "${nixPrefix}/bin/nix-setup";
   };
 
   extrae = {stage, conf, ...}:
@@ -102,6 +103,14 @@ let
     ];
   };
 
+  # Print the environment to ensure we don't get anything nasty
+  envRecord = {stage, conf, ...}: w.envRecord {
+    program = stageProgram stage;
+  };
+
+  broom = {stage, conf, ...}: w.broom {
+    program = stageProgram stage;
+  };
   # We may be able to use overlays by invoking the fix function directly, but we
   # have to get the definition of the bsc packages and the garlic ones as
   # overlays.
@@ -119,11 +128,18 @@ let
     };
 
   stages = with common; []
+    # Cleans ALL environment variables
+    ++ [ broom ]
+
     # Use sbatch to request resources first
     ++ optional enableSbatch sbatch
 
-    # Repeats the next stages N times
-    ++ optionals enableControl [ nixsetup control ]
+    # Record the current env vars set by SLURM to verify we don't have something
+    # nasty (like sourcing .bashrc). Take a look at #26
+    ++ [ envRecord ]
+
+    # Repeats the next stages N=30 times
+    ++ optional enableControl control
 
     # Executes srun to launch the program in the requested nodes, and
     # immediately after enters the nix environment again, as slurmstepd launches

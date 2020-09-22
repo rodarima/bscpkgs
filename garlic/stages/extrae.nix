@@ -24,8 +24,7 @@ stdenv.mkDerivation {
   phases = [ "installPhase" ];
   installPhase = ''
     cat > $out <<EOF
-    #!${bash}/bin/bash
-    # Requires /nix to use bash
+    #!/bin/sh
     
     export EXTRAE_HOME=${extrae}
     export LD_PRELOAD=${extrae}/lib/lib${traceLib}trace.so:$LD_PRELOAD

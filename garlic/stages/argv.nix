@@ -17,7 +17,7 @@ stdenv.mkDerivation {
   phases = [ "installPhase" ];
   installPhase = ''
     cat > $out <<EOF
-    #!${bash}/bin/bash
+    #!${bash}/bin/bash --norc
     # Requires /nix to use bash
     
     ${env}
