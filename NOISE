@@ -82,4 +82,22 @@ ABSTRACT
   I_MPI_THREAD_SPLIT controls whether the multithread capabilities are 
   enabled or not.
 
+1.6 LLVM and OpenMP problem
+
+  The LLVM OpenMP implementation is installed in libomp.so, however two 
+  symbolic links are created for libgomp.so and libiomp5.so.
+
+    libgomp.so -> libomp.so
+    libiomp5.so -> libomp.so
+    libomp.so
+  
+  So applications compiled with OpenMP by other compilers may end up 
+  using the LLVM implementation. This can be observed by setting  
+  LD_DEBUG=all of using strace(1) and looking for the libomp.so library 
+  being loaded.
+
+  In bscpkgs the symbolic links have been removed for the clangOmpss2 
+  compiler.
+
+
 /* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
