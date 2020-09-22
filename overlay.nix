@@ -13,7 +13,7 @@ let
   bsc = {
     # Default MPI implementation to use. Will be overwritten by the
     # experiments.
-    mpi = self.bsc.openmpi;
+    mpi = self.bsc.impi;
 
     perf = callPackage ./bsc/perf/default.nix {
       kernel = self.linuxPackages_4_9.kernel;
