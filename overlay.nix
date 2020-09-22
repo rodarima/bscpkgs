@@ -128,11 +128,33 @@ let
       # Load some helper functions to generate app variants
       inherit (import ./garlic/gen.nix) genApps genApp genConfigs;
 
-      mpptest = callPackage ./garlic/mpptest { };
+      # Override the hardening flags and parallel build by default (TODO)
+      #mkDerivation = callPackage ./garlic/mkDerivation.nix { };
 
-      ppong = callPackage ./garlic/ppong {
-        mpi = self.bsc.mpi;
-      };
+      # Apps for Garlic
+#      heat = callPackage ./garlic/heat {
+#        stdenv = pkgs.gcc7Stdenv;
+#        mpi = intel-mpi;
+#        tampi = tampi;
+#      };
+#
+#      creams = callPackage ./garlic/creams {
+#        stdenv = pkgs.gcc9Stdenv;
+#        mpi = intel-mpi;
+#        tampi = tampi.override {
+#          mpi = intel-mpi;
+#        };
+#      };
+#
+#      lulesh = callPackage ./garlic/lulesh {
+#        mpi = intel-mpi;
+#      };
+#
+#      hpcg = callPackage ./garlic/hpcg { };
+#
+#      hpccg = callPackage ./garlic/hpccg { };
+#
+#      fwi = callPackage ./garlic/fwi { };
 
       nbody = callPackage ./garlic/nbody {
         cc = self.bsc.icc;
@@ -158,13 +180,16 @@ let
         extrae    = callPackage ./garlic/stages/extrae.nix { };
         stagen    = callPackage ./garlic/stages/stagen.nix { };
         perf      = callPackage ./garlic/stages/perf.nix { };
+        broom     = callPackage ./garlic/stages/broom.nix { };
+        envRecord = callPackage ./garlic/stages/envRecord.nix { };
       };
 
-      # Perf is tied to a linux kernel specific version
-      #linuxPackages = self.linuxPackages_4_4;
-      #perfWrapper = callPackage ./garlic/perf.nix {
-      #  perf = self.linuxPackages.perf;
-      #};
+      # Tests (move to bsc ?)
+      mpptest = callPackage ./garlic/mpptest { };
+
+      ppong = callPackage ./garlic/ppong {
+        mpi = self.bsc.mpi;
+      };
 
       exp = {
         noise = callPackage ./garlic/exp/noise.nix { };
