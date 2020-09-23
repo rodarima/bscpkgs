@@ -3,7 +3,7 @@
 , nanos6
 , mpi
 , tampi
-, mcxx
+, cc 
 , vtk
 , boost
 , gitBranch ? "master"
@@ -30,7 +30,7 @@ stdenv.mkDerivation rec {
     nanos6
     mpi
     tampi
-    mcxx
+    cc
     vtk
     boost
   ];
@@ -54,7 +54,7 @@ stdenv.mkDerivation rec {
   '';
 
   makeFlags = [
-    "-f" "Makefile.clang"
+    "-f" "Makefile.${cc.cc.CC}"
     "apps"
     "APP=ExHeat3D"
     ( if (numComm != null) then "NUM_COMM=${toString numComm}" else "" )
