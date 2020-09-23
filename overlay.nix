@@ -165,7 +165,7 @@ let
       };
 
       saiph = callPackage ./garlic/saiph {
-        stdenv = self.bsc.stdenvOmpss2;
+        cc = self.bsc.clangOmpss2;
       };
 
       # Execution wrappers
