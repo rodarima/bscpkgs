@@ -115,6 +115,18 @@ let
   # have to get the definition of the bsc packages and the garlic ones as
   # overlays.
 
+  argv = {stage, conf, ...}: with conf; w.argv {
+    program = stageProgram stage;
+    env = ''
+      export NANOS6_REPORT_PREFIX="#"
+      export I_MPI_THREAD_SPLIT=1
+    ''
+    + optionalString enableExtrae
+    ''export NANOS6=extrae
+      export NANOS6_EXTRAE_AS_THREADS=0
+    '';
+  };
+
   saiphFn = {stage, conf, ...}: with conf;
     let
       # We set the mpi implementation to the one specified in the conf, so all
@@ -153,7 +165,7 @@ let
     ++ optional enablePerf perf
 
     # Execute the saiph example app
-    ++ [ saiphFn ];
+    ++ [ argv saiphFn ];
 
   # List of actual programs to be executed
   jobs = map (conf: w.stagen { inherit conf stages; }) configs;
