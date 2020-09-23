@@ -132,7 +132,7 @@ let
     ++ [ broom ]
 
     # Use sbatch to request resources first
-    ++ optional enableSbatch sbatch
+    ++ optionals enableSbatch [ sbatch nixsetup ]
 
     # Record the current env vars set by SLURM to verify we don't have something
     # nasty (like sourcing .bashrc). Take a look at #26
