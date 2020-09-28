@@ -28,7 +28,7 @@ let
     # Stage configuration
     enableSbatch = true;
     enableControl = false;
-    enableExtrae = true;
+    enableExtrae = false;
     enablePerf = false;
 
     # MN4 path
