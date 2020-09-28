@@ -15,7 +15,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  version = "11.0.0";
+  version = "${src.shortRev}";
   pname = "clang-ompss2";
   enableParallelBuilding = true;
   isClang = true;
