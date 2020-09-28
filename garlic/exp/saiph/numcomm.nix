@@ -120,6 +120,7 @@ let
     env = ''
       export NANOS6_REPORT_PREFIX="#"
       export I_MPI_THREAD_SPLIT=1
+      export ASAN_SYMBOLIZER_PATH=${pkgs.bsc.clangOmpss2Unwrapped}/bin/llvm-symbolizer
     ''
     + optionalString enableExtrae
     ''export NANOS6=extrae
