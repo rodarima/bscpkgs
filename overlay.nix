@@ -30,6 +30,9 @@ let
 
     mpichDebug = self.mpich.override { enableDebug = true; };
 
+    # Updated version of libpsm2: TODO push upstream.
+    #libpsm2 = callPackage ./bsc/libpsm2/default.nix { };
+
     # Default Intel MPI version is 2019 (the last one)
     impi = self.bsc.intelMpi;
 
