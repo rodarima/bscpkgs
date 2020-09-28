@@ -182,6 +182,7 @@ let
         perf      = callPackage ./garlic/stages/perf.nix { };
         broom     = callPackage ./garlic/stages/broom.nix { };
         envRecord = callPackage ./garlic/stages/envRecord.nix { };
+        valgrind  = callPackage ./garlic/stages/valgrind.nix { };
       };
 
       # Tests (move to bsc ?)
