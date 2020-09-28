@@ -9,15 +9,29 @@
 , patchelf
 , autoPatchelfHook
 , enableDebug ? false
+# The _mt version seems to cause seg-faults and deadlocks with the libpsm2
+# provider library with programs that call the MPI library without any locking
+# mechanism. See https://pm.bsc.es/gitlab/rarias/bscpkgs/-/issues/28. By
+# default, we use the non-mt variant, which provides a big lock. If you want to
+# use it, take a look at the I_MPI_THREAD_SPLIT env-var as well.
+, enableMt ? false
 }:
+
+let
+
+  lib_variant = (if enableDebug then "debug" else "release");
+
+  # See https://software.intel.com/content/www/us/en/develop/documentation/mpi-developer-reference-linux/top/environment-variable-reference/other-environment-variables.html
+  lib_mt = (if enableMt then "_mt" else "");
+  lib_name = "${lib_variant}${lib_mt}";
+
+in
 
 stdenv.mkDerivation rec {
   name = "intel-mpi-${version}";
   version = "2019.8.254";
   dir_nr = "16814";
   internal-ver = "2020.2.254";
-
-  lib_variant = (if enableDebug then "debug" else "release");
 
   src = builtins.fetchTarball {
     url = "http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/${dir_nr}/l_mpi_${version}.tgz";
@@ -66,7 +80,7 @@ stdenv.mkDerivation rec {
     mv include $out 
     mkdir $out/lib
     cp -a lib/lib* $out/lib
-    cp -a lib/${lib_variant}_mt/lib* $out/lib
+    cp -a lib/${lib_name}/lib* $out/lib
     cp -a libfabric/lib/* $out/lib
     cp -a libfabric/lib/prov/* $out/lib
     cp -a libfabric/bin/* $out/bin
