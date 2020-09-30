@@ -82,7 +82,9 @@ let
 
     extrae = callPackage ./bsc/extrae/default.nix { };
 
-    tampi = callPackage ./bsc/tampi/default.nix { };
+    tampi = self.bsc.tampiRelease;
+    tampiRelease = callPackage ./bsc/tampi/default.nix { };
+    tampiGit = callPackage ./bsc/tampi/git.nix { };
 
     mcxxGit = callPackage ./bsc/mcxx/default.nix {
       bison = self.bison_3_5;
