@@ -143,14 +143,21 @@ let
 #        tampi = tampi;
 #      };
 #
-#      creams = callPackage ./garlic/creams {
-#        stdenv = pkgs.gcc9Stdenv;
-#        mpi = intel-mpi;
-#        tampi = tampi.override {
-#          mpi = intel-mpi;
-#        };
-#      };
-#
+      creams = callPackage ./garlic/creams {
+        gitBranch = "garlic/mpi+send+seq";
+
+        #cc = self.gcc10;            # Does not work
+        #mpi = self.bsc.openmpi-mn4; # Does not work
+
+        cc  = self.bsc.icc;
+        mpi = self.bsc.mpi;
+      };
+
+      creamsInput = callPackage ./garlic/creams/input.nix {
+        gitBranch = "garlic/mpi+send+seq";
+        nodes = 1;
+      };
+
 #      lulesh = callPackage ./garlic/lulesh {
 #        mpi = intel-mpi;
 #      };
@@ -223,6 +230,16 @@ let
 
         saiph = {
           numcomm = callPackage ./garlic/exp/saiph/numcomm.nix {
+            pkgs = self // self.bsc.garlic;
+            nixpkgs = import <nixpkgs>;
+            genApp = self.bsc.garlic.genApp;
+            genConfigs = self.bsc.garlic.genConfigs;
+            runWrappers = self.bsc.garlic.runWrappers;
+          };
+        };
+
+        creams = {
+          SS_mpi_send_seq = callPackage ./garlic/exp/creams/SS+mpi+send+seq.nix {
             pkgs = self // self.bsc.garlic;
             nixpkgs = import <nixpkgs>;
             genApp = self.bsc.garlic.genApp;

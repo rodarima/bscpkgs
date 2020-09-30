@@ -28,7 +28,7 @@ with stdenv.lib;
 let
 
   sbatchOpt = name: value: optionalString (value!=null)
-    "#SBATCH --${name}=${value}\n";
+    "#SBATCH --${name}=${toString value}\n";
   sbatchEnable = name: value: optionalString (value!=null)
     "#SBATCH --${name}\n";
 
