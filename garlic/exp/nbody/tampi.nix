@@ -82,6 +82,7 @@ let
 
   nixsetup = {stage, conf, ...}: with conf; w.nixsetup {
     program = stageProgram stage;
+    nixsetup = "${nixPrefix}/bin/nix-setup";
   };
 
   extrae = {stage, conf, ...}: w.extrae {
