@@ -18,7 +18,7 @@ let
   # Common configuration
   common = {
     # Compile time nbody config
-    gitBranch = "Saiph_TAMPI_OMPSS";
+    gitBranch = "garlic/tampi+isend+oss+task+simd";
     mpi = pkgs.bsc.impi;
 
     # Resources
