@@ -10,5 +10,6 @@ stdenv.mkDerivation rec {
     tampi
     vtk
     boost
+    ministat
   ];
 }
