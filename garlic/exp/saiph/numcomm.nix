@@ -44,14 +44,23 @@ let
 
   w = runWrappers;
 
-  sbatch = {stage, conf, ...}: with conf; w.sbatch {
-    program = stageProgram stage;
-    exclusive = true;
-    time = "02:00:00";
-    qos = "debug";
-    jobName = "saiph";
-    inherit nixPrefix nodes ntasksPerNode;
-  };
+  sbatch = {stage, conf, ...}: with conf; w.sbatch (
+    # Allow a user to define a custom reservation for the job in MareNostrum4,
+    # by setting the garlic.sbatch.reservation attribute in the 
+    # ~/.config/nixpkgs/config.nix file. If the attribute is not set, no
+    # reservation is used. The user reservation may be overwritten by the
+    # experiment, if the reservation is set like with nodes or ntasksPerNode.
+    optionalAttrs (pkgs.config ? garlic.sbatch.reservation) {
+      inherit (pkgs.config.garlic.sbatch) reservation;
+    } // {
+      program = stageProgram stage;
+      exclusive = true;
+      time = "02:00:00";
+      qos = "debug";
+      jobName = "saiph";
+      inherit nixPrefix nodes ntasksPerNode;
+    }
+  );
 
   control = {stage, conf, ...}: with conf; w.control {
     program = stageProgram stage;
