@@ -38,5 +38,8 @@ stdenv.mkDerivation {
     EOF
 
     chmod +x $out/bin/run
+
+    # Mark the launcher for upload
+    touch $out/.upload-to-mn
   '';
 }
