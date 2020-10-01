@@ -6,6 +6,8 @@
 , impi
 , tampi
 , mcxx
+, gnuDef
+, intelDef
 , cc
 , gitBranch
 }:
@@ -18,12 +20,16 @@ let
   else
     "IntelMPI");
 
+  compName = (if cc == intelDef then
+    "Intel"
+  else
+    "GNU");
+
 in
 stdenv.mkDerivation rec {
   name = "creams";
 
   # src = /home/Computational/pmartin1/creams-simplified;
-
   src = builtins.fetchGit {
     url = "ssh://git@bscpm02.bsc.es/pmartin1/creams-simplified.git";
     ref = "${gitBranch}";
@@ -45,7 +51,8 @@ stdenv.mkDerivation rec {
     export TAMPI_HOME=${tampi}
 
     . etc/bashrc
-    #export FORTRAN_COMPILER=GNU # GCC compiler
+
+    export FORTRAN_COMPILER=${compName}
     export MPI_LIB=${mpiName}
 
     echo

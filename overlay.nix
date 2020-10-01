@@ -144,18 +144,17 @@ let
 #      };
 #
       creams = callPackage ./garlic/creams {
+        gnuDef   = self.gfortran10 ; # Default GNU   compiler version
+        intelDef = self.bsc.icc    ; # Default Intel compiler version
+
         gitBranch = "garlic/mpi+send+seq";
 
-        #cc = self.gcc10;            # Does not work
-        #mpi = self.bsc.openmpi-mn4; # Does not work
-
-        cc  = self.bsc.icc;
-        mpi = self.bsc.mpi;
+        cc  = self.bsc.icc; # self.bsc.icc OR self.gfortran10;
+        mpi = self.bsc.mpi; # self.bsc.mpi OR self.bsc.openmpi-mn4;
       };
 
       creamsInput = callPackage ./garlic/creams/input.nix {
         gitBranch = "garlic/mpi+send+seq";
-        nodes = 1;
       };
 
 #      lulesh = callPackage ./garlic/lulesh {

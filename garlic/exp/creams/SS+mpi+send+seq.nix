@@ -14,20 +14,22 @@ let
 
   # Set variable configuration for the experiment
   varConfig = {
-    # cc  = [ self.gcc10  ]; # Does not work
-    # mpi = [ bsc.openmpi ]; # Does not work
-    # cc  = [ bsc.icc  ];
-    # mpi = [ bsc.impi ];
+    cc  = [ bsc.icc  ]; # [ bsc.icc  pkgs.gfortran10 ];
 
-    nodes = [ 1 2 4 8 16 ];
+    mpi = [ bsc.impi ]; # [ bsc.impi bsc.openmpi-mn4 ];
+
+    input = [
+      { nodes=1 ; nprocz=48 ; granul=0; }
+      { nodes=2 ; nprocz=96 ; granul=0; }
+      { nodes=4 ; nprocz=192; granul=0; }
+      { nodes=8 ; nprocz=384; granul=0; }
+      { nodes=16; nprocz=768; granul=0; }
+    ];
   };
 
   # Common configuration
   common = {
     gitBranch = "garlic/mpi+send+seq";
-
-    cc  = bsc.icc ;
-    mpi = bsc.impi;
 
     # Resources
     ntasksPerNode   = 48;
@@ -56,10 +58,12 @@ let
   sbatch = {stage, conf, ...}: with conf; w.sbatch {
     program = stageProgram stage;
     exclusive = true;
-    time = "02:00:00";
-    qos = "debug";
-    jobName = "nbody-bs";
-    inherit nixPrefix nodes ntasksPerNode;
+    time = "10:00:00";
+    ####qos = "debug";
+    jobName = "creams-ss-mpi+send+seq";
+    inherit nixPrefix ntasksPerNode;
+
+    nodes = input.nodes;
   };
 
   control = {stage, conf, ...}: with conf; w.control {
@@ -109,19 +113,19 @@ let
     ];
   };
 
-  inputDataset = {stage, conf, ...}: with conf;
+  inputDataset = {stage, conf, ...}:
   let
     input = bsc.garlic.creamsInput.override {
-      inherit gitBranch nodes;
+      gitBranch = conf.gitBranch;
+      granul = conf.input.granul;
+      nprocz = conf.input.nprocz;
     };
   in w.argv
   {
     program = stageProgram stage;
     env = ''
       cp -r ${input}/SodTubeBenchmark/* .
-
-      pwd
-      ls -l
+      chmod +w -R .
     '';
   };
 
@@ -162,7 +166,7 @@ let
     # Optionally profile nanos6 with the new ctf
     ++ optional enableCtf ctf
 
-    # Execute the nbody app with the argv and env vars
+    # Execute the app with the argv and env vars
     ++ [ inputDataset creamsFn ];
 
   # List of actual programs to be executed
