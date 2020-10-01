@@ -99,5 +99,12 @@ ABSTRACT
   In bscpkgs the symbolic links have been removed for the clangOmpss2 
   compiler.
 
+1.7 Nix-shell does not allow isolation
+
+  Nix-shell is not isolated, the compilation process tries then to
+  use headers and libs from /usr.
+
+  This can induce compilation errors not happening inside nix-build.
+  Do not use to ensure reproducibility.
 
 /* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
