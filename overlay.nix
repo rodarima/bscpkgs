@@ -237,20 +237,22 @@ let
           };
         };
 
-        creamsSS = {
-          nohybrid = callPackage ./garlic/exp/creams/SS+nohybrid.nix {
-            pkgs = self // self.bsc.garlic;
-            nixpkgs = import <nixpkgs>;
-            genApp = self.bsc.garlic.genApp;
-            genConfigs = self.bsc.garlic.genConfigs;
-            runWrappers = self.bsc.garlic.runWrappers;
-          };
-         hybrid = callPackage ./garlic/exp/creams/SS+hybrid.nix {
-            pkgs = self // self.bsc.garlic;
-            nixpkgs = import <nixpkgs>;
-            genApp = self.bsc.garlic.genApp;
-            genConfigs = self.bsc.garlic.genConfigs;
-            runWrappers = self.bsc.garlic.runWrappers;
+        creams = {
+          ss = {
+            pure = callPackage ./garlic/exp/creams/ss+pure.nix {
+              pkgs = self // self.bsc.garlic;
+              nixpkgs = import <nixpkgs>;
+              genApp = self.bsc.garlic.genApp;
+              genConfigs = self.bsc.garlic.genConfigs;
+              runWrappers = self.bsc.garlic.runWrappers;
+            };
+            hybrid = callPackage ./garlic/exp/creams/ss+hybrid.nix {
+              pkgs = self // self.bsc.garlic;
+              nixpkgs = import <nixpkgs>;
+              genApp = self.bsc.garlic.genApp;
+              genConfigs = self.bsc.garlic.genConfigs;
+              runWrappers = self.bsc.garlic.runWrappers;
+            };
           };
         };
 
