@@ -38,19 +38,11 @@ stdenv.mkDerivation rec {
   # Required for nanos6
   hardeningDisable = [ "bindnow" ];
   
-#  Enable debug
-#  postPatch = ''
-#    sed -i 's/^SANITIZE_FLAGS=/SANITIZE_FLAGS=$(DEBUG_FLAGS)/g' \
-#      saiphv2/cpp/src/Makefile.clang
-#  '';
-
   preBuild = ''
     cd saiphv2/cpp/src
 
     export VTK_VERSION=8.2
     export VTK_HOME=${vtk}
-    export BOOST_HOME=${boost}
-    export SAIPH_HOME=.
   '';
 
   makeFlags = [
