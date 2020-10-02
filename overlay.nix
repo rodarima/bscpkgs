@@ -197,6 +197,9 @@ let
         mpi = self.bsc.mpi;
       };
 
+      # Post processing tools
+      hist = callPackage ./garlic/postprocess/hist { };
+
       exp = {
         noise = callPackage ./garlic/exp/noise.nix { };
         nbody = {
