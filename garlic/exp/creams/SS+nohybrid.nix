@@ -14,20 +14,26 @@ let
 
   # Set variable configuration for the experiment
   varConfig = {
-    mpi = [ bsc.impi bsc.openmpi ];
-    nodes = [ 1 ];
+    cc  = [ bsc.icc  ]; # [ bsc.icc  pkgs.gfortran10 ];
+
+    mpi = [ bsc.impi ]; # [ bsc.impi bsc.openmpi-mn4 ];
+
+    input = [
+      { nodes=1 ; nprocz=48 ; granul=0; time= "10:00:00";  }
+      { nodes=2 ; nprocz=96 ; granul=0; time= "05:00:00";  }
+      { nodes=4 ; nprocz=192; granul=0; time= "03:00:00";  }
+      { nodes=8 ; nprocz=384; granul=0; time= "02:00:00";  }
+      { nodes=16; nprocz=768; granul=0; time= "01:00:00";  }
+    ];
+
+    gitBranch = [ "garlic/mpi+send+seq" ];
   };
 
   # Common configuration
   common = {
-    # Compile time nbody config
-    gitBranch = "garlic/mpi+send+seq";
-
-    cc = bsc.icc;
-
     # Resources
-    ntasksPerNode = 48;
-    nodes = 1;
+    ntasksPerNode   = 48;
+    #ntasksPerSocket = 24; // Add this variable to nix
 
     # Stage configuration
     enableSbatch = true;
@@ -50,12 +56,13 @@ let
   w = runWrappers;
 
   sbatch = {stage, conf, ...}: with conf; w.sbatch {
+    nodes = input.nodes;
     program = stageProgram stage;
     exclusive = true;
-    time = "02:00:00";
-    qos = "debug";
-    jobName = "nbody-bs";
-    inherit nixPrefix nodes ntasksPerNode;
+    time = input.time;
+    #qos = "debug";
+    jobName = "creams-ss-${toString input.nodes}-${toString gitBranch}";
+    inherit nixPrefix ntasksPerNode;
   };
 
   control = {stage, conf, ...}: with conf; w.control {
@@ -105,19 +112,19 @@ let
     ];
   };
 
-  inputDataset = {stage, conf, ...}: with conf;
+  inputDataset = {stage, conf, ...}:
   let
     input = bsc.garlic.creamsInput.override {
-      inherit gitBranch nodes;
+      gitBranch = conf.gitBranch;
+      granul = conf.input.granul;
+      nprocz = conf.input.nprocz;
     };
   in w.argv
   {
     program = stageProgram stage;
     env = ''
       cp -r ${input}/SodTubeBenchmark/* .
-
-      pwd
-      ls -l
+      chmod +w -R .
     '';
   };
 
@@ -158,7 +165,7 @@ let
     # Optionally profile nanos6 with the new ctf
     ++ optional enableCtf ctf
 
-    # Execute the nbody app with the argv and env vars
+    # Execute the app with the argv and env vars
     ++ [ inputDataset creamsFn ];
 
   # List of actual programs to be executed

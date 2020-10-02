@@ -237,8 +237,8 @@ let
           };
         };
 
-        creams = {
-          SS_mpi_send_seq = callPackage ./garlic/exp/creams/SS+mpi+send+seq.nix {
+        creamsSS = {
+          nohybrid = callPackage ./garlic/exp/creams/SS+nohybrid.nix {
             pkgs = self // self.bsc.garlic;
             nixpkgs = import <nixpkgs>;
             genApp = self.bsc.garlic.genApp;
