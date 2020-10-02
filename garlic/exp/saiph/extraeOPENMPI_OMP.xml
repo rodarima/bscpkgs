@@ -1,7 +1,6 @@
 <?xml version='1.0'?>
 
 <trace enabled="yes"
- home="/apps/BSCTOOLS/extrae/3.7.1/openmpi_4_0_1"
  initial-mode="detail"
  type="paraver"
 >

@@ -1,7 +1,6 @@
 <?xml version='1.0'?>
 
 <trace enabled="yes"
- home="/apps/CEPBATOOLS/extrae/2.4.3rc3/openmpi/64"
  initial-mode="detail"
  type="paraver"
 >
