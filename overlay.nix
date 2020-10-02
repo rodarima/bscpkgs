@@ -245,6 +245,13 @@ let
             genConfigs = self.bsc.garlic.genConfigs;
             runWrappers = self.bsc.garlic.runWrappers;
           };
+         hybrid = callPackage ./garlic/exp/creams/SS+hybrid.nix {
+            pkgs = self // self.bsc.garlic;
+            nixpkgs = import <nixpkgs>;
+            genApp = self.bsc.garlic.genApp;
+            genConfigs = self.bsc.garlic.genConfigs;
+            runWrappers = self.bsc.garlic.runWrappers;
+          };
         };
 
         osu = rec {
