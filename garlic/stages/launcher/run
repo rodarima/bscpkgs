@@ -1,0 +1,19 @@
+#!/bin/sh -ex
+
+>&2 echo "Running launcher run stage"
+env
+
+if [ -e /nix ]; then
+  >&2 echo "Cannot use the launcher inside nix environment!"
+  exit 1
+fi
+
+if [ -z "$GARLIC_OUT" ]; then
+  >&2 echo "GARLIC_OUT is not set"
+  exit 1
+fi
+  
+mkdir -p "$GARLIC_OUT"
+cd "$GARLIC_OUT"
+
+exec nix-isolate @nixPrefix@@out@/bin/stage2

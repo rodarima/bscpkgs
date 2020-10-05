@@ -70,6 +70,9 @@ let
       pmix = self.bsc.pmix2;
     };
 
+    # Use a slurm compatible with MN4
+    slurm = self.bsc.slurm17;
+
     openmpi-mn4 = callPackage ./bsc/openmpi/default.nix {
       pmix = self.bsc.pmix2;
       pmi2 = self.bsc.slurm17-libpmi2;
@@ -128,6 +131,11 @@ let
 
     mpptest = callPackage ./bsc/mpptest/default.nix { };
 
+    nixtools = callPackage ./bsc/nixtools/default.nix {
+      targetCluster = "mn4";
+      nixPrefix = "/gpfs/projects/bsc15/nix";
+    };
+
     garlic = {
 
       # Load some helper functions to generate app variants
@@ -183,7 +191,7 @@ let
       runWrappers = {
         sbatch    = callPackage ./garlic/stages/sbatch.nix { };
         srun      = callPackage ./garlic/stages/srun.nix { };
-        launch    = callPackage ./garlic/stages/launcher.nix { };
+        launch    = callPackage ./garlic/stages/launcher { };
         control   = callPackage ./garlic/stages/control.nix { };
         nixsetup  = callPackage ./garlic/stages/nix-setup.nix { };
         argv      = callPackage ./garlic/stages/argv.nix { };
@@ -194,6 +202,7 @@ let
         broom     = callPackage ./garlic/stages/broom.nix { };
         envRecord = callPackage ./garlic/stages/envRecord.nix { };
         valgrind  = callPackage ./garlic/stages/valgrind.nix { };
+        nix-isolate = callPackage ./garlic/stages/nix-isolate.nix { };
       };
 
       # Tests (move to bsc ?)
@@ -207,7 +216,7 @@ let
       hist = callPackage ./garlic/postprocess/hist { };
 
       exp = {
-        noise = callPackage ./garlic/exp/noise.nix { };
+        #noise = callPackage ./garlic/exp/noise.nix { };
         nbody = {
           bs = callPackage ./garlic/exp/nbody/bs.nix {
             pkgs = self // self.bsc.garlic;

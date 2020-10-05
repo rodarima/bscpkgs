@@ -1,5 +1,6 @@
 {
   stdenv
+, slurm
 }:
 {
   program
@@ -14,8 +15,9 @@ stdenv.mkDerivation rec {
   dontPatchShebangs = true;
   installPhase = ''
     cat > $out <<EOF
-    #!/bin/sh
-    exec srun --mpi=pmi2 ${srunOptions} ${nixPrefix}${program}
+    #!/bin/sh -ex
+    exec ${slurm}/bin/srun --mpi=pmi2 ${srunOptions} \
+      ${nixPrefix}${program}
     EOF
     chmod +x $out
   '';

@@ -15,7 +15,7 @@ let
   # Set variable configuration for the experiment
   varConfig = {
     cc = [ bsc.icc ];
-    mpi = [ bsc.impi bsc.openmpi ];
+    mpi = [ bsc.impi ];
     blocksize = [ 1024 ];
   };
 
@@ -89,9 +89,9 @@ let
     perfArgs = "sched record -a";
   };
 
-  nixsetup = {stage, conf, ...}: with conf; w.nixsetup {
+  nixsetup = {stage, conf, ...}: with conf; w.nix-isolate {
     program = stageProgram stage;
-    nixsetup = "${nixPrefix}/bin/nix-setup";
+    clusterName = "mn4";
   };
 
   extrae = {stage, conf, ...}: w.extrae {
@@ -143,6 +143,10 @@ let
       inherit cc blocksize mpi gitBranch;
     };
 
+  launch = w.launch.override {
+    nixPrefix = common.nixPrefix;
+  };
+
   stages = with common; []
     # Use sbatch to request resources first
     ++ optional enableSbatch sbatch
@@ -172,4 +176,4 @@ let
 
 in
   # We simply run each program one after another
-  w.launch jobs
+  launch jobs

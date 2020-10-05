@@ -1,5 +1,6 @@
 {
   stdenv
+, nixPrefix ? ""
 }:
 
 apps: # Each app must be unique
@@ -10,8 +11,17 @@ stdenv.mkDerivation {
 
   buildInputs = [] ++ apps;
   apps = apps;
-  phases = [ "installPhase" ];
+  phases = [ "unpackPhase" "patchPhase" "installPhase" ];
   dontPatchShebangs = true;
+
+  src = ./.;
+
+  inherit nixPrefix;
+
+  patchPhase = ''
+    substituteAllInPlace run
+    substituteAllInPlace stage2
+  '';
 
   installPhase = ''
     mkdir -p $out/apps
@@ -29,17 +39,13 @@ stdenv.mkDerivation {
     done
 
     mkdir -p $out/bin
-    cat > $out/bin/run <<EOF
-    #!/bin/sh
-
-    for j in $out/apps/*; do
-      \$j/bin/run
-    done
-    EOF
-
-    chmod +x $out/bin/run
+    install -m755 run $out/bin/run
+    install -m755 stage2 $out/bin/stage2
+    chmod +x $out/bin/*
 
     # Mark the launcher for upload
     touch $out/.upload-to-mn
+    # And mark it as an experiment
+    touch $out/.experiment
   '';
 }

@@ -1,6 +1,7 @@
 {
   stdenv
 , numactl
+, slurm
 }:
 
 {
@@ -50,7 +51,7 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out
     cat > $out/job <<EOF
-    #!/bin/sh
+    #!/bin/sh -ex
     #SBATCH --job-name="${jobName}"
     ''
     + sbatchOpt "ntasks" ntasks
@@ -72,14 +73,14 @@ stdenv.mkDerivation rec {
     EOF
     
     cat > $out/${name} <<EOF
-    #!/bin/sh
+    #!/bin/sh -ex
     if [ -e "${chdirPrefix}/$(basename $out)" ]; then
       >&2 echo "Execution aborted: '${chdirPrefix}/$(basename $out)' already exists"
       exit 1
     fi
     mkdir -p "${chdirPrefix}/$(basename $out)"
-    echo sbatch ${nixPrefix}$out/job
-    sbatch ${nixPrefix}$out/job
+    echo ${slurm}/bin/sbatch ${nixPrefix}$out/job
+    ${slurm}/bin/sbatch ${nixPrefix}$out/job
     EOF
     chmod +x $out/${name}
   '';

@@ -1,0 +1,12 @@
+#!/bin/sh -ex
+
+>&2 echo "Running launcher stage2"
+
+if [ ! -e "/nix" ]; then
+  >&2 echo "Cannot execute stage2 outside from nix environment"
+  exit 1
+fi
+
+for j in @out@/apps/*; do
+  $j/bin/run
+done
