@@ -25,12 +25,12 @@ let
     gitBranch = "garlic/tampi+send+oss+task";
 
     # nbody runtime options
-    particles = 1024*128;
-    timesteps = 20;
+    particles = 1024*4;
+    timesteps = 10;
 
     # Resources
-    ntasksPerNode = "48";
-    nodes = "1";
+    ntasksPerNode = "2";
+    nodes = "2";
 
     # Stage configuration
     enableSbatch = true;
@@ -76,7 +76,7 @@ let
 
   srun = {stage, conf, ...}: with conf; w.srun {
     program = stageProgram stage;
-    srunOptions = "--cpu-bind=verbose,rank";
+    srunOptions = "--cpu-bind=verbose,socket";
     inherit nixPrefix;
   };
 
