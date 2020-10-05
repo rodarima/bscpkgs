@@ -143,14 +143,20 @@ let
 #        tampi = tampi;
 #      };
 #
-#      creams = callPackage ./garlic/creams {
-#        stdenv = pkgs.gcc9Stdenv;
-#        mpi = intel-mpi;
-#        tampi = tampi.override {
-#          mpi = intel-mpi;
-#        };
-#      };
-#
+      creams = callPackage ./garlic/creams {
+        gnuDef   = self.gfortran10 ; # Default GNU   compiler version
+        intelDef = self.bsc.icc    ; # Default Intel compiler version
+
+        gitBranch = "garlic/mpi+send+seq";
+
+        cc  = self.bsc.icc; # self.bsc.icc OR self.gfortran10;
+        mpi = self.bsc.mpi; # self.bsc.mpi OR self.bsc.openmpi-mn4;
+      };
+
+      creamsInput = callPackage ./garlic/creams/input.nix {
+        gitBranch = "garlic/mpi+send+seq";
+      };
+
 #      lulesh = callPackage ./garlic/lulesh {
 #        mpi = intel-mpi;
 #      };
@@ -228,6 +234,25 @@ let
             genApp = self.bsc.garlic.genApp;
             genConfigs = self.bsc.garlic.genConfigs;
             runWrappers = self.bsc.garlic.runWrappers;
+          };
+        };
+
+        creams = {
+          ss = {
+            pure = callPackage ./garlic/exp/creams/ss+pure.nix {
+              pkgs = self // self.bsc.garlic;
+              nixpkgs = import <nixpkgs>;
+              genApp = self.bsc.garlic.genApp;
+              genConfigs = self.bsc.garlic.genConfigs;
+              runWrappers = self.bsc.garlic.runWrappers;
+            };
+            hybrid = callPackage ./garlic/exp/creams/ss+hybrid.nix {
+              pkgs = self // self.bsc.garlic;
+              nixpkgs = import <nixpkgs>;
+              genApp = self.bsc.garlic.genApp;
+              genConfigs = self.bsc.garlic.genConfigs;
+              runWrappers = self.bsc.garlic.runWrappers;
+            };
           };
         };
 
