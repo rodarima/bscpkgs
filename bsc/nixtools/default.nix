@@ -1,5 +1,6 @@
 {
   stdenv
+, glibc
 , targetCluster
 , nixPrefix
 }:
@@ -8,6 +9,7 @@ stdenv.mkDerivation rec {
   name = "nixtools-${targetCluster}";
   #version = "${src.shortRev}";
   src = ~/nixtools;
+  buildInputs = [ glibc.static ];
   makeFlags = [ "DESTDIR=$(out)" ];
   preBuild = "env";
   dontPatchShebangs = true;

@@ -1,0 +1,23 @@
+#!/bin/sh -ex
+
+>&2 echo Running isolate stage1
+>&2 echo PATH=$PATH
+
+if [ -e /nix ]; then
+  >&2 echo "/nix found, aborting"
+  exit 1
+fi
+
+nixhome="@nixPrefix@/nix"
+shell="@busybox@/bin/sh"
+nixjoin="@nixPrefix@@nixtools@/bin/nix-join"
+
+
+#-m @nixPrefix@ \
+join_flags="
+	-m /etc \
+	-m /var/run/munge \
+	-m /gpfs/projects/bsc15 \
+	-m /bin:@nixPrefix@@busybox@/bin"
+
+exec $nixjoin -i $join_flags $nixhome -- @out@/bin/stage2

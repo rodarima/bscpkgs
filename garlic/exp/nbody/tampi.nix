@@ -33,6 +33,7 @@ let
     nodes = "2";
 
     # Stage configuration
+    enableRunexp = true;
     enableSbatch = true;
     enableControl = true;
     enableExtrae = false;
@@ -89,9 +90,10 @@ let
     perfArgs = "sched record -a";
   };
 
-  nixsetup = {stage, conf, ...}: with conf; w.nix-isolate {
+  isolate = {stage, conf, ...}: with conf; w.isolate {
     program = stageProgram stage;
     clusterName = "mn4";
+    inherit nixPrefix;
   };
 
   extrae = {stage, conf, ...}: w.extrae {
@@ -148,16 +150,19 @@ let
   };
 
   stages = with common; []
+    # Launch the experiment remotely
+    #++ optional enableRunexp runexp
+
     # Use sbatch to request resources first
     ++ optional enableSbatch sbatch
 
     # Repeats the next stages N times
-    ++ optionals enableControl [ nixsetup control ]
+    ++ optionals enableControl [ isolate control ]
 
     # Executes srun to launch the program in the requested nodes, and
     # immediately after enters the nix environment again, as slurmstepd launches
     # the next stages from outside the namespace.
-    ++ [ srun nixsetup ]
+    ++ [ srun isolate ]
 
     # Intrumentation with extrae
     ++ optional enableExtrae extrae
@@ -174,6 +179,22 @@ let
   # List of actual programs to be executed
   jobs = map (conf: w.stagen { inherit conf stages; }) configs;
 
+  launcher = launch jobs;
+
+  runexp = stage: w.runexp {
+    program = stageProgram stage;
+    nixPrefix = common.nixPrefix;
+  };
+
+  isolatedRun = stage: isolate {
+    inherit stage;
+    conf = common;
+  };
+
+  final = runexp (isolatedRun launcher);
+  
+
 in
   # We simply run each program one after another
-  launch jobs
+  #launch jobs
+  final

@@ -13,6 +13,7 @@ stdenv.mkDerivation {
   apps = apps;
   phases = [ "unpackPhase" "patchPhase" "installPhase" ];
   dontPatchShebangs = true;
+  programPath = "/bin/run";
 
   src = ./.;
 
@@ -20,7 +21,6 @@ stdenv.mkDerivation {
 
   patchPhase = ''
     substituteAllInPlace run
-    substituteAllInPlace stage2
   '';
 
   installPhase = ''
@@ -40,7 +40,6 @@ stdenv.mkDerivation {
 
     mkdir -p $out/bin
     install -m755 run $out/bin/run
-    install -m755 stage2 $out/bin/stage2
     chmod +x $out/bin/*
 
     # Mark the launcher for upload

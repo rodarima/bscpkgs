@@ -202,7 +202,8 @@ let
         broom     = callPackage ./garlic/stages/broom.nix { };
         envRecord = callPackage ./garlic/stages/envRecord.nix { };
         valgrind  = callPackage ./garlic/stages/valgrind.nix { };
-        nix-isolate = callPackage ./garlic/stages/nix-isolate.nix { };
+        isolate   = callPackage ./garlic/stages/isolate { };
+        runexp    = callPackage ./garlic/stages/runexp { };
       };
 
       # Tests (move to bsc ?)
