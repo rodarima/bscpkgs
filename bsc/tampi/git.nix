@@ -17,8 +17,7 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
   buildInputs = [ autoreconfHook automake autoconf libtool gnumake boost mpi gcc ];
   dontDisableStatic = true;
-  configureFlags = [ "--disable-mpi-mt-check" "CXXFLAGS=-DOMPI_SKIP_MPICXX=1" ];
-
+  makeFlags = [ "V=1" ];
   src = builtins.fetchGit {
     url = "ssh://git@bscpm02.bsc.es/interoperability/tampi";
     ref = "master";
