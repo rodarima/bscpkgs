@@ -35,11 +35,6 @@ stdenv.mkDerivation rec {
     makeFlagsArray+=(CFLAGS="${cflags}")
   '' else "");
 
-  # HACK: This should be fixed in the Makefile.
-  postPatch = ''
-    sed -i 's/libtampi.a/libtampi-c.a/g' Makefile
-  '';
-
   makeFlags = [
     "CC=${cc.cc.CC}"
     "BS=${toString blocksize}"
