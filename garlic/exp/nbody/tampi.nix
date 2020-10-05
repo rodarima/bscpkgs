@@ -112,10 +112,6 @@ let
 
   argv = {stage, conf, ...}: w.argv {
     program = stageProgram stage;
-    env = ''
-      set -e
-      export I_MPI_THREAD_SPLIT=1
-    '';
     argv = ''( -t ${toString conf.timesteps}
       -p ${toString conf.particles} )'';
   };

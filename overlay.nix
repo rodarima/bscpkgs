@@ -131,6 +131,10 @@ let
 
     mpptest = callPackage ./bsc/mpptest/default.nix { };
 
+    busybox = self.busybox.override {
+      enableStatic = true;
+    };
+
     nixtools = callPackage ./bsc/nixtools/default.nix {
       targetCluster = "mn4";
       nixPrefix = "/gpfs/projects/bsc15/nix";

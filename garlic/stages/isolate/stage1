@@ -1,4 +1,4 @@
-#!/bin/sh -ex
+#!/bin/bash -ex
 
 >&2 echo Running isolate stage1
 >&2 echo PATH=$PATH
@@ -13,11 +13,19 @@ shell="@busybox@/bin/sh"
 nixjoin="@nixPrefix@@nixtools@/bin/nix-join"
 
 
+env=(
+  PATH="@nixPrefix@@busybox@/bin:@busybox@/bin:@extraPath@"
+  $(env | grep ^SLURM || true)
+  $(env | grep ^GARLIC_OUT || true)
+)
+
 #-m @nixPrefix@ \
-join_flags="
-	-m /etc \
+join_flags="-m /etc \
+	-m /.statelite/tmpfs/etc \
+	-m /sys \
 	-m /var/run/munge \
 	-m /gpfs/projects/bsc15 \
 	-m /bin:@nixPrefix@@busybox@/bin"
 
-exec $nixjoin -i $join_flags $nixhome -- @out@/bin/stage2
+exec $nixjoin -v -i $join_flags $nixhome -- \
+	env -i "${env[@]}" @out@/bin/stage2
