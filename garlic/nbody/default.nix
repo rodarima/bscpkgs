@@ -35,21 +35,10 @@ stdenv.mkDerivation rec {
     makeFlagsArray+=(CFLAGS="${cflags}")
   '' else "");
 
-  postPatch = ""
-
-  # This should be fixed in the Makefile as well.
-  + ''sed -i 's/libtampi.a/libtampi-c.a/g' Makefile
-  ''
-  # Dirty HACK until the nbody issue at:
-  # https://pm.bsc.es/gitlab/garlic/apps/nbody/-/issues/1
-  # is properly fixed.
-  +
-    (if (mpi.pname or "unknown") == "openmpi" then
-      ''sed -i 's/-lstdc++/-lstdc++ -lmpi_cxx/g' Makefile
-      ''
-    else
-      ""
-    );
+  # HACK: This should be fixed in the Makefile.
+  postPatch = ''
+    sed -i 's/libtampi.a/libtampi-c.a/g' Makefile
+  '';
 
   makeFlags = [
     "CC=${cc.cc.CC}"
