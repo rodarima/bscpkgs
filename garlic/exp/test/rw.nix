@@ -1,0 +1,180 @@
+{
+  stdenv
+, nixpkgs
+, pkgs
+, genApp
+, genConfigs
+, runWrappers
+}:
+
+with stdenv.lib;
+
+let
+  bsc = pkgs.bsc;
+
+  # Set variable configuration for the experiment
+  varConfig = {
+    cc = [ bsc.icc ];
+    mpi = [ bsc.impi ];
+    blocksize = [ 1024 ];
+  };
+
+  # Common configuration
+  common = {
+
+    # nbody runtime options
+    particles = 1024*4;
+    timesteps = 10;
+
+    # Resources
+    ntasksPerNode = "2";
+    nodes = "2";
+
+    # Stage configuration
+    enableRunexp = true;
+    enableSbatch = true;
+    enableControl = true;
+    enableExtrae = false;
+    enablePerf = false;
+    enableCtf = false;
+
+    # MN4 path
+    nixPrefix = "/gpfs/projects/bsc15/nix";
+  };
+
+  # Compute the cartesian product of all configurations
+  configs = map (conf: conf // common) (genConfigs varConfig);
+
+  stageProgram = stage:
+    if stage ? programPath
+    then "${stage}${stage.programPath}" else "${stage}";
+
+  w = runWrappers;
+
+  sbatch = {stage, conf, ...}: with conf; w.sbatch (
+    # Allow a user to define a custom reservation for the job in MareNostrum4,
+    # by setting the garlic.sbatch.reservation attribute in the 
+    # ~/.config/nixpkgs/config.nix file. If the attribute is not set, no
+    # reservation is used. The user reservation may be overwritten by the
+    # experiment, if the reservation is set like with nodes or ntasksPerNode.
+    optionalAttrs (pkgs.config ? garlic.sbatch.reservation) {
+      inherit (pkgs.config.garlic.sbatch) reservation;
+    } // {
+      program = stageProgram stage;
+      exclusive = true;
+      time = "02:00:00";
+      qos = "debug";
+      jobName = "nbody-tampi";
+      inherit nixPrefix nodes ntasksPerNode;
+    }
+  );
+
+  control = {stage, conf, ...}: with conf; w.control {
+    program = stageProgram stage;
+  };
+
+  srun = {stage, conf, ...}: with conf; w.srun {
+    program = stageProgram stage;
+    srunOptions = "--cpu-bind=verbose,socket";
+    inherit nixPrefix;
+  };
+
+  statspy = {stage, conf, ...}: with conf; w.statspy {
+    program = stageProgram stage;
+  };
+
+  perf = {stage, conf, ...}: with conf; w.perf {
+    program = stageProgram stage;
+    perfArgs = "sched record -a";
+  };
+
+  isolate = {stage, conf, ...}: with conf; w.isolate {
+    program = stageProgram stage;
+    clusterName = "mn4";
+    inherit nixPrefix;
+  };
+
+  extrae = {stage, conf, ...}: w.extrae {
+    program = stageProgram stage;
+    traceLib = "mpi"; # mpi -> libtracempi.so
+    configFile = ./extrae.xml;
+  };
+
+  ctf = {stage, conf, ...}: w.argv {
+    program = stageProgram stage;
+    env = ''
+      export NANOS6=ctf
+      export NANOS6_CTF2PRV=0
+    '';
+  };
+
+  argv = {stage, conf, ...}: w.argv {
+    program = "${pkgs.coreutils}/bin/true";
+    env = ''
+      set -x
+      pwd
+      echo hi > hi
+    '';
+  };
+
+  bscOverlay = import ../../../overlay.nix;
+
+  genPkgs = newOverlay: nixpkgs {
+    overlays = [
+      bscOverlay
+      newOverlay
+    ];
+  };
+
+  launch = w.launch.override {
+    nixPrefix = common.nixPrefix;
+  };
+
+  stages = with common; []
+    # Launch the experiment remotely
+    #++ optional enableRunexp runexp
+
+    # Use sbatch to request resources first
+    ++ optional enableSbatch sbatch
+
+    # Repeats the next stages N times
+    ++ optionals enableControl [ isolate control ]
+
+    # Executes srun to launch the program in the requested nodes, and
+    # immediately after enters the nix environment again, as slurmstepd launches
+    # the next stages from outside the namespace.
+    ++ [ srun isolate ]
+
+    # Intrumentation with extrae
+    ++ optional enableExtrae extrae
+
+    # Optionally profile the next stages with perf
+    ++ optional enablePerf perf
+
+    # Optionally profile nanos6 with the new ctf
+    ++ optional enableCtf ctf
+
+    ++ [ argv ];
+
+  # List of actual programs to be executed
+  jobs = map (conf: w.stagen { inherit conf stages; }) configs;
+
+  launcher = launch jobs;
+
+  runexp = stage: w.runexp {
+    program = stageProgram stage;
+    nixPrefix = common.nixPrefix;
+  };
+
+  isolatedRun = stage: isolate {
+    inherit stage;
+    conf = common;
+  };
+
+  final = runexp (isolatedRun launcher);
+  
+
+in
+  # We simply run each program one after another
+  #launch jobs
+  final

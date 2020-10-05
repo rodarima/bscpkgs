@@ -277,6 +277,17 @@ let
           };
           latency = latency-internode;
         };
+
+        test = {
+          rw = callPackage ./garlic/exp/test/rw.nix {
+            pkgs = self // self.bsc.garlic;
+            nixpkgs = import <nixpkgs>;
+            genApp = self.bsc.garlic.genApp;
+            genConfigs = self.bsc.garlic.genConfigs;
+            runWrappers = self.bsc.garlic.runWrappers;
+          };
+#          mpi = callPackage ./bsc/garlic/exp/nbody/mpi.nix { };
+        };
       };
     };
   };
