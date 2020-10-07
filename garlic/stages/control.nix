@@ -15,7 +15,7 @@ stdenv.mkDerivation {
   installPhase = ''
     cat > $out <<EOF
     #!/bin/sh
-    for n in {1..${toString loops}}; do
+    for n in \$(seq 1 ${toString loops}); do
       ${program}
     done
     EOF
