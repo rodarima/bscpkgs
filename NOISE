@@ -108,3 +108,19 @@ ABSTRACT
   Do not use to ensure reproducibility.
 
 /* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
+
+1.8 Nix compilation environment
+
+  When using local repo as src code, (e.g. developer mode on) a make
+  clean at the preBuild stage is required.
+
+  Nix sets the current date to the files copied from repos.
+  Makefile checks the files modification date in order to call or not
+  the compilation instructions.
+  If any object/binary file exists out of Nix, at the time we build 
+  within Nix, they will be copied with the current data and consequently 
+  not updated during the Nix compilation process.
+
+  See saiph devMode option and its implications at   
+  bscpkgs/garlic/saiph/default.nix
+  

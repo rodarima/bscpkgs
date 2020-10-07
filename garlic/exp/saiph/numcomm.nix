@@ -12,6 +12,7 @@ with stdenv.lib;
 let
   # Set variable configuration for the experiment
   varConfig = {
+    devMode = [ true ];
     numComm = [ 1 ];
   };
 
@@ -148,7 +149,7 @@ let
       });
     in
     customPkgs.bsc.garlic.saiph.override {
-      inherit numComm mpi gitBranch;
+      inherit devMode numComm mpi gitBranch;
     };
 
   stages = with common; []
