@@ -124,17 +124,17 @@ let
 
   argv = {stage, conf, ...}: w.argv {
     program = stageProgram stage;
-    env = ''
-      #export I_MPI_PMI_LIBRARY=${bsc.slurm17-libpmi2}/lib/libpmi2.so
-      export I_MPI_DEBUG=+1000
-      #export I_MPI_FABRICS=shm
+    #env = ''
+    #  #export I_MPI_PMI_LIBRARY=${bsc.slurm17-libpmi2}/lib/libpmi2.so
+    #  export I_MPI_DEBUG=+1000
+    #  #export I_MPI_FABRICS=shm
 
-      export MPICH_DBG_OUTPUT=VERBOSE
-      export MPICH_DBG_CLASS=ALL
-      export MPICH_DBG_OUTPUT=stdout
+    #  export MPICH_DBG_OUTPUT=VERBOSE
+    #  export MPICH_DBG_CLASS=ALL
+    #  export MPICH_DBG_OUTPUT=stdout
 
-      export FI_LOG_LEVEL=Info
-    '';
+    #  export FI_LOG_LEVEL=Info
+    #'';
     argv = ''( -t ${toString conf.timesteps}
       -p ${toString conf.particles} )'';
   };
@@ -168,27 +168,15 @@ let
     nixPrefix = common.nixPrefix;
   };
 
-  stages = with common; []
-    # Use sbatch to request resources first
-    ++ optionals enableSbatch [
-      sbatch
-      nixsetup
-      #isolate
-    ]
+  stdStages = [
+    sbatch
+    isolate
+    control
+    srun
+    isolate
+  ];
 
-    # Repeats the next stages N times
-    ++ optional enableControl control
-
-    # Executes srun to launch the program in the requested nodes, and
-    # immediately after enters the nix environment again, as slurmstepd launches
-    # the next stages from outside the namespace.
-    ++ [
-      #strace
-      srun
-      nixsetup
-      #isolate
-    ]
-
+  debugStages = with common; []
     # Intrumentation with extrae
     ++ optional enableExtrae extrae
 
@@ -198,11 +186,11 @@ let
     # Optionally profile nanos6 with the new ctf
     ++ optional enableCtf ctf
 
-    # Optionally enable strace
-    #++ optional enableStrace strace
+    # Optionally run the program with strace
+    ++ optional enableStrace strace
+  ;
 
-    # Execute the nbody app with the argv and env vars
-    ++ [ argv nbodyFn ];
+  stages = stdStages ++ debugStages ++ [ argv nbodyFn ];
 
   # List of actual programs to be executed
   jobs = map (conf: w.stagen { inherit conf stages; }) configs;
