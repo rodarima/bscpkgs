@@ -6,20 +6,23 @@
 , cc 
 , vtk
 , boost
+, devMode ? false
 , gitBranch ? "master"
 , numComm ? null
+, vectFlags ? null
+#, breakpointHook
 }:
 
 stdenv.mkDerivation rec {
   name = "saiph";
 
-  src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/DSLs/saiph.git";
-    ref = "${gitBranch}";
-  };
+  src = (if (devMode == true) then ~/repos/saiph
+         else
+	 builtins.fetchGit {
+           url = "ssh://git@bscpm02.bsc.es/DSLs/saiph.git";
+           ref = "${gitBranch}";
+         });
 
-  #src = /tmp/saiph;
-  
   programPath = "/bin/ExHeat3D";
 
   enableParallelBuilding = true;
@@ -33,23 +36,26 @@ stdenv.mkDerivation rec {
     cc
     vtk
     boost
+#    breakpointHook
   ];
 
   # Required for nanos6
   hardeningDisable = [ "bindnow" ];
   
   preBuild = ''
-    cd saiphv2/cpp/src
-
+    cd saiphv2/cpp/src 
     export VTK_VERSION=8.2
     export VTK_HOME=${vtk}
-  '';
+  ''
+  + (if (devMode == true) then "make clean" else "")
+  ;
 
   makeFlags = [
     "-f" "Makefile.${cc.cc.CC}"
     "apps"
     "APP=ExHeat3D"
     ( if (numComm != null) then "NUM_COMM=${toString numComm}" else "" )
+    ( if (vectFlags != null) then "VECT_FLAGS=${toString vectFlags}" else "" )
   ];
 
   installPhase = ''
