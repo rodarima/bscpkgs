@@ -11,15 +11,15 @@
 }:
 
 stdenv.mkDerivation {
-  name = "runexp";
+  name = "trebuchet";
   preferLocalBuild = true;
   phases = [ "unpackPhase" "installPhase" ];
   dontPatchShebangs = true;
   src = ./.;
   inherit sshHost nixPrefix nixtools targetCluster program;
   installPhase = ''
-    substituteAllInPlace runexp
-    cp runexp $out
+    substituteAllInPlace trebuchet
+    cp trebuchet $out
     chmod +x $out
   '';
 }

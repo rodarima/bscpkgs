@@ -16,13 +16,15 @@ let
   varConfig = {
     cc = [ bsc.icc ];
     mpi = [ bsc.impi ];
+    #mpi = [ bsc.mpichDebug ];
     blocksize = [ 1024 ];
   };
 
   # Common configuration
   common = {
     # Compile time nbody config
-    gitBranch = "garlic/tampi+send+oss+task";
+    gitBranch = "garlic/mpi+send";
+    #gitBranch = "garlic/tampi+send+oss+task";
 
     # nbody runtime options
     particles = 1024*4;
@@ -30,15 +32,16 @@ let
 
     # Resources
     ntasksPerNode = "2";
-    nodes = "2";
+    nodes = "1";
 
     # Stage configuration
-    enableRunexp = true;
-    enableSbatch = true;
-    enableControl = true;
-    enableExtrae = false;
-    enablePerf = false;
-    enableCtf = false;
+    enableTrebuchet = true;
+    enableSbatch    = true;
+    enableControl   = true;
+    enableExtrae    = false;
+    enablePerf      = false;
+    enableCtf       = false;
+    enableStrace    = true;
 
     # MN4 path
     nixPrefix = "/gpfs/projects/bsc15/nix";
@@ -90,6 +93,11 @@ let
     perfArgs = "sched record -a";
   };
 
+  nixsetup = {stage, conf, ...}: with conf; w.nixsetup {
+    program = stageProgram stage;
+    nixsetup = "${nixPrefix}/bin/nix-setup";
+  };
+
   isolate = {stage, conf, ...}: with conf; w.isolate {
     program = stageProgram stage;
     clusterName = "mn4";
@@ -110,8 +118,23 @@ let
     '';
   };
 
+  strace = {stage, conf, ...}: w.strace {
+    program = stageProgram stage;
+  };
+
   argv = {stage, conf, ...}: w.argv {
     program = stageProgram stage;
+    env = ''
+      #export I_MPI_PMI_LIBRARY=${bsc.slurm17-libpmi2}/lib/libpmi2.so
+      export I_MPI_DEBUG=+1000
+      #export I_MPI_FABRICS=shm
+
+      export MPICH_DBG_OUTPUT=VERBOSE
+      export MPICH_DBG_CLASS=ALL
+      export MPICH_DBG_OUTPUT=stdout
+
+      export FI_LOG_LEVEL=Info
+    '';
     argv = ''( -t ${toString conf.timesteps}
       -p ${toString conf.particles} )'';
   };
@@ -146,19 +169,25 @@ let
   };
 
   stages = with common; []
-    # Launch the experiment remotely
-    #++ optional enableRunexp runexp
-
     # Use sbatch to request resources first
-    ++ optional enableSbatch sbatch
+    ++ optionals enableSbatch [
+      sbatch
+      nixsetup
+      #isolate
+    ]
 
     # Repeats the next stages N times
-    ++ optionals enableControl [ isolate control ]
+    ++ optional enableControl control
 
     # Executes srun to launch the program in the requested nodes, and
     # immediately after enters the nix environment again, as slurmstepd launches
     # the next stages from outside the namespace.
-    ++ [ srun isolate ]
+    ++ [
+      #strace
+      srun
+      nixsetup
+      #isolate
+    ]
 
     # Intrumentation with extrae
     ++ optional enableExtrae extrae
@@ -169,6 +198,9 @@ let
     # Optionally profile nanos6 with the new ctf
     ++ optional enableCtf ctf
 
+    # Optionally enable strace
+    #++ optional enableStrace strace
+
     # Execute the nbody app with the argv and env vars
     ++ [ argv nbodyFn ];
 
@@ -177,7 +209,7 @@ let
 
   launcher = launch jobs;
 
-  runexp = stage: w.runexp {
+  trebuchet = stage: w.trebuchet {
     program = stageProgram stage;
     nixPrefix = common.nixPrefix;
   };
@@ -187,8 +219,7 @@ let
     conf = common;
   };
 
-  final = runexp (isolatedRun launcher);
-  
+  final = trebuchet (isolatedRun launcher);
 
 in
   # We simply run each program one after another

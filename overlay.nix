@@ -28,7 +28,7 @@ let
 
     mpich = callPackage ./bsc/mpich/default.nix { };
 
-    mpichDebug = self.mpich.override { enableDebug = true; };
+    mpichDebug = self.bsc.mpich.override { enableDebug = true; };
 
     # Updated version of libpsm2: TODO push upstream.
     #libpsm2 = callPackage ./bsc/libpsm2/default.nix { };
@@ -207,7 +207,8 @@ let
         envRecord = callPackage ./garlic/stages/envRecord.nix { };
         valgrind  = callPackage ./garlic/stages/valgrind.nix { };
         isolate   = callPackage ./garlic/stages/isolate { };
-        runexp    = callPackage ./garlic/stages/runexp { };
+        trebuchet = callPackage ./garlic/stages/trebuchet { };
+        strace    = callPackage ./garlic/stages/strace.nix { };
       };
 
       # Tests (move to bsc ?)

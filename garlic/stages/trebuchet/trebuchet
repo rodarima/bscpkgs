@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -ex
 # @upload-to-mn@
 
 # This program runs the current experiment in the ./result symlink in

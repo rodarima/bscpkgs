@@ -16,7 +16,7 @@ with stdenv.lib;
 stdenv.mkDerivation rec {
   name = "nbody";
 
-  #src = /home/Computational/rarias/bscpkgs/manual/nbody;
+  #src = ~/nbody;
 
   src = builtins.fetchGit {
     url = "${gitURL}";

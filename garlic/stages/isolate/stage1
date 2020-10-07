@@ -16,16 +16,31 @@ nixjoin="@nixPrefix@@nixtools@/bin/nix-join"
 env=(
   PATH="@nixPrefix@@busybox@/bin:@busybox@/bin:@extraPath@"
   $(env | grep ^SLURM || true)
+  $(env | grep ^PMI || true)
   $(env | grep ^GARLIC_OUT || true)
+  $(env | grep ^USER || true)
+  HOME="/homeless-shelter"
 )
 
-#-m @nixPrefix@ \
-join_flags="-m /etc \
-	-m /.statelite/tmpfs/etc \
-	-m /sys \
-	-m /var/run/munge \
-	-m /gpfs/projects/bsc15 \
-	-m /bin:@nixPrefix@@busybox@/bin"
+mounts=(
+	#-m @nixPrefix@
+	#FIXME: Use only the strictly neccesary from /etc
+	-m /etc
+	# The /etc/hosts file is a symlink to this etc/
+	-m /.statelite/tmpfs/etc
+	-m /sys
+	-m /dev
+	-m /proc
+	# nscd cache: doesn't exist (?)
+	#-m /var/run/nscd
+	# Needed for munge auth
+	-m /var/run/munge
+	# FIXME: We should only need nix and the output path
+	-m /gpfs/projects/bsc15
+	-m /bin:@nixPrefix@@busybox@/bin
+)
+
+join_flags="${mounts[@]}"
 
 exec $nixjoin -v -i $join_flags $nixhome -- \
 	env -i "${env[@]}" @out@/bin/stage2
