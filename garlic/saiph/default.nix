@@ -8,6 +8,8 @@
 , boost
 , gitBranch ? "master"
 , numComm ? null
+, vectFlags ? null
+#, breakpointHook
 }:
 
 stdenv.mkDerivation rec {
@@ -33,6 +35,7 @@ stdenv.mkDerivation rec {
     cc
     vtk
     boost
+#    breakpointHook
   ];
 
   # Required for nanos6
@@ -50,6 +53,7 @@ stdenv.mkDerivation rec {
     "apps"
     "APP=ExHeat3D"
     ( if (numComm != null) then "NUM_COMM=${toString numComm}" else "" )
+    ( if (vectFlags != null) then "VECT_FLAGS=${toString vectFlags}" else "" )
   ];
 
   installPhase = ''
