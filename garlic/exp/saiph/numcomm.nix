@@ -23,11 +23,11 @@ let
 
     # Resources
     ntasksPerNode = "2";
-    nodes = "2";
+    nodes = "1";
 
     # Stage configuration
     enableSbatch = true;
-    enableControl = false;
+    enableControl = true;
     enableExtrae = false;
     enablePerf = false;
 
@@ -63,7 +63,8 @@ let
   );
 
   control = {stage, conf, ...}: with conf; w.control {
-    program = stageProgram stage;
+     program = stageProgram stage;
+     loops = 100;
   };
 
   srun = {stage, conf, ...}: with conf; w.srun {
@@ -127,6 +128,7 @@ let
   argv = {stage, conf, ...}: with conf; w.argv {
     program = stageProgram stage;
     env = ''
+      export OMP_NUM_THREADS=24
       export NANOS6_REPORT_PREFIX="#"
       export I_MPI_THREAD_SPLIT=1
       export ASAN_SYMBOLIZER_PATH=${pkgs.bsc.clangOmpss2Unwrapped}/bin/llvm-symbolizer
