@@ -8,7 +8,6 @@ units:
 with stdenv.lib;
 
 let
-
   stageProgram = stage:
     if stage ? programPath
     then "${stage}${stage.programPath}" else "${stage}";

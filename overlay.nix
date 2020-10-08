@@ -209,6 +209,8 @@ let
         isolate   = callPackage ./garlic/stages/isolate { };
         trebuchet = callPackage ./garlic/stages/trebuchet { };
         strace    = callPackage ./garlic/stages/strace.nix { };
+        unit      = callPackage ./garlic/stages/unit.nix { };
+        experiment= callPackage ./garlic/stages/experiment/default.nix { };
       };
 
       # Tests (move to bsc ?)

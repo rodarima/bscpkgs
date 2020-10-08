@@ -17,7 +17,7 @@ let
     cc = [ bsc.icc ];
     mpi = [ bsc.impi ];
     #mpi = [ bsc.mpichDebug ];
-    blocksize = [ 1024 ];
+    blocksize = [ 1024 2048 ];
   };
 
   # Common configuration
@@ -164,7 +164,7 @@ let
       inherit cc blocksize mpi gitBranch;
     };
 
-  launch = w.launch.override {
+  experimentFn = w.experiment.override {
     nixPrefix = common.nixPrefix;
   };
 
@@ -193,13 +193,14 @@ let
   stages = stdStages ++ debugStages ++ [ argv nbodyFn ];
 
   # List of actual programs to be executed
-  jobs = map (conf: w.stagen { inherit conf stages; }) configs;
+  units = map (conf: w.unit { inherit conf stages; }) configs;
 
-  launcher = launch jobs;
+  experiment = experimentFn units;
 
   trebuchet = stage: w.trebuchet {
     program = stageProgram stage;
     nixPrefix = common.nixPrefix;
+    experiment = experiment;
   };
 
   isolatedRun = stage: isolate {
@@ -207,9 +208,10 @@ let
     conf = common;
   };
 
-  final = trebuchet (isolatedRun launcher);
+  final = trebuchet (isolatedRun experiment);
 
 in
   # We simply run each program one after another
   #launch jobs
   final
+  #jobs
