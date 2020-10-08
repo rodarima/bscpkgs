@@ -207,10 +207,10 @@ let
         envRecord = callPackage ./garlic/stages/envRecord.nix { };
         valgrind  = callPackage ./garlic/stages/valgrind.nix { };
         isolate   = callPackage ./garlic/stages/isolate { };
-        trebuchet = callPackage ./garlic/stages/trebuchet { };
+        trebuchet = callPackage ./garlic/stages/trebuchet.nix { };
         strace    = callPackage ./garlic/stages/strace.nix { };
         unit      = callPackage ./garlic/stages/unit.nix { };
-        experiment= callPackage ./garlic/stages/experiment/default.nix { };
+        experiment= callPackage ./garlic/stages/experiment.nix { };
       };
 
       # Tests (move to bsc ?)

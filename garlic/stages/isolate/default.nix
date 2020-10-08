@@ -7,6 +7,7 @@
 
 {
   program
+, stage
 , nixPrefix
 , clusterName
 }:
@@ -23,6 +24,7 @@ stdenv.mkDerivation {
   dontPatchShebangs = true;
   programPath = "/bin/stage1";
   inherit program nixPrefix clusterName nixtools busybox;
+  desc = "#  $out\n" + (if builtins.hasAttr "desc" stage then stage.desc else "");
   out = "$out";
   installPhase = ''
 

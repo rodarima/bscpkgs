@@ -101,7 +101,7 @@ let
   isolate = {stage, conf, ...}: with conf; w.isolate {
     program = stageProgram stage;
     clusterName = "mn4";
-    inherit nixPrefix;
+    inherit stage nixPrefix;
   };
 
   extrae = {stage, conf, ...}: w.extrae {
@@ -200,7 +200,8 @@ let
   trebuchet = stage: w.trebuchet {
     program = stageProgram stage;
     nixPrefix = common.nixPrefix;
-    experiment = experiment;
+    #experiment = experiment;
+    inherit stage;
   };
 
   isolatedRun = stage: isolate {

@@ -30,8 +30,9 @@ let
     programPath = stageProgram s;
   }) dStages.stages;
 
-  stageList = builtins.concatStringsSep "\n"
-    (map (x: "#  ${x.stage}") linkStages);
+  desc = builtins.concatStringsSep "\n"
+    (map (x: "#      ${x.stage}") linkStages);
+
 
   firstStage = (x: x.programPath) (elemAt linkStages 0);
 in
@@ -39,12 +40,12 @@ stdenv.mkDerivation {
   name = "unit";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
+  inherit desc;
   installPhase = ''
     cat > $out << EOF
     #!/bin/sh -e
 
-    # This script defines an experimental unit with the following stages:
-    ${stageList}
+    ${desc}
 
     # Set the experiment unit in the environment
     export GARLIC_UNIT=$(basename $out)
