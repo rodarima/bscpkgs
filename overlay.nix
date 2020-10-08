@@ -258,19 +258,23 @@ let
             hybrid = callPackage ./garlic/exp/creams/ss+hybrid.nix { };
           };
         };
-      };
 
-      test = {
-        exec = callPackage ./test/garlic/exec.nix {
-          exec = self.bsc.garlic.stages.exec;
+        hpcg = {
+          serial = callPackage ./garlic/exp/hpcg/serial.nix { };
         };
 
-        osu = rec {
-          latency-internode = callPackage ./garlic/exp/osu/latency.nix { };
-          latency-intranode = callPackage ./garlic/exp/osu/latency.nix {
-            interNode = false;
+        test = {
+          exec = callPackage ./test/garlic/exec.nix {
+            exec = self.bsc.garlic.stages.exec;
           };
-          latency = latency-internode;
+
+          osu = rec {
+            latency-internode = callPackage ./garlic/exp/osu/latency.nix { };
+            latency-intranode = callPackage ./garlic/exp/osu/latency.nix {
+              interNode = false;
+            };
+            latency = latency-internode;
+          };
         };
       };
     };

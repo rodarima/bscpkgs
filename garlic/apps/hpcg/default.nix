@@ -1,8 +1,5 @@
 {
   stdenv
-, nanos6
-, mpi
-, tampi
 , cc
 , gitBranch ? "garlic/seq"
 , makefileName ? "Linux_Serial"
@@ -21,10 +18,12 @@ stdenv.mkDerivation rec {
   '';
 
   buildInputs = [
-    nanos6
-    mpi
-    tampi
     cc
+  ];
+
+  makeFlags = [
+    "CC=${cc.cc.CC}"
+    "CXX=${cc.cc.CXX}"
   ];
 
   enableParallelBuilding = true;
