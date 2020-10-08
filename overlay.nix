@@ -172,19 +172,6 @@ let
       # Apps for Garlic
 
       apps = {
-        creams = callPackage ./garlic/apps/creams/default.nix {
-          gnuDef   = self.gfortran10 ; # Default GNU   compiler version
-          intelDef = self.bsc.icc    ; # Default Intel compiler version
-
-          gitBranch = "garlic/mpi+send+seq";
-
-          cc  = self.bsc.icc; # self.bsc.icc OR self.gfortran10;
-          mpi = self.bsc.mpi; # self.bsc.mpi OR self.bsc.openmpi-mn4;
-        };
-
-        creamsInput = callPackage ./garlic/apps/creams/input.nix {
-          gitBranch = "garlic/mpi+send+seq";
-        };
 
         nbody = callPackage ./garlic/apps/nbody/default.nix {
           cc = self.bsc.icc;
@@ -198,6 +185,23 @@ let
           cc = self.bsc.clangOmpss2;
         };
 
+        creams = callPackage ./garlic/apps/creams/default.nix {
+          gnuDef   = self.gfortran10 ; # Default GNU   compiler version
+          intelDef = self.bsc.icc    ; # Default Intel compiler version
+          gitBranch = "garlic/mpi+send+seq";
+          cc  = self.bsc.icc; # self.bsc.icc OR self.gfortran10;
+          mpi = self.bsc.mpi; # self.bsc.mpi OR self.bsc.openmpi-mn4;
+        };
+
+        creamsInput = callPackage ./garlic/apps/creams/input.nix {
+          gitBranch = "garlic/mpi+send+seq";
+        };
+
+        hpcg = callPackage ./garlic/hpcg {
+          cc = self.bsc.icc;
+          gitBranch = "garlic/seq";
+        };
+
 #        heat = callPackage ./garlic/apps/heat {
 #          stdenv = pkgs.gcc7Stdenv;
 #          mpi = intel-mpi;
@@ -207,8 +211,6 @@ let
 #        lulesh = callPackage ./garlic/apps/lulesh {
 #          mpi = intel-mpi;
 #        };
-#  
-#        hpcg = callPackage ./garlic/apps/hpcg { };
 #  
 #        hpccg = callPackage ./garlic/apps/hpccg { };
 #  
@@ -257,11 +259,19 @@ let
           };
         };
       };
-    };
 
-    test = {
-      exec = callPackage ./test/garlic/exec.nix {
-        exec = self.bsc.garlic.stages.exec;
+      test = {
+        exec = callPackage ./test/garlic/exec.nix {
+          exec = self.bsc.garlic.stages.exec;
+        };
+
+        osu = rec {
+          latency-internode = callPackage ./garlic/exp/osu/latency.nix { };
+          latency-intranode = callPackage ./garlic/exp/osu/latency.nix {
+            interNode = false;
+          };
+          latency = latency-internode;
+        };
       };
     };
   };
