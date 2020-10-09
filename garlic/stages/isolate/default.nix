@@ -21,6 +21,7 @@ stdenv.mkDerivation {
   dontPatchShebangs = true;
   programPath = "/bin/stage1";
   inherit nixPrefix clusterName nixtools busybox;
+  inherit nextStage;
   program = stageProgram nextStage;
   desc = "#  $out\n" + (if builtins.hasAttr "desc" nextStage then nextStage.desc else "");
   out = "$out";

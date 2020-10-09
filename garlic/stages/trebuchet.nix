@@ -13,14 +13,17 @@
 , targetCluster ? "mn4"
 }:
 
+with garlicTools;
+
 let
-  program = garlicTools.stageProgram nextStage;
+  program = stageProgram nextStage;
 in
 stdenv.mkDerivation {
   name = "trebuchet";
   phases = [ "installPhase" ];
   preferLocalBuild = true;
   dontPatchShebangs = true;
+  inherit nextStage;
   installPhase = ''
     cat > $out <<EOF
     #!/bin/sh -e
@@ -29,8 +32,9 @@ stdenv.mkDerivation {
     # Take a look at ${program}
     # to see what is being executed.
 
-    #  $out
-    ${nextStage.desc}
+    # This trebuchet launches the following experiment in an isolated
+    # environment:
+    #  ${nextStage.nextStage}
 
     nixtools=${nixPrefix}${nixtools}/bin
     runexp=\$nixtools/${targetCluster}/runexp
