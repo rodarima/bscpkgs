@@ -243,25 +243,6 @@ let
             hybrid = callPackage ./garlic/exp/creams/ss+hybrid.nix { };
           };
         };
-
-        osu = rec {
-          latency-internode = callPackage ./garlic/exp/osu/latency.nix { };
-          latency-intranode = callPackage ./garlic/exp/osu/latency.nix {
-            interNode = false;
-          };
-          latency = latency-internode;
-        };
-
-        test = {
-          rw = callPackage ./garlic/exp/test/rw.nix {
-            pkgs = self // self.bsc.garlic;
-            nixpkgs = import <nixpkgs>;
-            genApp = self.bsc.garlic.genApp;
-            genConfigs = self.bsc.garlic.genConfigs;
-            stages = self.bsc.garlic.stages;
-          };
-#          mpi = callPackage ./bsc/garlic/exp/nbody/mpi.nix { };
-        };
       };
     };
 
