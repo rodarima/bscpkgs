@@ -2,7 +2,6 @@
   stdenv
 , nixtools
 , busybox
-, strace
 , garlicTools
 }:
 
@@ -18,10 +17,6 @@ stdenv.mkDerivation {
   name = "isolate";
   preferLocalBuild = true;
   phases = [ "unpackPhase" "installPhase" ];
-  buildInputs = [
-    #nixtools
-    #strace
-  ];
   src = ./.;
   dontPatchShebangs = true;
   programPath = "/bin/stage1";
