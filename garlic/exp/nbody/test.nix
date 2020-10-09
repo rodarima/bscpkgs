@@ -1,7 +1,7 @@
 {
   stdenv
 , stdexp
-, pkgs
+, bsc
 , targetMachine
 , stages
 }:
@@ -9,8 +9,6 @@
 with stdenv.lib;
 
 let
-  bsc = pkgs.bsc;
-
   # Configurations for each unit (using the cartesian product)
   confUnit = with bsc; {
     blocksize = [ 1024 2048 ];

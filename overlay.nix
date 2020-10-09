@@ -4,7 +4,7 @@ super: /* Previous stage */
 let
   inherit (self.lib) callPackageWith;
   inherit (self.lib) callPackagesWith;
-  callPackage = callPackageWith (self // self.bsc);
+  callPackage = callPackageWith (self // self.bsc // self.garlic);
 
   # --------------------------------------------------------- #
   #  BSC Packages
@@ -236,57 +236,18 @@ let
       hist = callPackage ./garlic/postprocess/hist { };
 
       exp = {
-        #noise = callPackage ./garlic/exp/noise.nix { };
         nbody = {
-          bs = callPackage ./garlic/exp/nbody/bs.nix {
-            pkgs = self // self.bsc.garlic;
-            nixpkgs = import <nixpkgs>;
-            genApp = self.bsc.garlic.genApp;
-            genConfigs = self.bsc.garlic.genConfigs;
-            stages = self.bsc.garlic.stages;
-          };
-
-          tampi = callPackage ./garlic/exp/nbody/tampi.nix {
-            pkgs = self // self.bsc.garlic;
-            nixpkgs = import <nixpkgs>;
-            genApp = self.bsc.garlic.genApp;
-            genConfigs = self.bsc.garlic.genConfigs;
-            stages = self.bsc.garlic.stages;
-          };
-
-          test = callPackage ./garlic/exp/nbody/test.nix {
-            pkgs = self // self.bsc.garlic;
-            inherit (self.garlic) stdexp targetMachine stages;
-          };
-#          mpi = callPackage ./bsc/garlic/exp/nbody/mpi.nix { };
+          test  = callPackage ./garlic/exp/nbody/test.nix { };
         };
 
         saiph = {
-          numcomm = callPackage ./garlic/exp/saiph/numcomm.nix {
-            pkgs = self // self.bsc.garlic;
-            nixpkgs = import <nixpkgs>;
-            genApp = self.bsc.garlic.genApp;
-            genConfigs = self.bsc.garlic.genConfigs;
-            stages = self.bsc.garlic.stages;
-          };
+          numcomm = callPackage ./garlic/exp/saiph/numcomm.nix { };
         };
 
         creams = {
           ss = {
-            pure = callPackage ./garlic/exp/creams/ss+pure.nix {
-              pkgs = self // self.bsc.garlic;
-              nixpkgs = import <nixpkgs>;
-              genApp = self.bsc.garlic.genApp;
-              genConfigs = self.bsc.garlic.genConfigs;
-              stages = self.bsc.garlic.stages;
-            };
-            hybrid = callPackage ./garlic/exp/creams/ss+hybrid.nix {
-              pkgs = self // self.bsc.garlic;
-              nixpkgs = import <nixpkgs>;
-              genApp = self.bsc.garlic.genApp;
-              genConfigs = self.bsc.garlic.genConfigs;
-              stages = self.bsc.garlic.stages;
-            };
+            pure = callPackage ./garlic/exp/creams/ss+pure.nix { };
+            hybrid = callPackage ./garlic/exp/creams/ss+hybrid.nix { };
           };
         };
 
