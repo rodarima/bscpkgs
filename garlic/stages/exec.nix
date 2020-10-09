@@ -5,22 +5,26 @@
 
 {
   nextStage
-, loops ? 30
+, env ? ""
+, argv ? []
 }:
 
+with builtins;
 with garlicTools;
 
+let
+  argvString = concatStringsSep " " (map (e: toString e) argv);
+in
 stdenv.mkDerivation {
-  name = "control";
+  name = "exec";
   preferLocalBuild = true;
   phases = [ "installPhase" ];
-  dontPatchShebangs = true;
   installPhase = ''
     cat > $out <<EOF
     #!/bin/sh
-    for n in \$(seq 1 ${toString loops}); do
-      ${stageProgram nextStage}
-    done
+    ${env}
+
+    exec ${stageProgram nextStage} ${argvString}
     EOF
     chmod +x $out
   '';

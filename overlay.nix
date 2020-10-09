@@ -140,13 +140,20 @@ let
       nixPrefix = "/gpfs/projects/bsc15/nix";
     };
 
+    garlicTools = callPackage ./garlic/tools.nix {};
+
     garlic = {
+      # Configuration for the machines
+      machines = callPackage ./garlic/machines.nix {};
+
+      # Use the configuration for the following target machine
+      targetMachine = self.garlic.machines.mn4;
 
       # Load some helper functions to generate app variants
-      inherit (import ./garlic/gen.nix) genApps genApp genConfigs;
 
-      # Override the hardening flags and parallel build by default (TODO)
-      #mkDerivation = callPackage ./garlic/mkDerivation.nix { };
+      stdexp = callPackage ./garlic/exp/stdexp.nix {
+        inherit (self.garlic) targetMachine stages;
+      };
 
       # Apps for Garlic
 #      heat = callPackage ./garlic/heat {
@@ -187,30 +194,30 @@ let
         gitBranch = "garlic/seq";
       };
 
-      saiph = callPackage ./garlic/saiph {
+      saiph = callPackage ./garlic/saiph/default.nix {
         cc = self.bsc.clangOmpss2;
       };
 
-      # Execution wrappers
-      runWrappers = {
-        sbatch    = callPackage ./garlic/stages/sbatch.nix { };
-        srun      = callPackage ./garlic/stages/srun.nix { };
-        launch    = callPackage ./garlic/stages/launcher { };
-        control   = callPackage ./garlic/stages/control.nix { };
-        nixsetup  = callPackage ./garlic/stages/nix-setup.nix { };
-        argv      = callPackage ./garlic/stages/argv.nix { };
-        statspy   = callPackage ./garlic/stages/statspy.nix { };
-        extrae    = callPackage ./garlic/stages/extrae.nix { };
-        stagen    = callPackage ./garlic/stages/stagen.nix { };
-        perf      = callPackage ./garlic/stages/perf.nix { };
-        broom     = callPackage ./garlic/stages/broom.nix { };
-        envRecord = callPackage ./garlic/stages/envRecord.nix { };
-        valgrind  = callPackage ./garlic/stages/valgrind.nix { };
-        isolate   = callPackage ./garlic/stages/isolate { };
-        trebuchet = callPackage ./garlic/stages/trebuchet.nix { };
-        strace    = callPackage ./garlic/stages/strace.nix { };
-        unit      = callPackage ./garlic/stages/unit.nix { };
-        experiment= callPackage ./garlic/stages/experiment.nix { };
+      # Execution stages
+      stages = {
+        sbatch     = callPackage ./garlic/stages/sbatch.nix { };
+        srun       = callPackage ./garlic/stages/srun.nix { };
+        launch     = callPackage ./garlic/stages/launcher { };
+        control    = callPackage ./garlic/stages/control.nix { };
+        nixsetup   = callPackage ./garlic/stages/nix-setup.nix { };
+        exec       = callPackage ./garlic/stages/exec.nix { };
+        statspy    = callPackage ./garlic/stages/statspy.nix { };
+        extrae     = callPackage ./garlic/stages/extrae.nix { };
+        stagen     = callPackage ./garlic/stages/stagen.nix { };
+        perf       = callPackage ./garlic/stages/perf.nix { };
+        broom      = callPackage ./garlic/stages/broom.nix { };
+        envRecord  = callPackage ./garlic/stages/envRecord.nix { };
+        valgrind   = callPackage ./garlic/stages/valgrind.nix { };
+        isolate    = callPackage ./garlic/stages/isolate { };
+        trebuchet  = callPackage ./garlic/stages/trebuchet.nix { };
+        strace     = callPackage ./garlic/stages/strace.nix { };
+        unit       = callPackage ./garlic/stages/unit.nix { };
+        experiment = callPackage ./garlic/stages/experiment.nix { };
       };
 
       # Tests (move to bsc ?)
@@ -231,7 +238,7 @@ let
             nixpkgs = import <nixpkgs>;
             genApp = self.bsc.garlic.genApp;
             genConfigs = self.bsc.garlic.genConfigs;
-            runWrappers = self.bsc.garlic.runWrappers;
+            stages = self.bsc.garlic.stages;
           };
 
           tampi = callPackage ./garlic/exp/nbody/tampi.nix {
@@ -239,7 +246,12 @@ let
             nixpkgs = import <nixpkgs>;
             genApp = self.bsc.garlic.genApp;
             genConfigs = self.bsc.garlic.genConfigs;
-            runWrappers = self.bsc.garlic.runWrappers;
+            stages = self.bsc.garlic.stages;
+          };
+
+          test = callPackage ./garlic/exp/nbody/test.nix {
+            pkgs = self // self.bsc.garlic;
+            inherit (self.garlic) stdexp targetMachine stages;
           };
 #          mpi = callPackage ./bsc/garlic/exp/nbody/mpi.nix { };
         };
@@ -250,7 +262,7 @@ let
             nixpkgs = import <nixpkgs>;
             genApp = self.bsc.garlic.genApp;
             genConfigs = self.bsc.garlic.genConfigs;
-            runWrappers = self.bsc.garlic.runWrappers;
+            stages = self.bsc.garlic.stages;
           };
         };
 
@@ -261,14 +273,14 @@ let
               nixpkgs = import <nixpkgs>;
               genApp = self.bsc.garlic.genApp;
               genConfigs = self.bsc.garlic.genConfigs;
-              runWrappers = self.bsc.garlic.runWrappers;
+              stages = self.bsc.garlic.stages;
             };
             hybrid = callPackage ./garlic/exp/creams/ss+hybrid.nix {
               pkgs = self // self.bsc.garlic;
               nixpkgs = import <nixpkgs>;
               genApp = self.bsc.garlic.genApp;
               genConfigs = self.bsc.garlic.genConfigs;
-              runWrappers = self.bsc.garlic.runWrappers;
+              stages = self.bsc.garlic.stages;
             };
           };
         };
@@ -287,10 +299,16 @@ let
             nixpkgs = import <nixpkgs>;
             genApp = self.bsc.garlic.genApp;
             genConfigs = self.bsc.garlic.genConfigs;
-            runWrappers = self.bsc.garlic.runWrappers;
+            stages = self.bsc.garlic.stages;
           };
 #          mpi = callPackage ./bsc/garlic/exp/nbody/mpi.nix { };
         };
+      };
+    };
+
+    test = {
+      exec = callPackage ./test/garlic/exec.nix {
+        exec = self.bsc.garlic.stages.exec;
       };
     };
   };

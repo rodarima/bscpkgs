@@ -1,9 +1,10 @@
 {
   stdenv
-, nixPrefix ? ""
 }:
 
-units:
+{
+  units:
+}
 
 with stdenv.lib;
 

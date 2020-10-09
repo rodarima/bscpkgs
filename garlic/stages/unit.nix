@@ -14,8 +14,8 @@ let
 
   dStages = foldr (stageFn: {conf, prevStage, stages}: {
     conf = conf;
-    prevStage = stageFn {stage=prevStage; conf=conf;};
-    stages = [ (stageFn {stage=prevStage; conf=conf;}) ] ++ stages;
+    prevStage = stageFn {nextStage=prevStage; conf=conf;};
+    stages = [ (stageFn {nextStage=prevStage; conf=conf;}) ] ++ stages;
   })
     {conf=conf; stages=[]; prevStage=null;} stages;
 

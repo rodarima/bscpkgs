@@ -2,10 +2,11 @@
   stdenv
 , numactl
 , slurm
+, garlicTools
 }:
 
 {
-  program
+  nextStage
 , jobName
 , chdirPrefix ? "."
 , nixPrefix ? ""
@@ -26,6 +27,8 @@
 }:
 
 with stdenv.lib;
+with garlicTools;
+
 let
 
   sbatchOpt = name: value: optionalString (value!=null)
@@ -69,7 +72,7 @@ stdenv.mkDerivation rec {
     + optionalString (extra!=null) extra
     +
     ''
-    exec ${nixPrefix}${program}
+    exec ${nixPrefix}${stageProgram nextStage}
     EOF
     
     cat > $out/${name} <<EOF

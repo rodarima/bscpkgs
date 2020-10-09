@@ -3,14 +3,16 @@
 , nixtools
 , busybox
 , strace
+, garlicTools
 }:
 
 {
-  program
-, stage
+  nextStage
 , nixPrefix
 , clusterName
 }:
+
+with garlicTools;
 
 stdenv.mkDerivation {
   name = "isolate";
@@ -23,8 +25,9 @@ stdenv.mkDerivation {
   src = ./.;
   dontPatchShebangs = true;
   programPath = "/bin/stage1";
-  inherit program nixPrefix clusterName nixtools busybox;
-  desc = "#  $out\n" + (if builtins.hasAttr "desc" stage then stage.desc else "");
+  inherit nixPrefix clusterName nixtools busybox;
+  program = stageProgram nextStage;
+  desc = "#  $out\n" + (if builtins.hasAttr "desc" nextStage then nextStage.desc else "");
   out = "$out";
   installPhase = ''
 
