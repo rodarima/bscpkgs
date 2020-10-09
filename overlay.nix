@@ -143,6 +143,8 @@ let
     garlicTools = callPackage ./garlic/tools.nix {};
 
     garlic = {
+      # TODO: move into garlic/default.nix
+
       # Configuration for the machines
       machines = callPackage ./garlic/machines.nix {};
 
@@ -151,51 +153,54 @@ let
 
       # Load some helper functions to generate app variants
 
-      stdexp = callPackage ./garlic/exp/stdexp.nix {
+      stdexp = callPackage ./garlic/stdexp.nix {
         inherit (self.garlic) targetMachine stages;
       };
 
       # Apps for Garlic
-#      heat = callPackage ./garlic/heat {
-#        stdenv = pkgs.gcc7Stdenv;
-#        mpi = intel-mpi;
-#        tampi = tampi;
-#      };
-#
-      creams = callPackage ./garlic/creams {
-        gnuDef   = self.gfortran10 ; # Default GNU   compiler version
-        intelDef = self.bsc.icc    ; # Default Intel compiler version
 
-        gitBranch = "garlic/mpi+send+seq";
+      apps = {
+        creams = callPackage ./garlic/apps/creams/default.nix {
+          gnuDef   = self.gfortran10 ; # Default GNU   compiler version
+          intelDef = self.bsc.icc    ; # Default Intel compiler version
 
-        cc  = self.bsc.icc; # self.bsc.icc OR self.gfortran10;
-        mpi = self.bsc.mpi; # self.bsc.mpi OR self.bsc.openmpi-mn4;
-      };
+          gitBranch = "garlic/mpi+send+seq";
 
-      creamsInput = callPackage ./garlic/creams/input.nix {
-        gitBranch = "garlic/mpi+send+seq";
-      };
+          cc  = self.bsc.icc; # self.bsc.icc OR self.gfortran10;
+          mpi = self.bsc.mpi; # self.bsc.mpi OR self.bsc.openmpi-mn4;
+        };
 
-#      lulesh = callPackage ./garlic/lulesh {
-#        mpi = intel-mpi;
-#      };
-#
-#      hpcg = callPackage ./garlic/hpcg { };
-#
-#      hpccg = callPackage ./garlic/hpccg { };
-#
-#      fwi = callPackage ./garlic/fwi { };
+        creamsInput = callPackage ./garlic/apps/creams/input.nix {
+          gitBranch = "garlic/mpi+send+seq";
+        };
 
-      nbody = callPackage ./garlic/nbody {
-        cc = self.bsc.icc;
-        mpi = self.bsc.mpi;
-        tampi = self.bsc.tampi;
-        mcxx = self.bsc.mcxx;
-        gitBranch = "garlic/seq";
-      };
+        nbody = callPackage ./garlic/apps/nbody/default.nix {
+          cc = self.bsc.icc;
+          mpi = self.bsc.mpi;
+          tampi = self.bsc.tampi;
+          mcxx = self.bsc.mcxx;
+          gitBranch = "garlic/seq";
+        };
 
-      saiph = callPackage ./garlic/saiph/default.nix {
-        cc = self.bsc.clangOmpss2;
+        saiph = callPackage ./garlic/apps/saiph/default.nix {
+          cc = self.bsc.clangOmpss2;
+        };
+
+#        heat = callPackage ./garlic/apps/heat {
+#          stdenv = pkgs.gcc7Stdenv;
+#          mpi = intel-mpi;
+#          tampi = tampi;
+#        };
+#  
+#        lulesh = callPackage ./garlic/apps/lulesh {
+#          mpi = intel-mpi;
+#        };
+#  
+#        hpcg = callPackage ./garlic/apps/hpcg { };
+#  
+#        hpccg = callPackage ./garlic/apps/hpccg { };
+#  
+#        fwi = callPackage ./garlic/apps/fwi { };
       };
 
       # Execution stages
@@ -317,9 +322,8 @@ in
   {
     bsc = bsc;
 
-    # Alias
+    # Aliases
     garlic = bsc.garlic;
-
-    # Alias
     exp = bsc.garlic.exp;
+    apps = bsc.garlic.apps;
   }

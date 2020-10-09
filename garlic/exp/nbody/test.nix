@@ -59,7 +59,7 @@ let
       bsc = super.bsc // { mpi = conf.mpi; };
     });
   in
-  customPkgs.garlic.nbody.override {
+  customPkgs.apps.nbody.override {
     inherit cc blocksize mpi gitBranch;
   };
 
@@ -71,5 +71,4 @@ let
 
 in
  
-  elemAt units 0
-  #buildExperiment units
+  stdexp.buildExperiment units

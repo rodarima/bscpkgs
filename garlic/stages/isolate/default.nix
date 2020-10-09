@@ -9,7 +9,7 @@
 {
   nextStage
 , nixPrefix
-, clusterName
+, clusterName ? "mn4"
 }:
 
 with garlicTools;

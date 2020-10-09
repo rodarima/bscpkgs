@@ -15,11 +15,11 @@ in
 rec {
   /* Takes a list of units and builds an experiment, after executing the
   trebuchet and the isolate stages. Returns the trebuchet stage. */
-  buildExperiment = {units, conf, ...}: stage.trebuchet {
+  buildExperiment = units: stages.trebuchet {
     inherit (machineConf) nixPrefix;
-    nextStage = stage.isolate {
+    nextStage = stages.isolate {
       inherit (machineConf) nixPrefix;
-      nextStage = stage.experiment {
+      nextStage = stages.experiment {
         inherit units;
       };
     };
@@ -73,7 +73,7 @@ rec {
   ];
 
   # FIXME: Remove this hack and allow custom nixpkgs
-  bscOverlay = import ../../overlay.nix;
+  bscOverlay = import ../overlay.nix;
   nixpkgs = import <nixpkgs>;
   genPkgs = newOverlay: nixpkgs {
     overlays = [

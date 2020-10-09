@@ -3,8 +3,8 @@
 }:
 
 {
-  units:
-}
+  units
+}:
 
 with stdenv.lib;
 

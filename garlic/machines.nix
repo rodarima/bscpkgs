@@ -7,6 +7,7 @@
   mn4 = {
     config = {
       name = "mn4";
+      sshHosts = [ "mn1" "mn2" "mn3" ];
       nixPrefix = "/gpfs/projects/bsc15/nix";
       cachelineBytes = 64;
       march = "skylake-avx512";

@@ -1,16 +1,21 @@
 {
   stdenv
 , nixtools
+, garlicTools
 }:
 
 {
-  program
+  nextStage
 , nixPrefix
+
+# FIXME: These two should be specified in the configuration of the machine
 , sshHost ? "mn"
 , targetCluster ? "mn4"
-, stage
 }:
 
+let
+  program = garlicTools.stageProgram nextStage;
+in
 stdenv.mkDerivation {
   name = "trebuchet";
   phases = [ "installPhase" ];
@@ -25,7 +30,7 @@ stdenv.mkDerivation {
     # to see what is being executed.
 
     #  $out
-    ${stage.desc}
+    ${nextStage.desc}
 
     nixtools=${nixPrefix}${nixtools}/bin
     runexp=\$nixtools/${targetCluster}/runexp
