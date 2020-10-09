@@ -32,41 +32,27 @@ let
     cpuBind = "sockets,verbose";
   };
 
-  confMachine = targetMachine.config;
-
   # Compute the array of configurations
   configs = stdexp.buildConfigs {
     var = confUnit;
-    fixed = confMachine // confExperiment;
+    fixed = targetMachine.config // confExperiment;
   };
 
   exec = {nextStage, conf, ...}: with conf; stages.exec {
     inherit nextStage;
     argv = [ "-t" timesteps "-p" particles ];
-    env = "";
   };
 
-  # We may be able to use overlays by invoking the fix function directly, but we
-  # have to get the definition of the bsc packages and the garlic ones as
-  # overlays.
   program = {nextStage, conf, ...}: with conf;
   let
-    # We set the mpi implementation to the one specified in the conf, so all
-    # packages in bsc will use that one.
-    customPkgs = stdexp.genPkgs (self: super: {
-      bsc = super.bsc // { mpi = conf.mpi; };
-    });
+    customPkgs = stdexp.replaceMpi conf.mpi;
   in
-  customPkgs.apps.nbody.override {
-    inherit cc blocksize mpi gitBranch;
-  };
+    customPkgs.apps.nbody.override {
+      inherit cc blocksize mpi gitBranch;
+    };
 
-  # Generate the experimental units
-  units = map (c: stages.unit {
-    conf = c;
-    stages = stdexp.stdStages ++ [ exec program ];
-  }) configs;
+  pipeline = stdexp.stdStages ++ [ exec program ];
 
 in
  
-  stdexp.buildExperiment units
+  stdexp.genExperiment { inherit configs pipeline; }

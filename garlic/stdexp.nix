@@ -15,7 +15,7 @@ in
 rec {
   /* Takes a list of units and builds an experiment, after executing the
   trebuchet and the isolate stages. Returns the trebuchet stage. */
-  buildExperiment = units: stages.trebuchet {
+  buildTrebuchet = units: stages.trebuchet {
     inherit (machineConf) nixPrefix;
     nextStage = stages.isolate {
       inherit (machineConf) nixPrefix;
@@ -81,4 +81,21 @@ rec {
       newOverlay
     ];
   };
+
+  replaceMpi = mpi: genPkgs (self: super: {
+    bsc = super.bsc // { inherit mpi; };
+  });
+
+  # Generate the experimental units
+  genUnits = {configs, pipeline}: map (c: stages.unit {
+    conf = c;
+    stages = pipeline;
+  }) configs;
+
+  # Generate the complete experiment
+  genExperiment = {configs, pipeline}: 
+  let
+    units = genUnits { inherit configs pipeline; };
+  in
+    buildTrebuchet units;
 }
