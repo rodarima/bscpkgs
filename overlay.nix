@@ -207,16 +207,9 @@ let
       stages = {
         sbatch     = callPackage ./garlic/stages/sbatch.nix { };
         srun       = callPackage ./garlic/stages/srun.nix { };
-        launch     = callPackage ./garlic/stages/launcher { };
         control    = callPackage ./garlic/stages/control.nix { };
-        nixsetup   = callPackage ./garlic/stages/nix-setup.nix { };
         exec       = callPackage ./garlic/stages/exec.nix { };
-        statspy    = callPackage ./garlic/stages/statspy.nix { };
         extrae     = callPackage ./garlic/stages/extrae.nix { };
-        stagen     = callPackage ./garlic/stages/stagen.nix { };
-        perf       = callPackage ./garlic/stages/perf.nix { };
-        broom      = callPackage ./garlic/stages/broom.nix { };
-        envRecord  = callPackage ./garlic/stages/envRecord.nix { };
         valgrind   = callPackage ./garlic/stages/valgrind.nix { };
         isolate    = callPackage ./garlic/stages/isolate { };
         trebuchet  = callPackage ./garlic/stages/trebuchet.nix { };

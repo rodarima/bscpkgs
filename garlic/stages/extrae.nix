@@ -1,36 +1,34 @@
 {
   stdenv
-, bash
-#, writeShellScriptBin
+, garlicTools
 }:
 
 {
-  program
+  nextStage
 , configFile
 , traceLib
 , extrae
 }:
 
-#writeShellScriptBin "extraeWrapper" ''
-#  export EXTRAE_HOME=${extrae}
-#  export LD_PRELOAD=${extrae}/lib/lib${traceLib}trace.so:$LD_PRELOAD
-#  export EXTRAE_CONFIG_FILE=${configFile}
-#  exec ${program}
-#''
+with garlicTools;
 
-stdenv.mkDerivation {
-  name = "extrae";
-  preferLocalBuild = true;
-  phases = [ "installPhase" ];
-  installPhase = ''
-    cat > $out <<EOF
-    #!/bin/sh
-    
-    export EXTRAE_HOME=${extrae}
-    export LD_PRELOAD=${extrae}/lib/lib${traceLib}trace.so:$LD_PRELOAD
-    export EXTRAE_CONFIG_FILE=${configFile}
-    exec ${program}
-    EOF
-    chmod +x $out
-  '';
-}
+let
+  program = stageProgram nextStage;
+in
+  stdenv.mkDerivation {
+    name = "extrae";
+    phases = [ "installPhase" ];
+    preferLocalBuild = true;
+    dontPatchShebangs = true;
+    installPhase = ''
+      cat > $out <<EOF
+      #!/bin/sh
+      
+      export EXTRAE_HOME=${extrae}
+      export LD_PRELOAD=${extrae}/lib/lib${traceLib}trace.so:$LD_PRELOAD
+      export EXTRAE_CONFIG_FILE=${configFile}
+      exec ${program}
+      EOF
+      chmod +x $out
+    '';
+  }
