@@ -9,31 +9,34 @@
 with stdenv.lib;
 
 let
-  # Configurations for each unit (using the cartesian product)
-  confUnit = with bsc; {
+  # Initial variable configuration
+  varConf = with bsc; {
     numComm = [ 1 2 ];
   };
 
-  # Configuration for the complete experiment
-  confExperiment = with bsc; {
+  # Generate the complete configuration for each unit
+  genConf = with bsc; c: targetMachine.config // rec {
     # saiph options
     devMode = false;
+    inherit (c) numComm;
     mpi = impi;
     gitBranch = "garlic/tampi+isend+oss+task+simd";
 
-    # Repeat the execution of each unit 30 times
+    # Repeat the execution of each unit 100 times
     loops = 100;
 
     # Resources
+    qos = "debug";
+    time = "02:00:00";
     ntasksPerNode = 2;
     nodes = 1;
     cpuBind = "sockets,verbose";
+    jobName = "saiph-${toString numComm}-${gitBranch}";
   };
 
   # Compute the array of configurations
   configs = stdexp.buildConfigs {
-    var = confUnit;
-    fixed = targetMachine.config // confExperiment;
+    inherit varConf genConf;
   };
 
   exec = {nextStage, conf, ...}: with conf; stages.exec {
@@ -50,11 +53,11 @@ let
   let
     customPkgs = stdexp.replaceMpi conf.mpi;
   in
-  customPkgs.apps.saiph.override {
-    inherit devMode numComm mpi gitBranch;
-  };
+    customPkgs.apps.saiph.override {
+      inherit devMode numComm mpi gitBranch;
+    };
 
-  pipeline = stdexp.stdStages ++ [ exec program ];
+  pipeline = stdexp.stdPipeline ++ [ exec program ];
 
 in
  
