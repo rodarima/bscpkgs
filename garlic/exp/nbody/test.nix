@@ -9,16 +9,17 @@
 with stdenv.lib;
 
 let
-  # Configurations for each unit (using the cartesian product)
-  confUnit = with bsc; {
+  # Initial variable configuration
+  varConf = with bsc; {
     blocksize = [ 1024 2048 ];
   };
 
-  # Configuration for the complete experiment
-  confExperiment = with bsc; {
+  # Generate the complete configuration for each unit
+  genConf = with bsc; c: targetMachine.config // rec {
     # nbody options
     particles = 1024 * 4;
     timesteps = 10;
+    inherit (c) blocksize;
     cc = icc;
     mpi = impi;
     gitBranch = "garlic/mpi+send";
@@ -27,15 +28,16 @@ let
     loops = 30;
 
     # Resources
+    qos = "debug";
     ntasksPerNode = 2;
     nodes = 1;
     cpuBind = "sockets,verbose";
+    jobName = "nbody-bs-${toString blocksize}-${gitBranch}";
   };
 
   # Compute the array of configurations
   configs = stdexp.buildConfigs {
-    var = confUnit;
-    fixed = targetMachine.config // confExperiment;
+    inherit varConf genConf;
   };
 
   exec = {nextStage, conf, ...}: with conf; stages.exec {
@@ -51,7 +53,8 @@ let
       inherit cc blocksize mpi gitBranch;
     };
 
-  pipeline = stdexp.stdStages ++ [ exec program ];
+    pipeline = stdexp.stdUnitPre {sbatch=mySbatch;}
+    ++ [ exec program ];
 
 in
  
