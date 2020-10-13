@@ -10,8 +10,8 @@ This document covers the execution of experiments in the Garlic
 benchmark, which are performed under strict conditions. The several
 stages of the execution are documented so the experimenter can have a
 global overview of how the benchmark runs under the hood.
-The measurements taken during the execution of the experiment are stored
-in a file used in posterior processing steps.
+The results of the experiment are stored in a known path to be used in
+posterior processing steps.
 .AE
 .\"#####################################################################
 .nr GROWPS 3
@@ -113,10 +113,17 @@ stage connects via
 .I ssh
 to the target machine and executes the next stage there. Once in the
 target machine, the
+.I runexp
+stage computes the output path to store the experiment results, using
+the user and group in the target cluster and changes the working
+directory there. In MareNostrum 4 the output path is at
+.CW /gpfs/projects/$group/$user/garlic-out .
+Then the
 .I isolate
 stage is executed to enter the sandbox and the
 .I experiment
-stage is executed, running the experiment which launches several
+stage begins, which creates a directory to store the experiment output,
+and launches several
 .I unit
 stages.
 .PP
@@ -124,7 +131,7 @@ Each unit executes a
 .I sbatch
 stage which runs the
 .I sbatch(1)
-program with a job script that simply executes the next stage. The
+program with a job script that simply calls the next stage. The
 sbatch program internally reads the
 .CW /etc/slurm/slurm.conf
 file from outside the sandbox, so we must explicitly allow this file to
@@ -215,7 +222,8 @@ _
 Stage     	Target	Safe	Copies	User	Std
 _
 trebuchet	xeon	no	no	yes	yes
-isolate 	login	no	no	yes	yes
+runexp  	login	no	no	yes	yes
+isolate 	login	no	no	no	yes
 experiment	login	yes	no	no	yes
 unit    	login	yes	no	no	yes
 sbatch  	login	yes	no	no	yes
