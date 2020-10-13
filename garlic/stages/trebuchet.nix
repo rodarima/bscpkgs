@@ -6,10 +6,7 @@
 {
   nextStage
 , nixPrefix
-
-# FIXME: These two should be specified in the configuration of the machine
-, sshHost ? "mn"
-, targetCluster ? "mn4"
+, sshHost
 }:
 
 with garlicTools;

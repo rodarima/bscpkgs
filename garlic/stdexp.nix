@@ -16,7 +16,7 @@ rec {
   /* Takes a list of units and builds an experiment, after executing the
   trebuchet, runexp and isolate stages. Returns the trebuchet stage. */
   buildTrebuchet = units: stages.trebuchet {
-    inherit (machineConf) nixPrefix;
+    inherit (machineConf) nixPrefix sshHost;
     nextStage = stages.runexp {
       inherit (machineConf) nixPrefix;
       nextStage = stages.isolate {
