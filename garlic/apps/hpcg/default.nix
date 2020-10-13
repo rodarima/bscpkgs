@@ -41,4 +41,6 @@ stdenv.mkDerivation rec {
     cp bin/* $out/bin/
   '';
 
+  programPath = "/bin/xhpcg";
+
 }

@@ -197,7 +197,7 @@ let
           gitBranch = "garlic/mpi+send+seq";
         };
 
-        hpcg = callPackage ./garlic/hpcg {
+        hpcg = callPackage ./garlic/apps/hpcg/default.nix {
           cc = self.bsc.icc;
           gitBranch = "garlic/seq";
         };
