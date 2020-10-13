@@ -199,7 +199,8 @@ let
 
         hpcg = callPackage ./garlic/apps/hpcg/default.nix {
           cc = self.bsc.icc;
-          gitBranch = "garlic/seq";
+          mpi = self.bsc.impi;
+          gitBranch = "garlic/mpi+omp";
         };
 
 #        heat = callPackage ./garlic/apps/heat {
@@ -262,8 +263,8 @@ let
         hpcg = {
           serial = callPackage ./garlic/exp/hpcg/serial.nix { };
           mpi = callPackage ./garlic/exp/hpcg/mpi.nix { };
-          # omp = callPackage ./garlic/exp/hpcg/omp.nix { };
-          # mpi+omp = callPackage ./garlic/exp/hpcg/mpi+omp.nix { };
+          omp = callPackage ./garlic/exp/hpcg/omp.nix { };
+          mpi_omp = callPackage ./garlic/exp/hpcg/mpi+omp.nix { };
         };
 
         test = {

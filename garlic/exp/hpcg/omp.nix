@@ -19,8 +19,8 @@ let
     # hpcg options
     n = c.n;
     cc = icc;
-    mpi = impi;
-    gitBranch = "garlic/mpi";
+    mpi = null; # TODO: Remove this for omp
+    gitBranch = "garlic/seq";
 
     # Repeat the execution of each unit 30 times
     loops = 30;
@@ -53,7 +53,7 @@ let
     customPkgs = stdexp.replaceMpi conf.mpi;
   in
     customPkgs.apps.hpcg.override {
-      inherit cc mpi gitBranch;
+      inherit cc gitBranch;
     };
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];

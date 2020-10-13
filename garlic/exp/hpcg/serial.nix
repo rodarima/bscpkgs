@@ -19,7 +19,7 @@ let
     # hpcg options
     n = c.n;
     cc = icc;
-    mpi = impi;
+    mpi = null; # TODO: Remove this for serial
     gitBranch = "garlic/seq";
 
     # Repeat the execution of each unit 30 times
@@ -59,5 +59,5 @@ let
   pipeline = stdexp.stdPipeline ++ [ exec program ];
 
 in
- 
+
   stdexp.genExperiment { inherit configs pipeline; }

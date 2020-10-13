@@ -1,11 +1,11 @@
 {
   stdenv
 , cc
-, mpi
-, gitBranch ? "garlic/seq"
-, makefileName ? "Linux_Serial"
+, mpi ? null
+, gitBranch
 }:
 
+with stdenv.lib;
 stdenv.mkDerivation rec {
   name = "hpcg";
 
@@ -20,8 +20,8 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     cc
-    mpi
-  ];
+  ]
+  ++ optional (mpi != null) mpi;
 
   makeFlags = [
     "CC=${cc.cc.CC}"
@@ -29,12 +29,6 @@ stdenv.mkDerivation rec {
   ];
 
   enableParallelBuilding = true;
-
-  configurePhase = ''
-    mkdir build
-    cd build
-    ../configure ${makefileName}
-  '';
 
   installPhase = ''
     mkdir -p $out/bin

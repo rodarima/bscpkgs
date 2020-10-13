@@ -20,7 +20,7 @@ let
     n = c.n;
     cc = icc;
     mpi = impi;
-    gitBranch = "garlic/mpi";
+    gitBranch = "garlic/mpi+omp";
 
     # Repeat the execution of each unit 30 times
     loops = 30;
