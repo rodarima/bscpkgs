@@ -58,6 +58,18 @@ let
       intelLicense = self.bsc.intelLicense;
     };
 
+    # We need to set the cc.cc.CC and cc.cc.CXX attributes, in order to
+    # determine the name of the compiler
+    # FIXME: Use a proper and automatic way to compute the compiler name
+    gcc = self.gcc.overrideAttrs (old1: {
+      cc = old1.cc.overrideAttrs (old2: {
+        passthru = old2.passthru // {
+          CC = "gcc";
+          CXX = "g++";
+        };
+      });
+    });
+
     intelLicense = callPackage ./bsc/intel-compiler/license.nix { };
 
     pmix2 = callPackage ./bsc/pmix/pmix2.nix { };
