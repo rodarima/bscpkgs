@@ -1,6 +1,5 @@
 {
   stdenv
-, nixtools
 , garlicTools
 }:
 
@@ -29,18 +28,15 @@ stdenv.mkDerivation {
     #!/bin/sh -e
     # Using the token @upload-to-mn@ we instruct the post-build hook to upload
     # this script and it's closure to the MN4 cluster, so it can run there.
+
+    # This trebuchet launches:
+    #  ${nextStage}
+    #  ${nextStage.nextStage}
+    #  ${nextStage.nextStage.nextStage}
+
     # Take a look at ${program}
     # to see what is being executed.
-
-    # This trebuchet launches the following experiment in an isolated
-    # environment:
-    #  ${nextStage.nextStage}
-
-    nixtools=${nixPrefix}${nixtools}/bin
-    runexp=\$nixtools/${targetCluster}/runexp
-
-    >&2 echo "Launching \"\$runexp ${program}\" in MN4"
-    ssh ${sshHost} \$runexp ${program}
+    ssh ${sshHost} ${nixPrefix}${program}
     EOF
     chmod +x $out
   '';

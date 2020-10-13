@@ -1,0 +1,18 @@
+#!/bin/sh -ex
+
+if [ -e /nix ]; then
+    >&2 echo "Cannot use runexp inside nix environment!"
+    exit 1
+fi
+
+>&2 echo Running runexp for MN4
+>&2 echo PATH=$PATH
+
+user=$(id -un)
+group=$(id -gn)
+
+export GARLIC_OUT="/gpfs/projects/$group/$user/garlic-out"
+mkdir -p "$GARLIC_OUT"
+cd "$GARLIC_OUT"
+
+exec @nixPrefix@@program@

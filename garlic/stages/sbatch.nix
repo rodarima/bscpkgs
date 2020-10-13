@@ -8,7 +8,7 @@
 {
   nextStage
 , jobName
-, chdirPrefix ? "."
+, chdir ? "."
 , nixPrefix ? ""
 , binary ? "/bin/run"
 , ntasks ? null
@@ -49,7 +49,7 @@ stdenv.mkDerivation rec {
   #SBATCH --cpus-per-task=1
   dontBuild = true;
   dontPatchShebangs = true;
-  programPath = "/${name}";
+  programPath = "/run";
 
   installPhase = ''
     mkdir -p $out
@@ -61,7 +61,7 @@ stdenv.mkDerivation rec {
     + sbatchOpt "ntasks-per-node" ntasksPerNode
     + sbatchOpt "ntasks-per-socket" ntasksPerSocket
     + sbatchOpt "nodes" nodes
-    + sbatchOpt "chdir" "${chdirPrefix}/$(basename $out)"
+    + sbatchOpt "chdir" chdir
     + sbatchOpt "output" output
     + sbatchOpt "error" error
     + sbatchEnable "exclusive" exclusive
@@ -75,16 +75,10 @@ stdenv.mkDerivation rec {
     exec ${nixPrefix}${stageProgram nextStage}
     EOF
     
-    cat > $out/${name} <<EOF
+    cat > $out/run <<EOF
     #!/bin/sh -ex
-    if [ -e "${chdirPrefix}/$(basename $out)" ]; then
-      >&2 echo "Execution aborted: '${chdirPrefix}/$(basename $out)' already exists"
-      exit 1
-    fi
-    mkdir -p "${chdirPrefix}/$(basename $out)"
-    echo ${slurm}/bin/sbatch ${nixPrefix}$out/job
     ${slurm}/bin/sbatch ${nixPrefix}$out/job
     EOF
-    chmod +x $out/${name}
+    chmod +x $out/run
   '';
 }

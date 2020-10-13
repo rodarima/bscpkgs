@@ -212,6 +212,7 @@ let
         extrae     = callPackage ./garlic/stages/extrae.nix { };
         valgrind   = callPackage ./garlic/stages/valgrind.nix { };
         isolate    = callPackage ./garlic/stages/isolate { };
+        runexp     = callPackage ./garlic/stages/runexp { };
         trebuchet  = callPackage ./garlic/stages/trebuchet.nix { };
         strace     = callPackage ./garlic/stages/strace.nix { };
         unit       = callPackage ./garlic/stages/unit.nix { };

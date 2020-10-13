@@ -14,13 +14,16 @@ let
 in
 rec {
   /* Takes a list of units and builds an experiment, after executing the
-  trebuchet and the isolate stages. Returns the trebuchet stage. */
+  trebuchet, runexp and isolate stages. Returns the trebuchet stage. */
   buildTrebuchet = units: stages.trebuchet {
     inherit (machineConf) nixPrefix;
-    nextStage = stages.isolate {
+    nextStage = stages.runexp {
       inherit (machineConf) nixPrefix;
-      nextStage = stages.experiment {
-        inherit units;
+      nextStage = stages.isolate {
+        inherit (machineConf) nixPrefix;
+        nextStage = stages.experiment {
+          inherit units;
+        };
       };
     };
   };
