@@ -261,6 +261,9 @@ let
 
         hpcg = {
           serial = callPackage ./garlic/exp/hpcg/serial.nix { };
+          mpi = callPackage ./garlic/exp/hpcg/mpi.nix { };
+          # omp = callPackage ./garlic/exp/hpcg/omp.nix { };
+          # mpi+omp = callPackage ./garlic/exp/hpcg/mpi+omp.nix { };
         };
 
         test = {

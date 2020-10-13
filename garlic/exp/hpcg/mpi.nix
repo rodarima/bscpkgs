@@ -15,7 +15,9 @@ let
   # Set variable configuration for the experiment
   varConfig = {
     cc = [ bsc.icc ];
-    gitBranch = [ "garlic/seq" ];
+    mpi = [ bsc.impi ];
+    gitBranch = [ "garlic/mpi" ];
+    makefileName = [ "MPI" ];
     n = [ 104 64 ];
   };
 
@@ -132,7 +134,7 @@ let
       });
     in
     customPkgs.bsc.garlic.hpcg.override {
-      inherit cc gitBranch;
+      inherit cc mpi gitBranch makefileName;
     };
 
   stages = with common; []

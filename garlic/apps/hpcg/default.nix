@@ -1,6 +1,7 @@
 {
   stdenv
 , cc
+, mpi
 , gitBranch ? "garlic/seq"
 , makefileName ? "Linux_Serial"
 }:
@@ -19,6 +20,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     cc
+    mpi
   ];
 
   makeFlags = [
