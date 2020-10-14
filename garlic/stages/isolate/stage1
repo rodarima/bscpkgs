@@ -1,7 +1,7 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
->&2 echo Running isolate stage1
->&2 echo PATH=$PATH
+#>&2 echo Running isolate stage1
+#>&2 echo PATH=$PATH
 
 if [ -e /nix ]; then
   >&2 echo "/nix found, aborting"
@@ -42,5 +42,5 @@ mounts=(
 
 join_flags="${mounts[@]}"
 
-exec $nixjoin -v -i $join_flags $nixhome -- \
+exec $nixjoin -i $join_flags $nixhome -- \
 	env -i "${env[@]}" @out@/bin/stage2

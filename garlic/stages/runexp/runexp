@@ -1,4 +1,4 @@
-#!/bin/sh -ex
+#!/bin/sh -e
 
 if [ -e /nix ]; then
     >&2 echo "Cannot use runexp inside nix environment!"

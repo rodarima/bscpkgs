@@ -19,7 +19,7 @@ stdenv.mkDerivation rec {
   dontPatchShebangs = true;
   installPhase = ''
     cat > $out <<EOF
-    #!/bin/sh -ex
+    #!/bin/sh -e
     exec ${slurm}/bin/srun \
       --mpi=pmi2 \
       --cpu-bind=${cpuBind} \

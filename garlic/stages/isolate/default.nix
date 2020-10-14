@@ -26,9 +26,6 @@ stdenv.mkDerivation {
   desc = "#  $out\n" + (if builtins.hasAttr "desc" nextStage then nextStage.desc else "");
   out = "$out";
   installPhase = ''
-
-    echo PATH=$PATH
-
     substituteAllInPlace stage1
     substituteAllInPlace stage2
 

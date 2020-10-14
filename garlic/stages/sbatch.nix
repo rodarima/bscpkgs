@@ -54,7 +54,7 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out
     cat > $out/job <<EOF
-    #!/bin/sh -ex
+    #!/bin/sh -e
     #SBATCH --job-name="${jobName}"
     ''
     + sbatchOpt "ntasks" ntasks
@@ -76,7 +76,7 @@ stdenv.mkDerivation rec {
     EOF
     
     cat > $out/run <<EOF
-    #!/bin/sh -ex
+    #!/bin/sh -e
     ${slurm}/bin/sbatch ${nixPrefix}$out/job
     EOF
     chmod +x $out/run
