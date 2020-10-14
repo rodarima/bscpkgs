@@ -1,6 +1,7 @@
 {
   stdenv
 , bash
+, writeText
 }:
 
 {
@@ -35,6 +36,8 @@ let
 
 
   firstStage = (x: x.programPath) (elemAt linkStages 0);
+
+  jsonConf = writeText "garlic_config.json" (builtins.toJSON conf);
 in
 stdenv.mkDerivation {
   name = "unit";
@@ -53,6 +56,9 @@ stdenv.mkDerivation {
     # And change the working directory
     mkdir \$GARLIC_UNIT
     cd \$GARLIC_UNIT
+
+    # Copy the configuration for the unit to the output path
+    cp ${jsonConf} garlic_config.json
 
     # Finally, execute the first stage:
     exec ${firstStage}
