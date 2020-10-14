@@ -9,9 +9,14 @@
       name = "mn4";
       sshHost = "mn1";
       nixPrefix = "/gpfs/projects/bsc15/nix";
-      cachelineBytes = 64;
       march = "skylake-avx512";
       mtune = "skylake-avx512";
+      hw = {
+        cpusPerNode = 48;
+        cpusPerSocket = 24;
+        socketsPerNode = 2;
+        cachelineBytes = 64;
+      };
     };
     # TODO: Add the specific details for SLURM and the interconection here
   };
