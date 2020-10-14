@@ -31,6 +31,7 @@ stdenv.mkDerivation {
     fi
 
     export GARLIC_EXPERIMENT=$(basename $out)
+    echo "Running experiment \$GARLIC_EXPERIMENT"
 
     if [ -e "\$GARLIC_EXPERIMENT" ]; then
       >&2 echo "Already exists \$GARLIC_EXPERIMENT, aborting"
