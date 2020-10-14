@@ -1,0 +1,2 @@
+#!/bin/sh
+rsync -a mn1:go/$1 .

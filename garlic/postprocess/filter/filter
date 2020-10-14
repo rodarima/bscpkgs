@@ -1,0 +1,18 @@
+#!/bin/sh
+
+for unit in $1/*; do
+	#echo unit=$unit
+	bs=$(jq ".blocksize" "$unit/garlic_config.json")
+	#echo bs=$bs
+
+	awk '/^time /{print $2}' > time.$bs $unit/stdout.log
+
+	N=$(wc -l "time.$bs" | awk '{print $1}')
+	#echo N=$N
+
+	if [ $N -lt 30 ]; then
+		echo "too few points ($N) in unit $unit"
+		#exit 1
+	fi
+
+done
