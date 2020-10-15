@@ -260,12 +260,11 @@ let
         mpi = self.bsc.mpi;
       };
 
-      # Post processing tools
-      hist = callPackage ./garlic/postprocess/hist { };
-
+      # Experiments
       exp = {
         nbody = {
           test  = callPackage ./garlic/exp/nbody/test.nix { };
+          tampi = callPackage ./garlic/exp/nbody/tampi.nix { };
         };
 
         saiph = {
@@ -286,11 +285,27 @@ let
           mpi_omp = callPackage ./garlic/exp/hpcg/mpi+omp.nix { };
           oss = callPackage ./garlic/exp/hpcg/oss.nix { };
         };
+      };
 
-        test = {
-          exec = callPackage ./test/garlic/exec.nix {
-            exec = self.bsc.garlic.stages.exec;
+      # Post processing tools
+      hist = callPackage ./garlic/postprocess/hist { };
+      getExpResult = callPackage ./garlic/postprocess/result.nix { };
+      fetchExperiment = callPackage ./garlic/postprocess/fetch.nix { };
+
+      # Figures generated from the experiments
+      fig = {
+        nbody = {
+          test = callPackage ./garlic/fig/nbody/test.nix {
+            experiments = [
+              self.bsc.garlic.exp.nbody.tampi
+            ];
           };
+        };
+      };
+
+      test = {
+        exec = callPackage ./test/garlic/exec.nix {
+          exec = self.bsc.garlic.stages.exec;
         };
       };
     };
@@ -302,6 +317,5 @@ in
 
     # Aliases
     garlic = bsc.garlic;
-    exp = bsc.garlic.exp;
-    apps = bsc.garlic.apps;
+    inherit (bsc.garlic) exp fig apps;
   }
