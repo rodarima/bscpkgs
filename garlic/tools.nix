@@ -39,6 +39,8 @@ let
       then "${stage}${stage.programPath}"
       else "${stage}";
 
+    /* Given a trebuchet, returns the experiment */
+    getExperimentStage = drv: drv.nextStage.nextStage.nextStage;
   };
 in
   gen
