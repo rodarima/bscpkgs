@@ -302,12 +302,6 @@ let
           };
         };
       };
-
-      test = {
-        exec = callPackage ./test/garlic/exec.nix {
-          exec = self.bsc.garlic.stages.exec;
-        };
-      };
     };
   };
 
