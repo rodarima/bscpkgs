@@ -244,6 +244,7 @@ let
         exec       = callPackage ./garlic/stages/exec.nix { };
         extrae     = callPackage ./garlic/stages/extrae.nix { };
         valgrind   = callPackage ./garlic/stages/valgrind.nix { };
+        perf       = callPackage ./garlic/stages/perf.nix { };
         isolate    = callPackage ./garlic/stages/isolate { };
         runexp     = callPackage ./garlic/stages/runexp { };
         trebuchet  = callPackage ./garlic/stages/trebuchet.nix { };
