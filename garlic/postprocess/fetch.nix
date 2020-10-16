@@ -10,14 +10,14 @@
 {
   sshHost
 , prefix
-, experiment
+, experimentStage
+, trebuchetStage
 , garlicTemp
 }:
 
 with garlicTools;
 
 let
-  experimentStage = getExperimentStage experiment;
   experimentName = baseNameOf (toString experimentStage);
 in
   stdenv.mkDerivation {
@@ -33,11 +33,15 @@ in
       mkdir -p ${garlicTemp}
       export PATH=${rsync}/bin:${openssh}/bin:${nix}/bin
       rsync -av \
+        --copy-links \
         --include='*/*/*.log' --include='*/*/*.json' --exclude='*/*/*' \
         '${sshHost}:${prefix}/${experimentName}' ${garlicTemp}
 
-      res=\$(nix-build -E '(with import ./default.nix; garlic.getExpResult \
-        {experiment = "${experiment}"; garlicTemp = "${garlicTemp}"; })')
+      res=\$(nix-build -E '(with import ./default.nix; garlic.getExpResult { \
+        experimentStage = "${experimentStage}"; \
+        trebuchetStage = "${trebuchetStage}"; \
+        garlicTemp = "${garlicTemp}"; \
+      })')
 
       echo "The results for experiment ${experimentName} are at:"
       echo "  \$res"
