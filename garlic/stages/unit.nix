@@ -50,8 +50,20 @@ stdenv.mkDerivation {
 
     ${desc}
 
+    if [ -z "\$GARLIC_OUT" ]; then
+      >&2 echo "GARLIC_OUT not defined, aborting"
+      exit 1
+    fi
+
+    cd "\$GARLIC_OUT"
+
     # Set the experiment unit in the environment
     export GARLIC_UNIT=$(basename $out)
+
+    if [ -e "\$GARLIC_UNIT" ]; then
+      >&2 echo "skipping, unit path already exists: \$GARLIC_UNIT"
+      exit 0
+    fi
 
     # And change the working directory
     mkdir \$GARLIC_UNIT

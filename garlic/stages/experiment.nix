@@ -13,6 +13,9 @@ with garlicTools;
 let
   unitsString = builtins.concatStringsSep "\n"
     (map (x: "${stageProgram x}") units);
+
+  unitsLinks = builtins.concatStringsSep "\n"
+    (map (x: "ln -s ../${baseNameOf x} ${baseNameOf x}") units);
 in
 stdenv.mkDerivation {
   name = "experiment";
@@ -30,16 +33,20 @@ stdenv.mkDerivation {
       exit 1
     fi
 
+    cd "\$GARLIC_OUT"
+
     export GARLIC_EXPERIMENT=$(basename $out)
-    echo "Running experiment \$GARLIC_EXPERIMENT"
 
     if [ -e "\$GARLIC_EXPERIMENT" ]; then
-      >&2 echo "Already exists \$GARLIC_EXPERIMENT, aborting"
-      exit 1
+      >&2 echo "skipping, experiment path already exists: \$GARLIC_EXPERIMENT"
+      exit 0
     fi
 
     mkdir -p "\$GARLIC_EXPERIMENT"
     cd "\$GARLIC_EXPERIMENT"
+    ${unitsLinks}
+
+    echo "Running experiment \$GARLIC_EXPERIMENT"
 
     # This is an experiment formed by the following units:
     ${unitsString}
