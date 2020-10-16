@@ -116,6 +116,7 @@ let
     nanos6Latest = callPackage ./bsc/nanos6/default.nix { };
     nanos6Git = callPackage ./bsc/nanos6/git.nix { };
 
+    babeltrace = callPackage ./bsc/babeltrace/default.nix { };
     babeltrace2 = callPackage ./bsc/babeltrace2/default.nix { };
 
     vtk = callPackage ./bsc/vtk/default.nix {
