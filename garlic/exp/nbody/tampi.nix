@@ -12,7 +12,7 @@ let
   # Initial variable configuration
   varConf = with bsc; {
     # We need at least cpusPerNode blocks
-    nblocks = [ 32 64 128 256 ];
+    nblocks = [ 4 8 16 32 64 128 256 512 ];
   };
 
   machineConfig = targetMachine.config;
