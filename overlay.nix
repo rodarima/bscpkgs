@@ -295,7 +295,7 @@ let
       # Figures generated from the experiments
       fig = {
         nbody = {
-          test = callPackage ./garlic/fig/nbody/test.nix {
+          test = callPackage ./garlic/fig/nbody/test/default.nix {
             experiments = [
               self.bsc.garlic.exp.nbody.tampi
             ];
