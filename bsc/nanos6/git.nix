@@ -11,6 +11,8 @@
 , extrae
 , boost
 , autoreconfHook
+, enableJemalloc ? false
+, jemalloc ? null
 }:
 
 with stdenv.lib;
@@ -37,6 +39,9 @@ stdenv.mkDerivation rec {
     export NANOS6_GIT_VERSION=${src.rev}
     export NANOS6_GIT_BRANCH=${branch}
   '';
+
+  configureFlags = [] ++
+    optional enableJemalloc "--with-jemalloc=${jemalloc}";
 
   # The "bindnow" flags are incompatible with ifunc resolution mechanism. We
   # disable all by default, which includes bindnow.

@@ -116,6 +116,19 @@ let
     nanos6Latest = callPackage ./bsc/nanos6/default.nix { };
     nanos6Git = callPackage ./bsc/nanos6/git.nix { };
 
+    jemalloc = self.jemalloc.overrideAttrs (old:
+    {
+      # Custom nanos6 configure options
+      configureFlags = old.configureFlags ++ [
+        "--with-jemalloc-prefix=nanos6_je_"
+        "--enable-stats"
+      ];
+    });
+
+    nanos6Jemalloc = callPackage ./bsc/nanos6/git.nix {
+      enableJemalloc = true;
+    };
+
     babeltrace = callPackage ./bsc/babeltrace/default.nix { };
     babeltrace2 = callPackage ./bsc/babeltrace2/default.nix { };
 
