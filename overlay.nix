@@ -162,6 +162,11 @@ let
       # Configuration for the machines
       machines = callPackage ./garlic/machines.nix {};
 
+      report = callPackage ./garlic/report.nix {
+        fig = self.bsc.garlic.fig;
+        exp = self.bsc.garlic.exp;
+      };
+
       # Use the configuration for the following target machine
       targetMachine = self.garlic.machines.mn4;
 
