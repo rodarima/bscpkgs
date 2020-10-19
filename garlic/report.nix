@@ -1,7 +1,6 @@
 {
   stdenv
 , fig
-, exp
 , writeText
 , busybox
 , jq
@@ -9,7 +8,6 @@
 }:
 let
   figJSON = writeText "fig.json" (builtins.toJSON fig);
-  expJSON = writeText "exp.json" (builtins.toJSON exp);
 in
   stdenv.mkDerivation {
     name = "report";
@@ -19,8 +17,8 @@ in
       ls -l
       sed -i -e "s:@fig\.nbody\.test@:$(jq -r .nbody.test ${figJSON}):g" report.tex
       jq . ${figJSON}
-      jq . ${expJSON}
       pdflatex report.tex -o report.pdf
+      # Run again to fix figure references
       pdflatex report.tex -o report.pdf
     '';
     installPhase = ''

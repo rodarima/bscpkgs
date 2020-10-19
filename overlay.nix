@@ -164,7 +164,6 @@ let
 
       report = callPackage ./garlic/report.nix {
         fig = self.bsc.garlic.fig;
-        exp = self.bsc.garlic.exp;
       };
 
       # Use the configuration for the following target machine
