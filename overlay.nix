@@ -282,6 +282,12 @@ let
         nbody = {
           test  = callPackage ./garlic/exp/nbody/test.nix { };
           tampi = callPackage ./garlic/exp/nbody/tampi.nix { };
+          freeCpu = callPackage ./garlic/exp/nbody/tampi.nix {
+            enableFreeCpu = true;
+          };
+          jemalloc = callPackage ./garlic/exp/nbody/tampi.nix {
+            enableJemalloc = true;
+          };
         };
 
         saiph = {
@@ -307,6 +313,12 @@ let
       # Post processing tools
       hist = callPackage ./garlic/postprocess/hist { };
       getExpResult = callPackage ./garlic/postprocess/result.nix { };
+      resultFromTrebuchet = trebuchetStage: self.garlic.getExpResult {
+        garlicTemp = "/tmp/garlic-temp";
+        inherit trebuchetStage;
+        experimentStage = with self.bsc.garlicTools;
+          getExperimentStage trebuchetStage;
+      };
       fetchExperiment = callPackage ./garlic/postprocess/fetch.nix { };
 
       # Figures generated from the experiments
@@ -316,6 +328,18 @@ let
             experiments = [
               self.bsc.garlic.exp.nbody.tampi
             ];
+          };
+          jemalloc = callPackage ./garlic/fig/nbody/jemalloc/default.nix {
+            resDefault = self.garlic.resultFromTrebuchet
+              self.bsc.garlic.exp.nbody.tampi;
+            resJemalloc = self.garlic.resultFromTrebuchet
+              self.bsc.garlic.exp.nbody.jemalloc;
+          };
+          freeCpu = callPackage ./garlic/fig/nbody/freeCpu/default.nix {
+            resDefault = self.garlic.resultFromTrebuchet
+              self.bsc.garlic.exp.nbody.tampi;
+            resFreeCpu = self.garlic.resultFromTrebuchet
+              self.bsc.garlic.exp.nbody.freeCpu;
           };
         };
       };

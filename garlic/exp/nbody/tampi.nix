@@ -4,6 +4,8 @@
 , bsc
 , targetMachine
 , stages
+, enableJemalloc ? false
+, enableFreeCpu ? false
 }:
 
 with stdenv.lib;
@@ -35,7 +37,7 @@ let
     mpi = impi;
     gitBranch = "garlic/tampi+send+oss+task";
     cflags = "-g";
-
+    
     # Repeat the execution of each unit 30 times
     loops = 10;
 
@@ -44,7 +46,9 @@ let
     ntasksPerNode = hw.socketsPerNode;
     nodes = 1;
     time = "02:00:00";
-    cpuBind = "sockets,verbose";
+    cpuBind = if (enableFreeCpu)
+      then "verbose,mask_cpu:0x7fffff,0x7fffff000000"
+      else "sockets,verbose";
     jobName = "bs-${toString blocksize}-${gitBranch}-nbody";
   };
 
@@ -67,9 +71,13 @@ let
   let
     customPkgs = stdexp.replaceMpi conf.mpi;
   in
-    customPkgs.apps.nbody.override {
+    customPkgs.apps.nbody.override ({
       inherit cc blocksize mpi gitBranch cflags;
-    };
+    } // optionalAttrs enableJemalloc {
+      mcxx = bsc.mcxx.override {
+        nanos6 = bsc.nanos6Jemalloc;
+      };
+    });
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];
 
