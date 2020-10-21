@@ -282,13 +282,12 @@ let
         nbody = rec {
           test  = callPackage ./garlic/exp/nbody/test.nix { };
           tampi = callPackage ./garlic/exp/nbody/tampi.nix { };
-          baseline = tampi;
-          freeCpu = callPackage ./garlic/exp/nbody/tampi.nix {
-            freeCpu = true;
-          };
-          jemalloc = callPackage ./garlic/exp/nbody/tampi.nix {
-            enableJemalloc = true;
-          };
+
+          # Experiment variants
+          medium = tampi.override { particles = 64 * 1024; };
+          baseline = medium;
+          freeCpu = baseline.override { freeCpu = true; };
+          jemalloc = baseline.override { enableJemalloc = true; };
         };
 
         saiph = {

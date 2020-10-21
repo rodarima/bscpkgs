@@ -8,6 +8,7 @@
 
 # Leave the first CPU per socket unused?
 , freeCpu ? false
+, particles ? 1024 * 32
 }:
 
 with stdenv.lib;
@@ -25,7 +26,7 @@ let
   genConf = with bsc; c: targetMachine.config // rec {
     inherit (machineConfig) hw;
     # nbody options
-    particles = 1024 * 32;
+    inherit particles;
     timesteps = 10;
     inherit (c) nblocks;
     totalTasks = ntasksPerNode * nodes;
