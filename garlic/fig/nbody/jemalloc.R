@@ -59,7 +59,7 @@ p = ggplot(data=D, aes(x=blocksize, y=tnorm)) +
 		linetype="dashed", color="red") +
 
 	# Draw boxplots
-	geom_boxplot(aes(fill=freeCpu)) +
+	geom_boxplot(aes(fill=jemalloc)) +
 
 #	# Use log2 scale in x
 #	scale_x_continuous(trans=log2_trans(),
@@ -69,11 +69,12 @@ p = ggplot(data=D, aes(x=blocksize, y=tnorm)) +
 
 	theme_bw() +
 
-	theme(plot.subtitle=element_text(size=10)) +
+	theme(plot.subtitle=element_text(size=8)) +
 
 	theme(legend.position = c(0.85, 0.85)) #+
 
 	# Place each variant group in one separate plot
+	#facet_wrap(~jemalloc)
 
 
 
@@ -86,12 +87,13 @@ dev.off()
 png("scatter.png", width=w*ppi, height=h*ppi, res=ppi)
 #
 ## Create the plot with the normalized time vs blocksize
-p = ggplot(D, aes(x=blocksize, y=time, color=freeCpu)) +
+p = ggplot(D, aes(x=blocksize, y=time, color=jemalloc)) +
 
 	labs(x="Block size", y="Time (s)",
               title="Nbody granularity",
               subtitle=input_file) +
 	theme_bw() +
+	theme(plot.subtitle=element_text(size=8)) +
 
 	geom_point(shape=21, size=3) +
 	#scale_x_continuous(trans=log2_trans()) +

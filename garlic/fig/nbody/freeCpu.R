@@ -45,7 +45,7 @@ p = ggplot(data=D, aes(x=blocksize, y=tnorm)) +
 	# Labels
 	labs(x="Block size", y="Normalized time",
               title="Nbody normalized time",
-              subtitle="@expResult@/data.csv") +
+              subtitle=input_file) +
 
 	# Center the title
 	#theme(plot.title = element_text(hjust = 0.5)) +
@@ -68,7 +68,7 @@ p = ggplot(data=D, aes(x=blocksize, y=tnorm)) +
 
 	theme_bw() +
 
-	theme(plot.subtitle=element_text(size=10)) +
+	theme(plot.subtitle=element_text(size=8)) +
 
 	theme(legend.position = c(0.85, 0.85)) #+
 
@@ -90,8 +90,9 @@ p = ggplot(D, aes(x=blocksize, y=time, color=freeCpu)) +
 
 	labs(x="Block size", y="Time (s)",
               title="Nbody granularity",
-              subtitle="@expResult@") +
+              subtitle=input_file) +
 	theme_bw() +
+	theme(plot.subtitle=element_text(size=8)) +
 
 	geom_point(shape=21, size=3) +
 	#scale_x_continuous(trans=log2_trans()) +
