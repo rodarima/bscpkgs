@@ -279,11 +279,12 @@ let
 
       # Experiments
       exp = {
-        nbody = {
+        nbody = rec {
           test  = callPackage ./garlic/exp/nbody/test.nix { };
           tampi = callPackage ./garlic/exp/nbody/tampi.nix { };
+          baseline = tampi;
           freeCpu = callPackage ./garlic/exp/nbody/tampi.nix {
-            enableFreeCpu = true;
+            freeCpu = true;
           };
           jemalloc = callPackage ./garlic/exp/nbody/tampi.nix {
             enableJemalloc = true;
@@ -310,37 +311,44 @@ let
         };
       };
 
+      hist = callPackage ./garlic/pp/hist { };
+
       # Post processing tools
-      hist = callPackage ./garlic/postprocess/hist { };
-      getExpResult = callPackage ./garlic/postprocess/result.nix { };
-      resultFromTrebuchet = trebuchetStage: self.garlic.getExpResult {
-        garlicTemp = "/tmp/garlic-temp";
-        inherit trebuchetStage;
-        experimentStage = with self.bsc.garlicTools;
-          getExperimentStage trebuchetStage;
+      pp = rec {
+        getExpResult = callPackage ./garlic/pp/result.nix {
+          inherit fetchExperiment;
+        };
+        resultFromTrebuchet = trebuchetStage: getExpResult {
+          garlicTemp = "/tmp/garlic-temp";
+          inherit trebuchetStage;
+          experimentStage = with self.bsc.garlicTools;
+            getExperimentStage trebuchetStage;
+        };
+        fetchExperiment = callPackage ./garlic/pp/fetch.nix { };
+        timetable = callPackage ./garlic/pp/timetable.nix { };
+        rPlot = callPackage ./garlic/pp/rplot.nix { };
+        timetableFromTrebuchet = tre: timetable (resultFromTrebuchet tre);
+        mergeDatasets = callPackage ./garlic/pp/merge.nix { };
+
+        # Takes a list of experiments and returns a file that contains the
+        # all timetable results from the experiments.
+        merge = exps: mergeDatasets (map timetableFromTrebuchet exps);
       };
-      fetchExperiment = callPackage ./garlic/postprocess/fetch.nix { };
 
       # Figures generated from the experiments
-      fig = {
+      fig = with self.bsc.garlic; {
         nbody = {
-          test = callPackage ./garlic/fig/nbody/test/default.nix {
-            experiments = [
-              self.bsc.garlic.exp.nbody.tampi
-            ];
+
+          jemalloc = pp.rPlot {
+            script = ./garlic/fig/nbody/jemalloc.R;
+            dataset = with exp.nbody; pp.merge [ baseline jemalloc ];
           };
-          jemalloc = callPackage ./garlic/fig/nbody/jemalloc/default.nix {
-            resDefault = self.garlic.resultFromTrebuchet
-              self.bsc.garlic.exp.nbody.tampi;
-            resJemalloc = self.garlic.resultFromTrebuchet
-              self.bsc.garlic.exp.nbody.jemalloc;
+
+          freeCpu = pp.rPlot {
+            script = ./garlic/fig/nbody/freeCpu.R;
+            dataset = with exp.nbody; pp.merge [ baseline freeCpu ];
           };
-          freeCpu = callPackage ./garlic/fig/nbody/freeCpu/default.nix {
-            resDefault = self.garlic.resultFromTrebuchet
-              self.bsc.garlic.exp.nbody.tampi;
-            resFreeCpu = self.garlic.resultFromTrebuchet
-              self.bsc.garlic.exp.nbody.freeCpu;
-          };
+
         };
       };
     };

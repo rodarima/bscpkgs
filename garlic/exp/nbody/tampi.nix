@@ -5,7 +5,9 @@
 , targetMachine
 , stages
 , enableJemalloc ? false
-, enableFreeCpu ? false
+
+# Leave the first CPU per socket unused?
+, freeCpu ? false
 }:
 
 with stdenv.lib;
@@ -37,6 +39,7 @@ let
     mpi = impi;
     gitBranch = "garlic/tampi+send+oss+task";
     cflags = "-g";
+    inherit enableJemalloc;
     
     # Repeat the execution of each unit 30 times
     loops = 10;
@@ -46,9 +49,15 @@ let
     ntasksPerNode = hw.socketsPerNode;
     nodes = 1;
     time = "02:00:00";
-    cpuBind = if (enableFreeCpu)
-      then "verbose,mask_cpu:0x7fffff,0x7fffff000000"
-      else "sockets,verbose";
+
+
+    # If we want to leave one CPU per socket unused
+    inherit freeCpu;
+
+    cpuBind = if (freeCpu)
+      then "verbose,mask_cpu:0xfffffe,0xfffffe000000"
+      else "verbose,sockets";
+
     jobName = "bs-${toString blocksize}-${gitBranch}-nbody";
   };
 

@@ -14,6 +14,7 @@
 , ntasks ? null
 , ntasksPerNode ? null
 , ntasksPerSocket ? null
+, cpusPerTask ? null
 , nodes ? null
 , exclusive ? true # By default we run in exclusive mode
 , qos ? null
@@ -60,6 +61,7 @@ stdenv.mkDerivation rec {
     + sbatchOpt "ntasks" ntasks
     + sbatchOpt "ntasks-per-node" ntasksPerNode
     + sbatchOpt "ntasks-per-socket" ntasksPerSocket
+    + sbatchOpt "cpus-per-task" cpusPerTask
     + sbatchOpt "nodes" nodes
     + sbatchOpt "chdir" chdir
     + sbatchOpt "output" output

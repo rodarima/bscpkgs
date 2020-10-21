@@ -1,20 +1,30 @@
 library(ggplot2)
 library(dplyr)
 library(scales)
+library(jsonlite)
 
-# Load the dataset
-#df=read.table("/nix/store/zcyazjbcjn2lhxrpa3bs5y7rw3bbcgnr-plot/data.csv",
-df=read.table("data.csv",
-	      col.names=c("variant", "blocksize", "time"))
+args=commandArgs(trailingOnly=TRUE)
+
+# Read the timetable from args[1]
+input_file = "timetable.json.gz"
+if (length(args)>0) { input_file = args[1] }
+
+# Load the dataset in NDJSON format
+dataset = jsonlite::stream_in(file(input_file)) %>%
+	jsonlite::flatten()
+
+# We only need the cpu bind, blocksize and time
+df = select(dataset, config.enableJemalloc, config.blocksize, time) %>%
+	rename(blocksize=config.blocksize,
+	       jemalloc=config.enableJemalloc)
 
 # Use the blocksize as factor
 df$blocksize = as.factor(df$blocksize)
+df$jemalloc = as.factor(df$jemalloc)
 
 # Split by malloc variant
-
-D=df %>% group_by(variant, blocksize) %>%
+D=df %>% group_by(jemalloc, blocksize) %>%
 	mutate(tnorm = time / median(time) - 1)
-
 
 bs_unique = unique(df$blocksize)
 nbs=length(bs_unique)
@@ -36,7 +46,7 @@ p = ggplot(data=D, aes(x=blocksize, y=tnorm)) +
 	# Labels
 	labs(x="Block size", y="Normalized time",
               title="Nbody normalized time",
-              subtitle="@expResult@/data.csv") +
+              subtitle=input_file) +
 
 	# Center the title
 	#theme(plot.title = element_text(hjust = 0.5)) +
@@ -49,7 +59,7 @@ p = ggplot(data=D, aes(x=blocksize, y=tnorm)) +
 		linetype="dashed", color="red") +
 
 	# Draw boxplots
-	geom_boxplot(aes(fill=variant)) +
+	geom_boxplot(aes(fill=freeCpu)) +
 
 #	# Use log2 scale in x
 #	scale_x_continuous(trans=log2_trans(),
@@ -64,7 +74,6 @@ p = ggplot(data=D, aes(x=blocksize, y=tnorm)) +
 	theme(legend.position = c(0.85, 0.85)) #+
 
 	# Place each variant group in one separate plot
-	#facet_wrap(~variant)
 
 
 
@@ -77,11 +86,11 @@ dev.off()
 png("scatter.png", width=w*ppi, height=h*ppi, res=ppi)
 #
 ## Create the plot with the normalized time vs blocksize
-p = ggplot(D, aes(x=blocksize, y=time, color=variant)) +
+p = ggplot(D, aes(x=blocksize, y=time, color=freeCpu)) +
 
 	labs(x="Block size", y="Time (s)",
               title="Nbody granularity",
-              subtitle="@expResult@") +
+              subtitle=input_file) +
 	theme_bw() +
 
 	geom_point(shape=21, size=3) +

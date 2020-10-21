@@ -13,12 +13,19 @@
 , experimentStage
 , trebuchetStage
 , garlicTemp
+# We only fetch the config, stdout and stderr by default
+, fetchAll ? false
 }:
 
 with garlicTools;
 
 let
   experimentName = baseNameOf (toString experimentStage);
+  rsyncFilter = if (fetchAll) then "" else ''
+    --include='*/*/garlic_config.json' \
+    --include='*/*/std*.log' \
+    --include='*/*/*/std*.log' \
+    --exclude='*/*/*/*' '';
 in
   stdenv.mkDerivation {
     name = "fetch";
@@ -34,10 +41,10 @@ in
       export PATH=${rsync}/bin:${openssh}/bin:${nix}/bin
       rsync -av \
         --copy-links \
-        --include='*/*/*.log' --include='*/*/*.json' --exclude='*/*/*' \
+        ${rsyncFilter} \
         '${sshHost}:${prefix}/${experimentName}' ${garlicTemp}
 
-      res=\$(nix-build -E '(with import ./default.nix; garlic.getExpResult { \
+      res=\$(nix-build -E '(with import ./default.nix; garlic.pp.getExpResult { \
         experimentStage = "${experimentStage}"; \
         trebuchetStage = "${trebuchetStage}"; \
         garlicTemp = "${garlicTemp}"; \
