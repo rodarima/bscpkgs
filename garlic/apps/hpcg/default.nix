@@ -1,6 +1,8 @@
 {
   stdenv
 , cc
+, nanos6 ? null
+, mcxx ? null
 , mpi ? null
 , gitBranch
 }:
@@ -21,6 +23,8 @@ stdenv.mkDerivation rec {
   buildInputs = [
     cc
   ]
+  ++ optional (mcxx != null) mcxx
+  ++ optional (nanos6 != null) nanos6
   ++ optional (mpi != null) mpi;
 
   makeFlags = [

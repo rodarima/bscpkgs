@@ -199,8 +199,24 @@ let
 
         hpcg = callPackage ./garlic/apps/hpcg/default.nix {
           cc = self.bsc.icc;
-          mpi = self.bsc.impi;
-          gitBranch = "garlic/mpi+omp";
+          mcxx = self.bsc.mcxx;
+          nanos6 = self.bsc.nanos6;
+          gitBranch = "garlic/oss";
+
+          # cc = self.bsc.icc;
+          # gitBranch = "garlic/seq";
+
+          # cc = self.bsc.icc;
+          # mpi = self.bsc.mpi;
+          # gitBranch = "garlic/mpi";
+
+          # cc = self.bsc.icc;
+          # gitBranch = "garlic/omp";
+
+          # cc = self.bsc.icc;
+          # mpi = self.bsc.mpi;
+          # gitBranch = "garlic/mpi+omp";
+
         };
 
 #        heat = callPackage ./garlic/apps/heat {
@@ -265,6 +281,7 @@ let
           mpi = callPackage ./garlic/exp/hpcg/mpi.nix { };
           omp = callPackage ./garlic/exp/hpcg/omp.nix { };
           mpi_omp = callPackage ./garlic/exp/hpcg/mpi+omp.nix { };
+          oss = callPackage ./garlic/exp/hpcg/oss.nix { };
         };
 
         test = {
