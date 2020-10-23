@@ -335,16 +335,22 @@ let
       };
 
       # Datasets used in the figures
-      ds = with self.bsc.garlic; {
-        nbody = {
-          jemalloc = with exp.nbody; pp.merge [ baseline jemalloc ];
-          freeCpu = with exp.nbody; pp.merge [ baseline freeCpu ];
+      ds = with self.bsc.garlic; with pp; {
+        nbody = with exp.nbody; {
+          test      = merge [ baseline ];
+          jemalloc  = merge [ baseline jemalloc ];
+          freeCpu   = merge [ baseline freeCpu ];
         };
       };
 
       # Figures generated from the experiments
       fig = with self.bsc.garlic; {
         nbody = {
+
+          test = pp.rPlot {
+            script = ./garlic/fig/nbody/test.R;
+            dataset = ds.nbody.test;
+          };
 
           jemalloc = pp.rPlot {
             script = ./garlic/fig/nbody/jemalloc.R;
