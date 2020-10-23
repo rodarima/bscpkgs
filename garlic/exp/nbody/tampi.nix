@@ -8,7 +8,7 @@
 
 # Leave the first CPU per socket unused?
 , freeCpu ? false
-, particles ? 1024 * 32
+, particles ? 4096 * 24
 }:
 
 with stdenv.lib;
@@ -16,8 +16,7 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    # We need at least cpusPerNode blocks
-    nblocks = [ 4 8 16 32 64 128 256 512 ];
+    nblocks = [ 12 24 48 96 192 384 768 ];
   };
 
   machineConfig = targetMachine.config;

@@ -284,7 +284,7 @@ let
           tampi = callPackage ./garlic/exp/nbody/tampi.nix { };
 
           # Experiment variants
-          medium = tampi.override { particles = 64 * 1024; };
+          medium = tampi.override { particles = 24 * 4096; };
           baseline = medium;
           freeCpu = baseline.override { freeCpu = true; };
           jemalloc = baseline.override { enableJemalloc = true; };
@@ -329,9 +329,17 @@ let
         timetableFromTrebuchet = tre: timetable (resultFromTrebuchet tre);
         mergeDatasets = callPackage ./garlic/pp/merge.nix { };
 
-        # Takes a list of experiments and returns a file that contains the
+        # Takes a list of experiments and returns a file that contains
         # all timetable results from the experiments.
         merge = exps: mergeDatasets (map timetableFromTrebuchet exps);
+      };
+
+      # Datasets used in the figures
+      ds = with self.bsc.garlic; {
+        nbody = {
+          jemalloc = with exp.nbody; pp.merge [ baseline jemalloc ];
+          freeCpu = with exp.nbody; pp.merge [ baseline freeCpu ];
+        };
       };
 
       # Figures generated from the experiments
@@ -340,12 +348,12 @@ let
 
           jemalloc = pp.rPlot {
             script = ./garlic/fig/nbody/jemalloc.R;
-            dataset = with exp.nbody; pp.merge [ baseline jemalloc ];
+            dataset = ds.nbody.jemalloc;
           };
 
           freeCpu = pp.rPlot {
             script = ./garlic/fig/nbody/freeCpu.R;
-            dataset = with exp.nbody; pp.merge [ baseline freeCpu ];
+            dataset = ds.nbody.freeCpu;
           };
 
         };
@@ -359,5 +367,5 @@ in
 
     # Aliases
     garlic = bsc.garlic;
-    inherit (bsc.garlic) exp fig apps;
+    inherit (bsc.garlic) exp fig apps ds;
   }

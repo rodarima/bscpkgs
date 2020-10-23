@@ -6,28 +6,33 @@ library(jsonlite)
 args=commandArgs(trailingOnly=TRUE)
 
 # Read the timetable from args[1]
-input_file = "timetable.json.gz"
+input_file = "input.json"
 if (length(args)>0) { input_file = args[1] }
 
 # Load the dataset in NDJSON format
 dataset = jsonlite::stream_in(file(input_file)) %>%
 	jsonlite::flatten()
 
-# We only need the cpu bind, blocksize and time
-df = select(dataset, config.freeCpu, config.blocksize, time) %>%
-	rename(blocksize=config.blocksize, freeCpu=config.freeCpu)
+particles = unique(dataset$config.particles)
 
-# Use the blocksize as factor
-df$blocksize = as.factor(df$blocksize)
+# We only need the cpu bind, nblocks and time
+df = select(dataset, config.freeCpu, config.nblocks, config.hw.cpusPerSocket, time) %>%
+	rename(nblocks=config.nblocks,
+		freeCpu=config.freeCpu,
+		cpusPerSocket=config.hw.cpusPerSocket)
+
+df = df %>% mutate(blocksPerCpu = nblocks / cpusPerSocket)
+
 df$freeCpu = as.factor(df$freeCpu)
+df$nblocks = as.factor(df$nblocks)
+df$blocksPerCpuFactor = as.factor(df$blocksPerCpu)
 
 # Split by malloc variant
-D=df %>% group_by(freeCpu, blocksize) %>%
+D=df %>% group_by(freeCpu, nblocks) %>%
 	mutate(tnorm = time / median(time) - 1)
 
-bs_unique = unique(df$blocksize)
+bs_unique = unique(df$nblocks)
 nbs=length(bs_unique)
-
 
 print(D)
 
@@ -39,12 +44,12 @@ png("box.png", width=w*ppi, height=h*ppi, res=ppi)
 #
 #
 #
-# Create the plot with the normalized time vs blocksize
-p = ggplot(data=D, aes(x=blocksize, y=tnorm)) +
+# Create the plot with the normalized time vs nblocks
+p = ggplot(data=D, aes(x=blocksPerCpuFactor, y=tnorm)) +
 
 	# Labels
-	labs(x="Block size", y="Normalized time",
-              title="Nbody normalized time",
+	labs(x="Blocks/CPU", y="Normalized time",
+              title=sprintf("Nbody normalized time. Particles=%d", particles), 
               subtitle=input_file) +
 
 	# Center the title
@@ -85,14 +90,15 @@ dev.off()
 #
 png("scatter.png", width=w*ppi, height=h*ppi, res=ppi)
 #
-## Create the plot with the normalized time vs blocksize
-p = ggplot(D, aes(x=blocksize, y=time, color=freeCpu)) +
+## Create the plot with the normalized time vs nblocks
+p = ggplot(D, aes(x=blocksPerCpuFactor, y=time, color=freeCpu)) +
 
-	labs(x="Block size", y="Time (s)",
-              title="Nbody granularity",
+	labs(x="Blocks/CPU", y="Time (s)",
+              title=sprintf("Nbody granularity. Particles=%d", particles), 
               subtitle=input_file) +
 	theme_bw() +
 	theme(plot.subtitle=element_text(size=8)) +
+	theme(legend.position = c(0.5, 0.88)) +
 
 	geom_point(shape=21, size=3) +
 	#scale_x_continuous(trans=log2_trans()) +

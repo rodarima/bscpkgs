@@ -20,8 +20,7 @@ stdenv.mkDerivation {
         conf=garlic_config.json
         for run in $(ls -d [0-9]* | sort -n); do
           time=$(awk '/^time /{print $2}' $run/stdout.log)
-          jq -cn "{ exp:\"$exp\", unit:\"$unit\", config:inputs, time:$time}" \
-            $conf >> $out
+          jq -cn "{ exp:\"$exp\", unit:\"$unit\", config:inputs, time:$time, run:$run }" $conf >> $out
         done
       done
     done
