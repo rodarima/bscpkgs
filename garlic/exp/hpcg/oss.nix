@@ -31,7 +31,7 @@ let
 
     # Resources
     qos = "debug";
-    ntasksPerNode = 48;
+    ntasksPerNode = 1;
     nodes = 1;
     time = "02:00:00";
     cpuBind = "sockets,verbose";
