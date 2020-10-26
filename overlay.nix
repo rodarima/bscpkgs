@@ -314,15 +314,14 @@ let
 
       # Post processing tools
       pp = rec {
-        getExpResult = callPackage ./garlic/pp/result.nix {
-          inherit fetchExperiment;
+        getExpResult = callPackage ./garlic/pp/result2.nix {
         };
-        resultFromTrebuchet = trebuchetStage: getExpResult {
+        resultFromTrebuchet = trebuchetStage: (getExpResult {
           garlicTemp = "/tmp/garlic-temp";
           inherit trebuchetStage;
           experimentStage = with self.bsc.garlicTools;
             getExperimentStage trebuchetStage;
-        };
+        });
         fetchExperiment = callPackage ./garlic/pp/fetch.nix { };
         timetable = callPackage ./garlic/pp/timetable.nix { };
         rPlot = callPackage ./garlic/pp/rplot.nix { };
@@ -337,9 +336,14 @@ let
       # Datasets used in the figures
       ds = with self.bsc.garlic; with pp; {
         nbody = with exp.nbody; {
-          test      = merge [ baseline ];
-          jemalloc  = merge [ baseline jemalloc ];
-          freeCpu   = merge [ baseline freeCpu ];
+          test      = merge [ test ];
+          baseline  = merge [ baseline ];
+          jemalloc  = merge [ jemalloc ];
+          freeCpu   = merge [ freeCpu ];
+          cmp = {
+            jemalloc = merge [ baseline jemalloc ];
+            freeCpu  = merge [ baseline freeCpu ];
+          };
         };
       };
 

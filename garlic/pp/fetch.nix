@@ -31,14 +31,17 @@ in
     name = "fetch";
     preferLocalBuild = true;
 
-    buildInputs = [ rsync openssh curl ];
+    buildInputs = [ rsync openssh curl nix ];
     phases = [ "installPhase" ];
+    # This doesn't work when multiple users have different directories where the
+    # results are stored.
+    #src = /. + "${prefix}${experimentName}";
 
     installPhase = ''
       cat > $out << EOF
       #!/bin/sh -e
       mkdir -p ${garlicTemp}
-      export PATH=${rsync}/bin:${openssh}/bin:${nix}/bin
+      export PATH=$PATH
       rsync -av \
         --copy-links \
         ${rsyncFilter} \
@@ -50,8 +53,11 @@ in
         garlicTemp = "${garlicTemp}"; \
       })')
 
+      rm -rf ${garlicTemp}/${experimentName}
+
       echo "The results for experiment ${experimentName} are at:"
       echo "  \$res"
+
       EOF
       chmod +x $out
     '';

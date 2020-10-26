@@ -5,13 +5,13 @@ if [ -e /nix ]; then
     exit 1
 fi
 
->&2 echo Running runexp for MN4
->&2 echo PATH=$PATH
+#>&2 echo Running runexp for MN4
+#>&2 echo PATH=$PATH
 
 user=$(id -un)
 group=$(id -gn)
 
-export GARLIC_OUT="/gpfs/projects/$group/$user/garlic-out"
+export GARLIC_OUT="/gpfs/projects/bsc15/garlic/out/$user"
 mkdir -p "$GARLIC_OUT"
 cd "$GARLIC_OUT"
 

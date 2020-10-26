@@ -25,7 +25,7 @@ let
     gitBranch = "garlic/mpi+send";
 
     # Repeat the execution of each unit 30 times
-    loops = 30;
+    loops = 10;
 
     # Resources
     qos = "debug";
@@ -34,6 +34,10 @@ let
     time = "02:00:00";
     cpuBind = "sockets,verbose";
     jobName = "nbody-bs-${toString blocksize}-${gitBranch}";
+
+    # Experiment revision: this allows a user to run again a experiment already
+    # executed
+    rev = 0;
   };
 
   # Compute the array of configurations
@@ -47,12 +51,13 @@ let
   };
 
   program = {nextStage, conf, ...}: with conf;
-  let
-    customPkgs = stdexp.replaceMpi conf.mpi;
-  in
-    customPkgs.apps.nbody.override {
-      inherit cc blocksize mpi gitBranch;
-    };
+  # FIXME: This is becoming very slow:
+  #let
+  #  customPkgs = stdexp.replaceMpi conf.mpi;
+  #in
+  bsc.garlic.apps.nbody.override {
+    inherit cc blocksize mpi gitBranch;
+  };
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];
 
