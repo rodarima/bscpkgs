@@ -11,23 +11,25 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    n = [ 104 64 ];
+    n = [ 200 104 64 ];
+    nblocks = [ 128 ];
   };
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
     # hpcg options
     n = c.n;
+    nblocks = c.nblocks;
     cc = icc;
     mpi = null; # TODO: Remove this for omp
-    gitBranch = "garlic/seq";
+    gitBranch = "garlic/omp";
 
     # Repeat the execution of each unit 30 times
     loops = 30;
 
     # Resources
     qos = "debug";
-    ntasksPerNode = 48;
+    ntasksPerNode = 1;
     nodes = 1;
     time = "02:00:00";
     cpuBind = "sockets,verbose";
@@ -45,6 +47,7 @@ let
       "--nx=${toString n}"
       "--ny=${toString n}"
       "--nz=${toString n}"
+      "--nblocks=${toString nblocks}"
     ];
   };
 

@@ -45,6 +45,7 @@ let
 
   exec = {nextStage, conf, ...}: with conf; stages.exec {
     inherit nextStage;
+    env = "NANOS6_DEPENDENCIES=discrete";
     argv = [
       "--nx=${toString n}"
       "--ny=${toString n}"
