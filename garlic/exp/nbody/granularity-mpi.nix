@@ -14,12 +14,17 @@ let
     blocksize = [ 128 256 512 1024 2048 4096 ];
   };
 
+  machineConfig = targetMachine.config;
+
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
+    inherit (machineConfig) hw;
     # nbody options
     particles = 1024 * 64;
     timesteps = 10;
     inherit (c) blocksize;
+    totalTasks = ntasksPerNode * nodes;
+    particlesPerTask = particles / totalTasks;
     cc = icc;
     mpi = impi;
     gitBranch = "garlic/mpi+send";
@@ -33,7 +38,7 @@ let
     nodes = 1;
     time = "02:00:00";
     cpuBind = "sockets,verbose";
-    jobName = "nbody-bs-${toString blocksize}-${gitBranch}";
+    jobName = "bs-${toString blocksize}-${gitBranch}-nbody";
 
     # Experiment revision: this allows a user to run again a experiment already
     # executed
