@@ -1,12 +1,15 @@
 {
   stdenv
 , garlicTools
+, rsync
 }:
 
 {
   trebuchetStage
 , experimentStage
 , garlicTemp
+# We only fetch the config, stdout and stderr by default
+, fetchAll ? false
 }:
 
 with garlicTools;
@@ -14,12 +17,18 @@ with garlicTools;
 let
   experimentName = baseNameOf (toString experimentStage);
   garlicOut = "/mnt/garlic-out";
+  rsyncFilter = if (fetchAll) then "" else ''
+    --include='*/*/garlic_config.json' \
+    --include='*/*/std*.log' \
+    --include='*/*/*/std*.log' \
+    --exclude='*/*/*/*' '';
 in
   stdenv.mkDerivation {
     name = "result";
     preferLocalBuild = true;
     __noChroot = true;
 
+    buildInputs = [ rsync ];
     phases = [ "installPhase" ];
 
     installPhase = ''
@@ -73,9 +82,10 @@ in
         echo "waiting 10 seconds to try again"
         sleep 10
       done
-      echo "$exp: execution complete"
+      echo "$exp: execution complete, fething results"
 
       mkdir -p $out
-      cp -aL $exp $out
+      #cp -aL $exp $out
+      rsync -P -rt --copy-links  ${rsyncFilter} $exp $out
     '';
   }
