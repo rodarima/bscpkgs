@@ -7,6 +7,11 @@
 , texlive
 }:
 let
+  # TODO: We can select only which elements we need from fig by using:
+  # echo [ $(grep -o '@[^ @]*@' garlic/report.tex | sed 's/@//g') ]
+  # and them importing as valid nix lang.
+
+  # By now, we require all plots
   figJSON = writeText "fig.json" (builtins.toJSON fig);
 in
   stdenv.mkDerivation {
