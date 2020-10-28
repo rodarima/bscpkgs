@@ -11,29 +11,30 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    blocksize = [ 1024 2048 ];
+    cpuMask = [ "0x1" "0x3" "0xf" "0xff" "0xffff" "0xfffffff" "0xffffffffffff" ];
   };
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
     # nbody options
-    particles = 1024 * 4;
+    particles = 1024 * 64;
     timesteps = 10;
-    inherit (c) blocksize;
+    blocksize = 1024;
+    inherit (c) cpuMask;
     cc = icc;
     mpi = impi;
-    gitBranch = "garlic/mpi+send";
+    gitBranch = "garlic/oss+task";
 
     # Repeat the execution of each unit 30 times
     loops = 30;
 
     # Resources
     qos = "debug";
-    ntasksPerNode = 2;
+    ntasksPerNode = 1;
     nodes = 1;
     time = "02:00:00";
-    cpuBind = "sockets,verbose";
-    jobName = "nbody-bs-${toString blocksize}-${gitBranch}";
+    cpuBind = "verbose,mask_cpu:${cpuMask}";
+    jobName = "nbody-bs-${cpuMask}-${gitBranch}";
   };
 
   # Compute the array of configurations
@@ -57,5 +58,5 @@ let
   pipeline = stdexp.stdPipeline ++ [ exec program ];
 
 in
- 
+
   stdexp.genExperiment { inherit configs pipeline; }
