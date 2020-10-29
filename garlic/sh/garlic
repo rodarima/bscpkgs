@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -e
 
-garlicOut=@garlicOut@
+garlicPrefix=@garlicPrefix@
 garlicTemp=@garlicTemp@
 sshHost=@sshHost@
 PATH=@PATH@
@@ -61,7 +61,7 @@ checkExperiment() {
 do_fetch() {
   expName=$(basename $experiment)
   user=$(ssh -G "$sshHost" | awk '/^user /{print $2}')
-  exp=$garlicOut/$user/$expName
+  exp=$garlicPrefix/$user/out/$expName
 
   if [ ! -e "$exp" ]; then
     echo "missing experiment: $exp"

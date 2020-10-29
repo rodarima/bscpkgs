@@ -10,7 +10,7 @@
 with garlicTools;
 
 let
-  garlicOut = "/mnt/garlic/out";
+  garlicPrefix = "/mnt/garlic";
   garlicTemp = "/tmp/garlic";
 in
   stdenv.mkDerivation {
@@ -22,7 +22,7 @@ in
 
     src = ./.;
 
-    inherit garlicOut garlicTemp sshHost;
+    inherit garlicPrefix garlicTemp sshHost;
 
     installPhase = ''
       substituteAllInPlace garlic

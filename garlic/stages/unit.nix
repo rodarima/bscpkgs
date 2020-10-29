@@ -74,10 +74,10 @@ stdenv.mkDerivation {
     rm -f "\$GARLIC_INDEX/${conf.unitName}" \
       "\$GARLIC_INDEX/${conf.expName}" 
 
-    ln -Tfs "../../out/\$GARLIC_UNIT" \
+    ln -Tfs "../out/\$GARLIC_UNIT" \
       "\$GARLIC_INDEX/${conf.unitName}"
 
-    ln -Tfs "../../out/\$GARLIC_EXPERIMENT" \
+    ln -Tfs "../out/\$GARLIC_EXPERIMENT" \
       "\$GARLIC_INDEX/${conf.expName}"
 
     if [ -e "\$GARLIC_UNIT" ]; then

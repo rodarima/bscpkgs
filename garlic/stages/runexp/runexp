@@ -11,9 +11,9 @@ fi
 user=$(id -un)
 group=$(id -gn)
 
-export GARLIC_OUT="/gpfs/projects/bsc15/garlic/out/$user"
+export GARLIC_OUT="/gpfs/projects/bsc15/garlic/$user/out"
 mkdir -p "$GARLIC_OUT"
-export GARLIC_INDEX="/gpfs/projects/bsc15/garlic/index/$user"
+export GARLIC_INDEX="/gpfs/projects/bsc15/garlic/$user/index"
 mkdir -p "$GARLIC_INDEX"
 export GARLIC_USER="$user"
 cd "$GARLIC_OUT"
