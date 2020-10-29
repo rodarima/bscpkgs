@@ -1,0 +1,197 @@
+#!/bin/bash
+
+garlicOut=@garlicOut@
+garlicTemp=@garlicTemp@
+sshHost=@sshHost@
+PATH=@PATH@
+
+usage() { echo "Usage: garlic [-RFwq] [-e experiment] [-t trebuchet]" 1>&2; exit 1; }
+
+trebuchetFromExperiment() {
+  nix-store -q --referrers $1 | grep trebuchet
+}
+experimentFromTrebuchet() {
+  nix-store -qR $1 | grep experiment
+}
+
+drvFromOutput() {
+  nix-store -q --deriver $1
+}
+
+checkTrebuchet() {
+  if [ ! -e "$trebuchet" ]; then
+    >&2 echo "$trebuchet: not found"
+    exit 1
+  fi
+
+  if [ ! -f "$trebuchet" ]; then
+    >&2 echo "$trebuchet: not a file"
+    exit 1
+  fi
+
+  # FIXME: We need a better way to determine a trebuchet
+  if [ -z "$(grep "This trebuchet launches" $trebuchet)" ]; then
+    >&2 echo "$trebuchet: not a trebuchet"
+    exit 1
+  fi
+
+  return 0
+}
+
+checkExperiment() {
+  if [ ! -e "$experiment" ]; then
+    >&2 echo "$experiment: not found"
+    exit 1
+  fi
+
+  if [ ! -f "$experiment" ]; then
+    >&2 echo "$experiment: not a file"
+    exit 1
+  fi
+
+  # FIXME: We need a better way to determine a experiment
+  if [ -z "$(grep "This is an experiment" $experiment)" ]; then
+    >&2 echo "$experiment: not an experiment"
+    exit 1
+  fi
+
+  return 0
+}
+
+do_fetch() {
+  expName=$(basename $experiment)
+  user=$(ssh -G "$sshHost" | awk '/^user /{print $2}')
+  exp=$garlicOut/$user/$expName
+
+  if [ ! -e "$exp" ]; then
+    echo "missing experiment: $exp"
+    exit 1
+  fi
+
+  cwd=$(pwd)
+
+  repeat=1
+  while [ 1 ]; do
+    repeat=0
+    cd $exp
+    test $verbose && >&2 echo "$exp: checking units"
+
+    for unit in *-unit; do
+      cd $exp/$unit
+      if [ ! -e status ]; then
+        
+        test $verbose && >&2 echo "$unit: no status"
+        repeat=1
+      else
+        st=$(cat status)
+        test $verbose && >&2 echo "$unit: $st"
+        if [ "$st" != "completed" ]; then
+          repeat=1
+        fi
+      fi
+    done
+
+    if [ $repeat -eq 0 ]; then
+      break
+    fi
+
+    if [ $waitResults -eq 1 ]; then
+      #echo "waiting 3 seconds to try again"
+      sleep 3
+    else
+      break
+    fi
+  done
+
+  if [ $repeat -eq 1 ]; then
+    >&2 echo "$exp: execution incomplete"
+    exit 1
+  fi
+
+  cd "$cwd"
+
+  test $verbose && >&2 echo "$exp: execution complete, fetching results"
+
+  mkdir -p $garlicTemp
+
+  rsync -rt --copy-links \
+    --include='*/*/garlic_config.json' \
+    --include='*/*/std*.log' \
+    --include='*/*/*/std*.log' \
+    --exclude='*/*/*/*' \
+    $exp $garlicTemp
+
+  nix-build -E "(with import ./default.nix; \
+    garlic.pp.store { \
+      experimentStage = import \"$experimentDrv\";
+      trebuchetStage = import \"$trebuchetDrv\";
+    })"
+
+  rm -rf $garlicTemp/$expName
+}
+
+do_run() {
+
+  $trebuchet
+}
+
+waitResults=1
+verbose=1
+operation=
+target=
+enableRun=
+enableFetch=
+
+while getopts "qwRFe:t:" o; do
+  case "${o}" in
+    e) experiment=${OPTARG} ;;
+    t) trebuchet=${OPTARG} ;;
+    R) enableRun=1 ;;
+    F) enableFetch=1 ;;
+    w) waitResults=0 ;;
+    q) verbose= ;;
+    *) usage ;;
+  esac
+done
+shift $((OPTIND-1))
+#target="$1"
+
+if [ -z "$trebuchet" -a -z "$experiment" ]; then
+  >&2 echo "missing trebuchet or experiment"
+  usage
+fi
+
+if [ -z "$enableRun" -a -z "$enableFetch" ]; then
+  >&2 echo "missing operation"
+  usage
+fi
+
+#if [ -z "$target" ]; then
+#  >&2 echo "missing target"
+#  usage
+#fi
+
+#trebuchet=$(nix-build -A "exp.$target")
+#checkTrebuchet $trebuchet
+#experiment=$(experimentFromTrebuchet $trebuchet)
+#checkExperiment $experiment
+
+if [ ! -z "$trebuchet" ]; then
+  checkTrebuchet $trebuchet
+  trebuchet=$(readlink -f $trebuchet)
+  experiment=$(experimentFromTrebuchet $trebuchet)
+  checkExperiment $experiment
+else
+  checkExperiment $experiment
+  experiment=$(readlink -f $experiment)
+  trebuchet=$(trebuchetFromExperiment $experiment)
+  checkTrebuchet $trebuchet
+fi
+
+trebuchetDrv=$(drvFromOutput $trebuchet)
+experimentDrv=$(drvFromOutput $experiment)
+
+if [ $enableRun ]; then do_run; fi
+if [ $enableFetch ]; then do_fetch; fi
+
+
