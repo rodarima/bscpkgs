@@ -11,7 +11,7 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    cpuMask = [ "0x1" "0x3" "0xf" "0xff" "0xffff" "0xfffffff" "0xffffffffffff" ];
+    cpuMask = [ "0x1" "0x3" "0xf" "0xff" "0xffff" "0xffffffff" "0xffffffffffff" ];
   };
 
   # Generate the complete configuration for each unit
