@@ -38,11 +38,12 @@ stdenv.mkDerivation {
     export GARLIC_EXPERIMENT=$(basename $out)
 
     if [ -e "\$GARLIC_EXPERIMENT" ]; then
-      >&2 echo "skipping, path exists: \$(pwd)/\$GARLIC_EXPERIMENT"
+      >&2 echo "skipping, experiment exists: \$(pwd)/\$GARLIC_EXPERIMENT"
       exit 0
     fi
 
     mkdir -p "\$GARLIC_EXPERIMENT"
+
     cd "\$GARLIC_EXPERIMENT"
     ${unitsLinks}
 
