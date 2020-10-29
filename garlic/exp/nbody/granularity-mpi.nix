@@ -18,6 +18,9 @@ let
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
+    expName = "nbody.test";
+    unitName = "${expName}.nb-${toString nblocks}";
+
     inherit (machineConfig) hw;
     # nbody options
     particles = 1024 * 64;
