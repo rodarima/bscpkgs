@@ -312,17 +312,17 @@ let
 
       hist = callPackage ./garlic/pp/hist { };
 
+      tool = callPackage ./garlic/sh/default.nix {
+        sshHost = "mn1";
+      };
+
       # Post processing tools
-      pp = rec {
-        getExpResult = callPackage ./garlic/pp/result2.nix {
-        };
-        resultFromTrebuchet = trebuchetStage: (getExpResult {
-          garlicTemp = "/tmp/garlic-temp";
+      pp = with self.bsc.garlicTools; rec {
+        store = callPackage ./garlic/pp/store.nix { };
+        resultFromTrebuchet = trebuchetStage: (store {
+          experimentStage = getExperimentStage trebuchetStage;
           inherit trebuchetStage;
-          experimentStage = with self.bsc.garlicTools;
-            getExperimentStage trebuchetStage;
         });
-        fetchExperiment = callPackage ./garlic/pp/fetch.nix { };
         timetable = callPackage ./garlic/pp/timetable.nix { };
         rPlot = callPackage ./garlic/pp/rplot.nix { };
         timetableFromTrebuchet = tre: timetable (resultFromTrebuchet tre);
