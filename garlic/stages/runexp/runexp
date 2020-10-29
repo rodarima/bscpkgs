@@ -13,6 +13,9 @@ group=$(id -gn)
 
 export GARLIC_OUT="/gpfs/projects/bsc15/garlic/out/$user"
 mkdir -p "$GARLIC_OUT"
+export GARLIC_INDEX="/gpfs/projects/bsc15/garlic/index/$user"
+mkdir -p "$GARLIC_INDEX"
+export GARLIC_USER="$user"
 cd "$GARLIC_OUT"
 
 exec @nixPrefix@@program@

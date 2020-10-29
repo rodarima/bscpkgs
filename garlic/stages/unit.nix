@@ -55,10 +55,30 @@ stdenv.mkDerivation {
       exit 1
     fi
 
+    if [ -z "\$GARLIC_EXPERIMENT" ]; then
+      >&2 echo "GARLIC_EXPERIMENT not defined, aborting"
+      exit 1
+    fi
+
+    if [ -z "\$GARLIC_INDEX" ]; then
+      >&2 echo "GARLIC_INDEX not defined, aborting"
+      exit 1
+    fi
+
     cd "\$GARLIC_OUT"
 
     # Set the experiment unit in the environment
     export GARLIC_UNIT=$(basename $out)
+
+    # Create an index entry
+    rm -f "\$GARLIC_INDEX/${conf.unitName}" \
+      "\$GARLIC_INDEX/${conf.expName}" 
+
+    ln -Tfs "../../out/\$GARLIC_UNIT" \
+      "\$GARLIC_INDEX/${conf.unitName}"
+
+    ln -Tfs "../../out/\$GARLIC_EXPERIMENT" \
+      "\$GARLIC_INDEX/${conf.expName}"
 
     if [ -e "\$GARLIC_UNIT" ]; then
       >&2 echo "skipping, unit path already exists: \$GARLIC_UNIT"

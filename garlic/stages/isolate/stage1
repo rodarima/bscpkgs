@@ -17,7 +17,7 @@ env=(
   PATH="@nixPrefix@@busybox@/bin:@busybox@/bin:@extraPath@"
   $(env | grep ^SLURM || true)
   $(env | grep ^PMI || true)
-  $(env | grep ^GARLIC_OUT || true)
+  $(env | grep ^GARLIC || true)
   $(env | grep ^USER || true)
   HOME="/homeless-shelter"
 )
