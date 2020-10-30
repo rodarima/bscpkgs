@@ -11,7 +11,7 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    n = [ { x = 128; y = 256; z = 264; } ];
+    n = [ { x = 256; y = 288; z = 288; } ];
     nblocks = [ 12 24 48 96 192 384 ];
   };
 

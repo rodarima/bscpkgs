@@ -11,7 +11,7 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    n = [ { x = 64; y = 64; z = 88; } ];
+    n = [ { x = 96; y = 96; z = 96; } ];
   };
 
   # Generate the complete configuration for each unit

@@ -11,7 +11,7 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    n = [ { x = 64; y = 64; z = 88; } ];
+    n = [ { x = 128; y = 192; z = 192; } ];
     nblocks = [ 12 24 48 96 192 384 ];
   };
 
@@ -29,10 +29,10 @@ let
     # Resources
     qos = "debug";
     ntasksPerNode = 1;
-    nodes = 2;
+    nodes = 4;
     time = "02:00:00";
     # Each task in different socket
-    cpuBind = "verbose,mask_cpu:0xffffff";
+    cpuBind = "verbose,mask_cpu:0x3f";
     jobName = "hpcg-${toString n.x}-${toString n.y}-${toString n.z}-${gitBranch}";
   };
 
@@ -45,7 +45,7 @@ let
     inherit nextStage;
     env = ''
       OMP_PROC_BIND=true
-      OMP_NUM_THREADS=12
+      OMP_NUM_THREADS=6
     '';
     argv = [
       "--nx=${toString n.x}"
