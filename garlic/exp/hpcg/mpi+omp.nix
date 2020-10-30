@@ -12,7 +12,7 @@ let
   # Initial variable configuration
   varConf = with bsc; {
     n = [ { x = 128; y = 192; z = 192; } ];
-    nblocks = [ 12 24 48 96 192 384 ];
+    nblocks = [ 6 12 24 48 96 192 ];
   };
 
   # Generate the complete configuration for each unit
@@ -51,6 +51,7 @@ let
       "--nx=${toString n.x}"
       "--ny=${toString n.y}"
       "--nz=${toString n.z}"
+      "--nblocks=${toString nblocks}"
     ];
   };
 
