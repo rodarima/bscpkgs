@@ -336,14 +336,10 @@ let
       # Datasets used in the figures
       ds = with self.bsc.garlic; with pp; {
         nbody = with exp.nbody; {
-          test      = merge [ test ];
-          baseline  = merge [ baseline ];
-          jemalloc  = merge [ jemalloc ];
-          freeCpu   = merge [ freeCpu ];
-          cmp = {
-            jemalloc = merge [ baseline jemalloc ];
-            freeCpu  = merge [ baseline freeCpu ];
-          };
+          test     = merge [ test ];
+          baseline = merge [ baseline ];
+          jemalloc = merge [ baseline jemalloc ];
+          freeCpu  = merge [ baseline freeCpu ];
         };
       };
 
