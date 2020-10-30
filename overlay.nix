@@ -288,14 +288,6 @@ let
           exec = callPackage ./test/garlic/exec.nix {
             exec = self.bsc.garlic.stages.exec;
           };
-
-          osu = rec {
-            latency-internode = callPackage ./garlic/exp/osu/latency.nix { };
-            latency-intranode = callPackage ./garlic/exp/osu/latency.nix {
-              interNode = false;
-            };
-            latency = latency-internode;
-          };
         };
       };
     };
