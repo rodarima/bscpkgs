@@ -1,30 +1,32 @@
 {
   stdenv
-, nanos6
-, mpi
-, tampi
-, mcxx
-, icc
+, mpi ? null
+, tampi ? null
+, mcxx ? null
+, cc
+, gitBranch
 }:
+
+with stdenv.lib;
+
+assert !(tampi != null && mcxx == null);
 
 stdenv.mkDerivation rec {
   name = "fwi";
-  variant = "oss+task";
 
   src = builtins.fetchGit {
     url = "https://gitlab.com/srodrb/BSC-FWI.git";
-    ref = "${variant}";
+    ref = "${gitBranch}";
   };
 
   enableParallelBuilding = true;
 
   buildInputs = [
-    nanos6
-    mpi
-    icc
-    tampi
-    mcxx
-  ];
+    cc
+  ]
+  ++ optional (mpi != null) mpi
+  ++ optional (tampi != null) tampi
+  ++ optional (mcxx != null) mcxx;
 
   # FIXME: This is an ugly hack.
   # When using _GNU_SOURCE or any other definition used in features.h, we need
@@ -45,15 +47,22 @@ stdenv.mkDerivation rec {
   '';
 
   makeFlags = [
-    "NZF=108"
-    "NXF=108"
-    "NYF=208"
-    "PRECISION=float"
+    "CC=${cc.cc.CC}"
   ];
 
+  postBuild = ''
+    make input
+  '';
+
+  #FIXME split the input in another derivation
   installPhase = ''
     mkdir -p $out/bin
     cp fwi $out/bin
     cp ModelGenerator $out/bin
+    mv InputModels $out/bin
+    mkdir -p $out/etc/fwi
+    cp SetupParams/{fwi_frequencies.txt,fwi_params.txt} $out/etc/fwi
   '';
+
+  programPath = "/bin/fwi";
 }
