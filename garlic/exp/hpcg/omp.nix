@@ -11,8 +11,8 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    n = [ 200 104 64 ];
-    nblocks = [ 128 ];
+    n = [ { x = 128; y = 256; z = 264; } ];
+    nblocks = [ 12 24 48 96 192 384 ];
   };
 
   # Generate the complete configuration for each unit
@@ -20,7 +20,7 @@ let
     # hpcg options
     n = c.n;
     nblocks = c.nblocks;
-    cc = icc;
+    cc = bsc.icc;
     mpi = null; # TODO: Remove this for omp
     gitBranch = "garlic/omp";
 
@@ -32,8 +32,9 @@ let
     ntasksPerNode = 1;
     nodes = 1;
     time = "02:00:00";
-    cpuBind = "sockets,verbose";
-    jobName = "hpcg-${toString n}-${gitBranch}";
+    # task in one socket
+    cpuBind = "verbose,mask_cpu:0xffffff";
+    jobName = "hpcg-${toString n.x}-${toString n.y}-${toString n.z}-${gitBranch}";
   };
 
   # Compute the array of configurations
@@ -43,10 +44,14 @@ let
 
   exec = {nextStage, conf, ...}: with conf; stages.exec {
     inherit nextStage;
+    env = ''
+      OMP_PROC_BIND=true
+      OMP_NUM_THREADS=24
+    '';
     argv = [
-      "--nx=${toString n}"
-      "--ny=${toString n}"
-      "--nz=${toString n}"
+      "--nx=${toString n.x}"
+      "--ny=${toString n.y}"
+      "--nz=${toString n.z}"
       "--nblocks=${toString nblocks}"
     ];
   };

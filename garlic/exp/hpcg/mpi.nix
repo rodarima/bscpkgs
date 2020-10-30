@@ -11,15 +11,15 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    n = [ 104 64 ];
+    n = [ { x = 64; y = 64; z = 88; } ];
   };
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
     # hpcg options
     n = c.n;
-    cc = icc;
-    mpi = impi;
+    cc = bsc.icc;
+    mpi = bsc.impi;
     gitBranch = "garlic/mpi";
 
     # Repeat the execution of each unit 30 times
@@ -27,11 +27,12 @@ let
 
     # Resources
     qos = "debug";
-    ntasksPerNode = 48;
-    nodes = 1;
+    ntasksPerNode = 1;
+    nodes = 24;
     time = "02:00:00";
-    cpuBind = "sockets,verbose";
-    jobName = "hpcg-${toString n}-${gitBranch}";
+    # Each task in different socket
+    cpuBind = "verbose,mask_cpu:0x1";
+    jobName = "hpcg-${toString n.x}-${toString n.y}-${toString n.z}-${gitBranch}";
   };
 
   # Compute the array of configurations
@@ -42,9 +43,9 @@ let
   exec = {nextStage, conf, ...}: with conf; stages.exec {
     inherit nextStage;
     argv = [
-      "--nx=${toString n}"
-      "--ny=${toString n}"
-      "--nz=${toString n}"
+      "--nx=${toString n.x}"
+      "--ny=${toString n.y}"
+      "--nz=${toString n.z}"
     ];
   };
 
