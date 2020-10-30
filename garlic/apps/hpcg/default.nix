@@ -1,46 +1,44 @@
 {
   stdenv
-, nanos6
-, mpi
-, mcxx
-, tampi
-, icc
+, cc
+, nanos6 ? null
+, mcxx ? null
+, mpi ? null
+, gitBranch
 }:
 
+with stdenv.lib;
 stdenv.mkDerivation rec {
   name = "hpcg";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/rpenacob/hpcg.git";
-    ref = "symgs_coloring_more_than_one_block_per_task_halos_blocking_discreete";
+    url = "ssh://git@bscpm02.bsc.es/rpenacob/garlic-hpcg.git";
+    ref = "${gitBranch}";
   };
 
   prePatch = ''
     #export NIX_DEBUG=6
   '';
 
-  patches = [ ./tampi.patch ];
-
   buildInputs = [
-    nanos6
-    mpi
-    icc
-    tampi
-    mcxx
+    cc
+  ]
+  ++ optional (mcxx != null) mcxx
+  ++ optional (nanos6 != null) nanos6
+  ++ optional (mpi != null) mpi;
+
+  makeFlags = [
+    "CC=${cc.cc.CC}"
+    "CXX=${cc.cc.CXX}"
   ];
 
   enableParallelBuilding = true;
-
-  configurePhase = ''
-    export TAMPI_HOME=${tampi}
-    mkdir build
-    cd build
-    ../configure MPI_ICPC_OSS
-  '';
 
   installPhase = ''
     mkdir -p $out/bin
     cp bin/* $out/bin/
   '';
+
+  programPath = "/bin/xhpcg";
 
 }
