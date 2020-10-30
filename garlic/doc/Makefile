@@ -1,8 +1,8 @@
-all: execution.pdf execution.txt
+all: execution.pdf execution.txt pp.pdf pp.txt
 
 %.pdf: %.ms
-	groff -ms -t -Tpdf $^ > $@
-	#killall -HUP mupdf
+	groff -ms -t -p -Tpdf $^ > $@
+	-killall -HUP mupdf
 
 %.txt: %.ms
-	groff -ms -t -Tutf8 $^ > $@
+	groff -ms -t -p -Tutf8 $^ > $@
