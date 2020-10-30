@@ -7,7 +7,6 @@
 
 <!-- Must we activate the tracing? Which is the tracing mode? (detail/bursts) Where is it located? Which kind of trace? Version of the XML parser?-->
 <trace enabled="yes"
- home="/nix/store/j80mlqa12d1baifg30jsx2smv90akzvc-extrae"
  initial-mode="detail"
  type="paraver"
 >
