@@ -277,6 +277,29 @@ let
         mpi = self.bsc.mpi;
       };
 
+      hist = callPackage ./garlic/pp/hist { };
+
+      tool = callPackage ./garlic/sh/default.nix {
+        sshHost = "mn1";
+      };
+
+      # Post processing tools
+      pp = with self.bsc.garlicTools; rec {
+        store = callPackage ./garlic/pp/store.nix { };
+        resultFromTrebuchet = trebuchetStage: (store {
+          experimentStage = getExperimentStage trebuchetStage;
+          inherit trebuchetStage;
+        });
+        timetable = callPackage ./garlic/pp/timetable.nix { };
+        rPlot = callPackage ./garlic/pp/rplot.nix { };
+        timetableFromTrebuchet = tre: timetable (resultFromTrebuchet tre);
+        mergeDatasets = callPackage ./garlic/pp/merge.nix { };
+
+        # Takes a list of experiments and returns a file that contains
+        # all timetable results from the experiments.
+        merge = exps: mergeDatasets (map timetableFromTrebuchet exps);
+      };
+
       # Experiments
       exp = {
         nbody = rec {
@@ -308,29 +331,6 @@ let
           mpi_omp = callPackage ./garlic/exp/hpcg/mpi+omp.nix { };
           oss = callPackage ./garlic/exp/hpcg/oss.nix { };
         };
-      };
-
-      hist = callPackage ./garlic/pp/hist { };
-
-      tool = callPackage ./garlic/sh/default.nix {
-        sshHost = "mn1";
-      };
-
-      # Post processing tools
-      pp = with self.bsc.garlicTools; rec {
-        store = callPackage ./garlic/pp/store.nix { };
-        resultFromTrebuchet = trebuchetStage: (store {
-          experimentStage = getExperimentStage trebuchetStage;
-          inherit trebuchetStage;
-        });
-        timetable = callPackage ./garlic/pp/timetable.nix { };
-        rPlot = callPackage ./garlic/pp/rplot.nix { };
-        timetableFromTrebuchet = tre: timetable (resultFromTrebuchet tre);
-        mergeDatasets = callPackage ./garlic/pp/merge.nix { };
-
-        # Takes a list of experiments and returns a file that contains
-        # all timetable results from the experiments.
-        merge = exps: mergeDatasets (map timetableFromTrebuchet exps);
       };
 
       # Datasets used in the figures
