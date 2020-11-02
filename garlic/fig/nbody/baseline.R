@@ -22,6 +22,7 @@ df = select(dataset, config.nblocks, config.hw.cpusPerSocket, time) %>%
 
 df = df %>% mutate(blocksPerCpu = nblocks / cpusPerSocket)
 df$nblocks = as.factor(df$nblocks)
+df$blocksPerCpuFactor = as.factor(df$blocksPerCpu)
 
 # Normalize the time by the median
 D=group_by(df, nblocks) %>%
@@ -41,10 +42,10 @@ png("box.png", width=w*ppi, height=h*ppi, res=ppi)
 #
 #
 # Create the plot with the normalized time vs nblocks
-p = ggplot(data=D, aes(x=nblocks, y=tnorm)) +
+p = ggplot(data=D, aes(x=blocksPerCpuFactor, y=tnorm)) +
 
 	# Labels
-	labs(x="Blocks", y="Normalized time",
+	labs(x="Num blocks", y="Normalized time",
               title=sprintf("Nbody normalized time. Particles=%d", particles), 
               subtitle=input_file) +
 
@@ -55,8 +56,8 @@ p = ggplot(data=D, aes(x=nblocks, y=tnorm)) +
 	#theme_bw() +
 
 	# Add the maximum allowed error lines
-	#geom_hline(yintercept=c(-0.01, 0.01),
-	#	linetype="dashed", color="red") +
+	geom_hline(yintercept=c(-0.01, 0.01),
+		linetype="dashed", color="red") +
 
 	# Draw boxplots
 	geom_boxplot() +
@@ -69,8 +70,6 @@ p = ggplot(data=D, aes(x=nblocks, y=tnorm)) +
 
 	theme(legend.position = c(0.85, 0.85)) #+
 
-	# Place each variant group in one separate plot
-	#facet_wrap(~jemalloc)
 
 
 
@@ -83,17 +82,18 @@ dev.off()
 png("scatter.png", width=w*ppi, height=h*ppi, res=ppi)
 #
 ## Create the plot with the normalized time vs nblocks
-p = ggplot(D, aes(x=nblocks, y=time)) +
+p = ggplot(D, aes(x=blocksPerCpuFactor, y=time)) +
 
-	labs(x="Blocks", y="Time (s)",
+	labs(x="Blocks/CPU", y="Time (s)",
               title=sprintf("Nbody granularity. Particles=%d", particles), 
               subtitle=input_file) +
 	theme_bw() +
 	theme(plot.subtitle=element_text(size=8)) +
 	theme(legend.position = c(0.5, 0.88)) +
 
-	geom_point(shape=21, size=3) # +
-	#scale_y_continuous(trans=log2_trans())
+	geom_point(shape=21, size=3) +
+	#scale_x_continuous(trans=log2_trans()) +
+	scale_y_continuous(trans=log2_trans())
 
 # Render the plot
 print(p)
