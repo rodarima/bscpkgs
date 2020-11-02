@@ -17,6 +17,9 @@ let
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
+    expName = "hpcg.oss";
+    unitName = "${expName}.nb${toString nblocks}";
+
     # hpcg options
     n = c.n;
     nblocks = c.nblocks;
