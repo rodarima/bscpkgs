@@ -303,7 +303,6 @@ let
       # Experiments
       exp = {
         nbody = rec {
-          test  = callPackage ./garlic/exp/nbody/test.nix { };
           tampi = callPackage ./garlic/exp/nbody/tampi.nix { };
 
           # Experiment variants
@@ -336,7 +335,6 @@ let
       # Datasets used in the figures
       ds = with self.bsc.garlic; with pp; {
         nbody = with exp.nbody; {
-          test     = merge [ test ];
           baseline = merge [ baseline ];
           jemalloc = merge [ baseline jemalloc ];
           freeCpu  = merge [ baseline freeCpu ];
@@ -347,9 +345,9 @@ let
       fig = with self.bsc.garlic; {
         nbody = {
 
-          test = pp.rPlot {
-            script = ./garlic/fig/nbody/test.R;
-            dataset = ds.nbody.test;
+          baseline = pp.rPlot {
+            script = ./garlic/fig/nbody/baseline.R;
+            dataset = ds.nbody.baseline;
           };
 
           jemalloc = pp.rPlot {
