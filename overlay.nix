@@ -339,6 +339,10 @@ let
           jemalloc = merge [ baseline jemalloc ];
           freeCpu  = merge [ baseline freeCpu ];
         };
+
+        hpcg = with exp.hpcg; {
+          oss = merge [ oss ];
+        };
       };
 
       # Figures generated from the experiments
