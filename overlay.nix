@@ -150,6 +150,8 @@ let
       enableStatic = true;
     };
 
+    groff = callPackage ./bsc/groff/default.nix { };
+
     nixtools = callPackage ./bsc/nixtools/default.nix { };
 
     garlicTools = callPackage ./garlic/tools.nix {};
