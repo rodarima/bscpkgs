@@ -4,6 +4,7 @@
 , autoconf
 , libtool
 , pkg-config
+, perl
 , numactl
 , hwloc
 , papi
@@ -25,6 +26,10 @@ stdenv.mkDerivation rec {
     ref = branch;
   };
 
+  prePatch = ''
+    patchShebangs scripts/generate_config.sh
+  '';
+
   enableParallelBuilding = true;
 
   preConfigure = ''
@@ -43,6 +48,7 @@ stdenv.mkDerivation rec {
     automake
     libtool
     pkg-config
+    perl
     boost
     numactl
     hwloc
