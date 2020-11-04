@@ -1,2 +1,4 @@
-*.txt
+*.utf8
+*.ascii
+*.html
 *.pdf
