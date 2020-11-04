@@ -1,8 +1,14 @@
-all: execution.pdf execution.txt pp.pdf pp.txt
+all: execution.pdf execution.ascii pp.pdf pp.ascii
+
+TTYOPT=-rPO=4m -rLL=72m
+#TTYOPT=-dpaper=a0 -rPO=4m -rLL=72m
 
 %.pdf: %.ms
-	groff -ms -t -p -Tpdf $^ > $@
+	REFER=ref.i groff -ms -t -p -R -Tpdf $^ > $@
 	-killall -HUP mupdf
 
-%.txt: %.ms
-	groff -ms -t -p -Tutf8 $^ > $@
+%.utf8: %.ms
+	REFER=ref.i groff -ms -t -p -R $(TTYOPT) -Tutf8 $^ > $@
+
+%.ascii: %.ms
+	REFER=ref.i groff -ms -t -p -R $(TTYOPT) -Tascii $^ > $@
