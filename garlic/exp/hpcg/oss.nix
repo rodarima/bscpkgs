@@ -11,7 +11,10 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    n = [ { x = 256; y = 288; z = 288; } ];
+    # FIXME: Temporally reduce the input size until we can load a precomputed
+    # input in each run, otherwise the execution time is very large.
+    n = [ { x = 104; y = 104; z = 104; } ];
+    #n = [ { x = 256; y = 288; z = 288; } ];
     nblocks = [ 12 24 48 96 192 384 ];
   };
 
