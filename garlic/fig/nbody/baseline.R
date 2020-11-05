@@ -26,7 +26,13 @@ df$blocksPerCpuFactor = as.factor(df$blocksPerCpu)
 
 # Normalize the time by the median
 D=group_by(df, nblocks) %>%
-	mutate(tnorm = time / median(time) - 1)
+	mutate(tnorm = time / median(time) - 1) %>%
+	mutate(bad = max(ifelse(abs(tnorm) >= 0.01, 1, 0)))
+
+D$bad = as.factor(D$bad)
+
+#D$bad = as.factor(ifelse(abs(D$tnorm) >= 0.01, 2,
+#	       ifelse(abs(D$tnorm) >= 0.005, 1, 0)))
 
 bs_unique = unique(df$nblocks)
 nbs=length(bs_unique)
@@ -42,12 +48,13 @@ png("box.png", width=w*ppi, height=h*ppi, res=ppi)
 #
 #
 # Create the plot with the normalized time vs nblocks
-p = ggplot(data=D, aes(x=blocksPerCpuFactor, y=tnorm)) +
+p = ggplot(data=D, aes(x=blocksPerCpuFactor, y=tnorm, color=bad)) +
 
 	# Labels
 	labs(x="Num blocks", y="Normalized time",
               title=sprintf("Nbody normalized time. Particles=%d", particles), 
               subtitle=input_file) +
+
 
 	# Center the title
 	#theme(plot.title = element_text(hjust = 0.5)) +
@@ -57,18 +64,19 @@ p = ggplot(data=D, aes(x=blocksPerCpuFactor, y=tnorm)) +
 
 	# Add the maximum allowed error lines
 	geom_hline(yintercept=c(-0.01, 0.01),
-		linetype="dashed", color="red") +
+		linetype="dashed", color="gray") +
 
 	# Draw boxplots
 	geom_boxplot() +
+	scale_color_manual(values=c("black", "brown")) +
 
 	#scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
 
 	theme_bw() +
 
 	theme(plot.subtitle=element_text(size=8)) +
-
-	theme(legend.position = c(0.85, 0.85)) #+
+	theme(legend.position = "none")
+	#theme(legend.position = c(0.85, 0.85))
 
 
 
