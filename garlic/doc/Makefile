@@ -4,7 +4,7 @@ TTYOPT=-rPO=4m -rLL=72m
 #TTYOPT=-dpaper=a0 -rPO=4m -rLL=72m
 
 %.pdf: %.ms
-	REFER=ref.i groff -ms -t -p -R -Tpdf $^ > $@
+	REFER=ref.i groff -ms -dpaper=a4 -k -t -p -R -Tpdf $^ > $@
 	-killall -HUP mupdf
 
 %.utf8: %.ms
