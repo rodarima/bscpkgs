@@ -39,9 +39,9 @@ in
         echo "$exp: not found"
         echo "Run the experiment and fetch the results with:"
         echo
-        #echo "  garlic -RF -t ${trebuchetStage}"
-        echo -e "\e[30;48;5;2mgarlic -RF -t ${trebuchetStage}\e[0m"
+        echo -e "\e[30;48;5;2mgarlic -RFv ${trebuchetStage}\e[0m"
         echo
+        echo "See garlic(1) for more details."
         echo "cannot continue building $out, aborting"
         exit 1
       fi
