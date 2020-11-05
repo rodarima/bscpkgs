@@ -1,32 +1,47 @@
 {
   stdenv
-, nanos6
 , mpi
 , tampi
-, mcxx
-, icc
+, clangOmpss2
+, bsx ? 1024
+, bsy ? 1024
 }:
 
 stdenv.mkDerivation rec {
   name = "heat";
+  extension = if (bsx == bsy)
+    then "${toString bsx}bs.exe"
+    else "${toString bsx}x${toString bsy}bs.exe";
 
-  src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/benchmarks/ompss-2/heat-conflict-kevin.git";
-    #rev = "25fde23e5ad5f5e2e58418ed269bc2b44642aa17";
-    ref = "master";
-  };
+  variant = "heat_ompss";
+  target = "${variant}.${extension}";
+
+  makeFlags = [
+    "BSX=${toString bsx}"
+    "BSY=${toString bsy}"
+    target
+  ];
+
+  src = ~/heat;
+  #src = builtins.fetchGit {
+  #  url = "ssh://git@bscpm02.bsc.es/garlic/apps/heat.git";
+  #  ref = "garlic";
+  #};
 
   buildInputs = [
-    nanos6
     mpi
-    icc
+    clangOmpss2
     tampi
-    mcxx
   ];
+
+  programPath = "/bin/${target}";
 
   installPhase = ''
     mkdir -p $out/bin
-    cp heat_* $out/bin/
+    cp ${target} $out/bin/
+
+    mkdir -p $out/etc
+    cp heat.conf $out/etc/
   '';
 
 }

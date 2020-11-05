@@ -238,10 +238,20 @@ let
 
         };
 
-#        heat = callPackage ./garlic/apps/heat {
-#          stdenv = pkgs.gcc7Stdenv;
-#          mpi = intel-mpi;
-#          tampi = tampi;
+        heat = callPackage ./garlic/apps/heat/default.nix { };
+#        heat = callPackage ./garlic/apps/heat/default.nix {
+#          # FIXME: The heat program must be able to compile with gcc9 and newer
+#          stdenv = self.gcc7Stdenv;
+#          #mpi = intel-mpi;
+#          #tampi = tampi;
+#
+#          # FIXME: Nanos6 fails to load if we are not using a compatible stdc++
+#          # version, so we use the same provided by gcc7
+#          mcxx = self.bsc.mcxx.override {
+#            nanos6 = self.bsc.nanos6.override {
+#              stdenv = self.gcc7Stdenv;
+#            };
+#          };
 #        };
 #  
 #        lulesh = callPackage ./garlic/apps/lulesh {
