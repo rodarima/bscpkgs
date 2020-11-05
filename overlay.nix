@@ -358,6 +358,10 @@ let
           oss = merge [ oss ];
         };
 
+        saiph = with exp.saiph; {
+          numcomm = merge [ numcomm ];
+        };
+
         heat = with exp.heat; {
           test = merge [ test ];
         };
