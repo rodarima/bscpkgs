@@ -5,13 +5,27 @@ garlicTemp=@garlicTemp@
 sshHost=@sshHost@
 PATH=@PATH@
 
-usage() { echo "Usage: garlic [-RFwq] [-e experiment] [-t trebuchet]" 1>&2; exit 1; }
+#garlicPrefix=/mnt/garlic
+#garlicTemp=/tmp/garlic
+#sshHost=mn1
+#PATH=/nix/store/yjkcxbf0y1jdlbj0axghlg2fndc4dqkz-patchelf-0.11/bin:/nix/store/6is25fyx29d731idycngl7qmgcax5xng-gcc-wrapper-9.3.0/bin:/nix/store/h986r9i2j9x5z8i5g8aj0z8jdd129wyx-gcc-9.3.0/bin:/nix/store/48dypl6qdsj3vdzh7hjg5qnngfpdcz7h-glibc-2.31-bin/bin:/nix/store/zmac3n79ayg4fdqgznmi2v3lmcprzx4g-coreutils-8.31/bin:/nix/store/dmnnqr6j7kqgcr357b5qwiwvjvg2yyhd-binutils-wrapper-2.31.1/bin:/nix/store/gmi6xrkl95h6iypv00dvdpm3f4md9i6i-binutils-2.31.1/bin:/nix/store/48dypl6qdsj3vdzh7hjg5qnngfpdcz7h-glibc-2.31-bin/bin:/nix/store/zmac3n79ayg4fdqgznmi2v3lmcprzx4g-coreutils-8.31/bin:/nix/store/a41ky6icdgxa54jzps32gfgcrdyx94hs-rsync-3.1.3/bin:/nix/store/sxll2dlamfm32xd2nyfx7v8mlnx0gxks-openssh-8.3p1/bin:/nix/store/3gp7gv5z9jj3g92czxadvgphpwiviv28-nix-2.3.7/bin:/nix/store/zmac3n79ayg4fdqgznmi2v3lmcprzx4g-coreutils-8.31/bin:/nix/store/f2hn65ksj194nmy58nrjikv9r9w25irh-findutils-4.7.0/bin:/nix/store/m39n3m5c7r22b3ma2phnwmp0jj8a5jja-diffutils-3.7/bin:/nix/store/ray7jgwsr5xbxp28wvr427vywd08nz9s-gnused-4.8/bin:/nix/store/gzc092gzsanvym4c6sjgh22dsh9fzj4s-gnugrep-3.4/bin:/nix/store/mn412q9rz9afdrhl9v2ybf605r91wzl2-gawk-5.1.0/bin:/nix/store/xca341k5x5b4hcmi310gjhdlgqm4l56m-gnutar-1.32/bin:/nix/store/zvb8qad72bz6j7ia60dcsf3dfncxxqc7-gzip-1.10/bin:/nix/store/9pb8zp3zyykw09rg60f2nv32plamhd7h-bzip2-1.0.6.0.1-bin/bin:/nix/store/fm2p1d8w9sx4gbaf8qfv2rsailsyhvm3-gnumake-4.3/bin:/nix/store/npfsrhkjww5q7sax7p7ijcrj3wlbrxn7-bash-4.4-p23/bin:/nix/store/72m0m8v6mbp58vbngjgv5pn2scqhs6kk-patch-2.7.6/bin:/nix/store/7vh7fckk2srlkmmkfhs9y85icwm9rhj5-xz-5.2.5-bin/bin
 
-trebuchetFromExperiment() {
-  nix-store -q --referrers $1 | grep trebuchet
-}
-experimentFromTrebuchet() {
-  nix-store -qR $1 | grep experiment
+usage() { echo "Usage: garlic [-RFwv] experiment" 1>&2; exit 1; }
+
+findClosure() {
+  what=$1
+  from=$2
+  mexp=$(nix-store -qR "$from" | grep -E -- "$what")
+  n=$(echo "$mexp" | awk 'BEGIN { count=0 } NF { count++ } END { print count }')
+  if [ $n -eq 0 ]; then
+    >&2 echo "$exp: $what not found"
+    exit 1
+  fi
+  if [ $n -gt 1 ]; then
+    >&2 echo "$exp: multiple $what found"
+    exit 1
+  fi
+  echo "$mexp"
 }
 
 drvFromOutput() {
@@ -136,62 +150,43 @@ do_run() {
 }
 
 waitResults=1
-verbose=1
+verbose=
 operation=
 target=
 enableRun=
 enableFetch=
 
-while getopts "qwRFe:t:" o; do
+while getopts "vwRF" o; do
   case "${o}" in
-    e) experiment=${OPTARG} ;;
-    t) trebuchet=${OPTARG} ;;
     R) enableRun=1 ;;
     F) enableFetch=1 ;;
     w) waitResults=0 ;;
-    q) verbose= ;;
+    v) verbose=1 ;;
     *) usage ;;
   esac
 done
 shift $((OPTIND-1))
-#target="$1"
+ref="$1"
 
-if [ -z "$trebuchet" -a -z "$experiment" ]; then
-  >&2 echo "missing trebuchet or experiment"
-  usage
-fi
 
 if [ -z "$enableRun" -a -z "$enableFetch" ]; then
   >&2 echo "missing operation"
   usage
 fi
 
-#if [ -z "$target" ]; then
-#  >&2 echo "missing target"
-#  usage
-#fi
-
-#trebuchet=$(nix-build -A "exp.$target")
-#checkTrebuchet $trebuchet
-#experiment=$(experimentFromTrebuchet $trebuchet)
-#checkExperiment $experiment
-
-if [ ! -z "$trebuchet" ]; then
-  checkTrebuchet $trebuchet
-  trebuchet=$(readlink -f $trebuchet)
-  experiment=$(experimentFromTrebuchet $trebuchet)
-  checkExperiment $experiment
-else
-  checkExperiment $experiment
-  experiment=$(readlink -f $experiment)
-  trebuchet=$(trebuchetFromExperiment $experiment)
-  checkTrebuchet $trebuchet
+if [ -z "$ref" ]; then
+  >&2 echo "missing experiment"
+  usage
 fi
+
+experiment=$(findClosure "-experiment$" "$ref")
+trebuchet=$(findClosure "-trebuchet$" "$ref")
+
+checkTrebuchet $trebuchet
+checkExperiment $experiment
 
 trebuchetDrv=$(drvFromOutput $trebuchet)
 experimentDrv=$(drvFromOutput $experiment)
 
 if [ $enableRun ]; then do_run; fi
 if [ $enableFetch ]; then do_fetch; fi
-
-
