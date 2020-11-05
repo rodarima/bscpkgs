@@ -384,6 +384,12 @@ let
           };
         };
 
+        hpcg = {
+          oss = with ds.hpcg; pp.rPlot {
+            script = ./garlic/fig/hpcg/oss.R;
+            dataset = oss;
+          };
+        };
 
         heat = {
           test = with ds.heat; pp.rPlot {
