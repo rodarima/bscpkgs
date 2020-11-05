@@ -1,0 +1,61 @@
+.\" The following commands are required for all man pages.
+.Dd Nov 5, 2020
+.Dt garlic 1
+.Os Linux
+.Sh NAME
+.Nm garlic
+.Nd Garlic benchmark tool
+.Sh SYNOPSIS
+.Nm garlic
+.Op Fl RFvw
+.Ar experiment
+.Sh DESCRIPTION
+.Nm
+is a program to handle tasks related with the experiments of the Garlic
+benchmark. The
+.Ar experiment
+argument is a path to a valid trebuchet or experiment stage script. The
+specified operations are executed sequentially and at
+least one must be selected from:
+.Bl -tag -width Ds -compact
+.Pp
+.It Fl R
+launches the
+.Ar experiment .
+.Pp
+.It Fl F
+waits until the
+.Ar experiment
+is completed and then fetches the results
+into the nix store.
+.El
+.Pp
+Additionally, the following options are available:
+.Bl -tag -width Ds -compact
+.Pp
+.It Fl v
+be more verbose.
+.Pp
+.It Fl w
+don't wait for the complete results when fetching; fails if they are not
+ready.
+.El
+.\" This next command is for sections 1, 6, 7, and 8 only.
+.\" .Sh ENVIRONMENT
+.\" .Sh FILES
+.Sh EXIT STATUS
+.Ex -std
+.\" .Sh EXAMPLES
+.\" This next command is for sections 1, 4, 6, 7, 8, and 9 only
+.\"     (fprintf/stderr type diagnostics).
+.\" .Sh DIAGNOSTICS
+.\" .Sh COMPATIBILITY
+.\" This next command is for sections 2, 3, 4, and 9 only
+.\"     (settings of the errno variable).
+.\" .Sh ERRORS
+.\" .Sh SEE ALSO
+.\" .Sh STANDARDS
+.\" .Sh HISTORY
+.\" .Sh AUTHORS
+.\" .Sh CAVEATS
+.\" .Sh BUGS
