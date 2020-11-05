@@ -16,6 +16,9 @@ let
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
+    expName = "saiph.numcomm";
+    unitName = "${expName}.nc-${toString numComm}";
+
     # saiph options
     devMode = false;
     inherit (c) numComm;
