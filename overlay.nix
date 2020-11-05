@@ -340,6 +340,10 @@ let
           mpi_omp = callPackage ./garlic/exp/hpcg/mpi+omp.nix { };
           oss = callPackage ./garlic/exp/hpcg/oss.nix { };
         };
+
+        heat = {
+          test = callPackage ./garlic/exp/heat/test.nix { };
+        };
       };
 
       # Datasets used in the figures
@@ -353,27 +357,35 @@ let
         hpcg = with exp.hpcg; {
           oss = merge [ oss ];
         };
+
+        heat = with exp.heat; {
+          test = merge [ test ];
+        };
       };
 
       # Figures generated from the experiments
       fig = with self.bsc.garlic; {
         nbody = {
-
           baseline = pp.rPlot {
             script = ./garlic/fig/nbody/baseline.R;
             dataset = ds.nbody.baseline;
           };
-
           jemalloc = pp.rPlot {
             script = ./garlic/fig/nbody/jemalloc.R;
             dataset = ds.nbody.jemalloc;
           };
-
           freeCpu = pp.rPlot {
             script = ./garlic/fig/nbody/freeCpu.R;
             dataset = ds.nbody.freeCpu;
           };
+        };
 
+
+        heat = {
+          test = with ds.heat; pp.rPlot {
+            script = ./garlic/fig/heat/test.R;
+            dataset = test;
+          };
         };
       };
     };
