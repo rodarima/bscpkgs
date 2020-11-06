@@ -97,6 +97,7 @@ program\[em]any changes in the program will cause nix to build it again
 using the updated program. The results will also depend on the
 execution pipeline, and the graph on the results. This chain of
 dependencies can be shown in the following dependency graph:
+.ie t \{\
 .PS
 circlerad=0.22;
 linewid=0.35;
@@ -111,6 +112,14 @@ circle "PP"
 arrow
 circle "Plot"
 .PE
+.\}
+.el \{\
+.nf
+ 
+  Prog ---> EP ---> Result ---> PP ---> Plot
+
+.fi
+.\}
 Ideally, the dependencies should be handled by nix, so it can detect any
 change and rebuild the necessary parts automatically. Unfortunately, nix
 is not able to build the result as a derivation directly as it requires access
