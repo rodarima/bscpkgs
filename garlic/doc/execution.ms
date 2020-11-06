@@ -115,9 +115,9 @@ to the target machine and executes the next stage there. Once in the
 target machine, the
 .I runexp
 stage computes the output path to store the experiment results, using
-the user and group in the target cluster and changes the working
-directory there. In MareNostrum 4 the output path is at
-.CW /gpfs/projects/$group/$user/garlic-out .
+the user in the target machine and changes the working directory there.
+In MareNostrum 4 the output path is at
+.CW /gpfs/projects/bsc15/garlic/$user/out .
 Then the
 .I isolate
 stage is executed to enter the sandbox and the
