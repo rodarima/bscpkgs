@@ -98,6 +98,25 @@ ABSTRACT
 
     xeon07$ git clone git@bscpm02.bsc.es:nanos6/nanos6.git
 
+  You will also need to access MareNostrum 4 from the xeon07 node, in 
+  order to submit experiments. Add the following lines as well to the 
+  ~/.ssh/config file and set your user name:
+
+    Host mn0 mn1 mn2
+            User your-mn4-username
+            IdentityFile ~/.ssh/id_rsa
+
+  Then copy the key to MareNostrum 4 (it will ask you the first time for 
+  your password):
+
+    xeon07$ ssh-copy-id -i ~/.ssh/id_rsa.pub mn1
+
+  And ensure that you can connect without a password:
+
+    xeon07$ ssh mn1
+    ...
+    login1$
+
 1.3 The bscpkgs repo
 
   Once you have Internet and you have granted access to the PM GitLab 
