@@ -149,7 +149,7 @@ sandbox, where the interfering environment variables are removed. The
 sbatch program is also provided in the
 .I "nix store" ,
 with a version compatible with the SLURM daemon running in the target
-cluster.
+machine.
 .NH 2
 Job execution
 .LP
