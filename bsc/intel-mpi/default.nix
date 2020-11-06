@@ -29,13 +29,13 @@ in
 
 stdenv.mkDerivation rec {
   name = "intel-mpi-${version}";
-  version = "2019.8.254";
-  dir_nr = "16814";
-  internal-ver = "2020.2.254";
+  version = "2019.9.304";
+  dir_nr = "17263";
+  internal-ver = "2020.4.304";
 
   src = builtins.fetchTarball {
     url = "http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/${dir_nr}/l_mpi_${version}.tgz";
-    sha256 = "1za4zyvxm5bfkrca843na6sxq2gq7qb87s0zysa7dnyqjwa11n45";
+    sha256 = "0nmp6np4s7nx2p94x40bpqkp5nasgif3gmbfl4lajzgj2rkh871v";
   };
 
   buildInputs = [
@@ -62,6 +62,7 @@ stdenv.mkDerivation rec {
   ];
 
   postPatch = ''
+    ls -l opt/intel/
     pushd opt/intel/compilers_and_libraries_${internal-ver}/linux/mpi/intel64/bin
       for i in mpi* ; do
         echo "Fixing paths in $i"
