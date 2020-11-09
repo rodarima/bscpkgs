@@ -7,8 +7,9 @@ Barcelona Supercomputing Center
 .AB
 .LP
 This document covers the format used to store the results of the
-execution and the postprocess steps used to generate a set of
-figures from the results to present the data.
+execution of experiments and the postprocess steps used to generate a
+set of figures from the results to present the data. The several stages
+of the postprocess pipeline are documented to provide a general picture.
 .AE
 .\"#####################################################################
 .nr GROWPS 3
