@@ -338,7 +338,12 @@ let
           mpi = callPackage ./garlic/exp/hpcg/mpi.nix { };
           omp = callPackage ./garlic/exp/hpcg/omp.nix { };
           mpi_omp = callPackage ./garlic/exp/hpcg/mpi+omp.nix { };
-          oss = callPackage ./garlic/exp/hpcg/oss.nix { };
+          input = callPackage ./garlic/exp/hpcg/gen.nix {
+            inherit (self.bsc.garlic.pp) resultFromTrebuchet;
+          };
+          oss = callPackage ./garlic/exp/hpcg/oss.nix {
+            genInput = self.bsc.garlic.exp.hpcg.input;
+          };
         };
 
         heat = {
