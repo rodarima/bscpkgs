@@ -20,7 +20,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  name = "extrae";
+  pname = "extrae";
   version = "3.8.3";
 
   src = fetchFromGitHub {
