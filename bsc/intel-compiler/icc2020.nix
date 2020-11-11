@@ -18,18 +18,15 @@ stdenv.mkDerivation rec {
   # From Arch Linux PKGBUILD
   dir_nr="17114";
   year="2020";
-  v_a="1";
-  v_b="217";
+  v_a="4";
+  v_b="304";
   update="4";
   composer_xe_dir="compilers_and_libraries_${year}.${v_a}.${v_b}";
-  #tgz="parallel_studio_xe_2020_update${update}_cluster_edition.tgz";
   tgz="parallel_studio_xe_2020_update${update}_professional_edition.tgz";
 
-  #https://registrationcenter-download.intel.com/akdlm/irc_nas/tec/17114/parallel_studio_xe_2020_update4_professional_edition.tgz
-  
   src = fetchurl {
     url = "http://registrationcenter-download.intel.com/akdlm/IRC_NAS/tec/${dir_nr}/${tgz}";
-    sha256 = "0nmp6np4s7nx2p94x40bpqkp5nasgif3gmbfl4lajzgj2rkh871v";
+    sha256 = "1rn9kk5bjj0jfv853b09dxrx7kzvv8dlyzw3hl9ijx9mqr09lrzr";
   };
 
   buildInputs = [
