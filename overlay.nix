@@ -138,6 +138,8 @@ let
 
     dummy = callPackage ./bsc/dummy/default.nix { };
 
+    rdma-core = callPackage ./bsc/rdma-core/default.nix { };
+
     clangOmpss2Unwrapped = callPackage ./bsc/llvm-ompss2/clang.nix {
       stdenv = self.llvmPackages_10.stdenv;
       enableDebug = false;
