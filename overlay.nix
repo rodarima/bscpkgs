@@ -97,7 +97,7 @@ let
 
     extrae = callPackage ./bsc/extrae/default.nix { };
 
-    tampi = self.bsc.tampiGit;
+    tampi = self.bsc.tampiRelease;
     tampiRelease = callPackage ./bsc/tampi/default.nix { };
     tampiGit = callPackage ./bsc/tampi/git.nix { };
 
