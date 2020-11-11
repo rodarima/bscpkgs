@@ -5,6 +5,7 @@
 , busybox
 , jq
 , texlive
+, sedReport
 }:
 let
   # TODO: We can select only which elements we need from fig by using:
@@ -13,15 +14,15 @@ let
 
   # By now, we require all plots
   figJSON = writeText "fig.json" (builtins.toJSON fig);
+  sedCmd = (import sedReport) fig;
 in
   stdenv.mkDerivation {
     name = "report";
     src = ./.;
     buildInputs = [ jq texlive.combined.scheme-basic ];
     buildPhase = ''
-      ls -l
-      sed -i -e "s:@fig\.nbody\.test@:$(jq -r .nbody.test ${figJSON}):g" report.tex
-      jq . ${figJSON}
+      ${sedCmd}
+      cat report.tex
       pdflatex report.tex -o report.pdf
       # Run again to fix figure references
       pdflatex report.tex -o report.pdf

@@ -181,6 +181,9 @@ let
       report = callPackage ./garlic/report.nix {
         fig = self.bsc.garlic.fig;
       };
+      sedReport = callPackage ./garlic/sedReport.nix {
+        fig = self.bsc.garlic.fig;
+      };
 
       # Use the configuration for the following target machine
       targetMachine = self.garlic.machines.mn4;
