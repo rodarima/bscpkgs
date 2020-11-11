@@ -26,6 +26,7 @@ stdenv.mkDerivation rec {
   src = builtins.fetchGit {
     url = "ssh://git@bscpm02.bsc.es/nanos6/nanos6";
     ref = branch;
+    rev = "bd306f903c7a4396f579402666082f5a7c34570b";
   };
 
   prePatch = ''
