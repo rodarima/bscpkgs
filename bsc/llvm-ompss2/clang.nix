@@ -6,7 +6,6 @@
 , bash
 , python3
 , perl
-, clang
 , which
 , libelf
 , libffi
@@ -30,7 +29,6 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     which
-    clang
     bash
     python3
     perl
