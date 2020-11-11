@@ -43,9 +43,7 @@ in stdenv.mkDerivation {
       wrapProgram $pls --prefix PERL5LIB : "$out/${perl.libPrefix}"
     done
 
-    # Remove any non-library as we are not using them
-    rm -rf $out/etc 
-    rm -rf $out/lib/systemd
+    # Remove the binaries as they pull systemd
     rm -rf $out/bin
     rm -rf $out/sbin
   '';
