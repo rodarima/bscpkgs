@@ -1,0 +1,24 @@
+diff --git a/substitute b/substitute
+index d5615606..82ca91a5 100755
+--- a/substitute
++++ b/substitute
+@@ -16,7 +16,7 @@ UNAME=`uname`
+ if [ "${UNAME}" = "Darwin" -o "${UNAME}" = "AIX" ] ; then
+ 	TMPFILE=substitute-$$
+ 	${SED} "s|${KEY}|${VALUE}|g" < ${FILE} >${TMPFILE}
+-	/bin/mv -f ${TMPFILE} ${FILE}
++	command mv -f ${TMPFILE} ${FILE}
+ else
+ 	${SED} "s|${KEY}|${VALUE}|g" -i ${FILE}
+ fi
+diff --git a/substitute-all b/substitute-all
+index 48c6b76a..eda7a0f2 100755
+--- a/substitute-all
++++ b/substitute-all
+@@ -23,5 +23,5 @@ fi
+ 
+ echo "Applying modification in ${PATHTOCHANGE} - Key = ${KEY} for value = ${VALUE}"
+ 
+-/usr/bin/find ${PATHTOCHANGE} -type f -exec ${SCRIPT_LOCATION} "${SED}" "${KEY}" "${VALUE}" {} \;
++command find ${PATHTOCHANGE} -type f -exec ${SCRIPT_LOCATION} "${SED}" "${KEY}" "${VALUE}" {} \;
+ 

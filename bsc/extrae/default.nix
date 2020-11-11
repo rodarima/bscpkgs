@@ -23,19 +23,15 @@ stdenv.mkDerivation rec {
   name = "extrae";
   version = "3.8.3";
 
-#  src = fetchurl {
-#    url = "https://ftp.tools.bsc.es/extrae/${name}-${version}-src.tar.bz2";
-#    sha256 = "0y036qc7y30pfj1mnb9nzv2vmxy6xxiy4pgfci6l3jc0lccdsgf8";
-#  };
-
   src = fetchFromGitHub {
-    owner = "rodarima";
-    #owner = "bsc-performance-tools";
+    owner = "bsc-performance-tools";
     repo = "extrae";
-    rev = "a8ec6882c03d130f88b09f2114887101ca9f6b09";
-    #rev = "${version}";
-    sha256 = "02gwl17r63kica6lxycyn10a0r2ciycf6g3cdq5cna5zl351qf31";
+    rev = "${version}";
+    sha256 = "08ghd14zb3bgqb1smb824d621pqqww4q01n3pyws0vp3xi0kavf4";
   };
+
+  # FIXME: Waiting for German to merge this patch
+  patches = [ ./use-command.patch ];
 
   enableParallelBuilding = true;
 
