@@ -28,6 +28,7 @@ in stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out
     cd $out
+    ln -s ${dataset} input.json
     Rscript --vanilla ${script} ${dataset}
   '';
 }
