@@ -20,7 +20,6 @@ let
     unitName = "${expName}.nc-${toString numComm}";
 
     # saiph options
-    devMode = false;
     inherit (c) numComm;
     mpi = impi;
     gitBranch = "garlic/tampi+isend+oss+task+simd";
@@ -57,7 +56,7 @@ let
     customPkgs = stdexp.replaceMpi conf.mpi;
   in
     customPkgs.apps.saiph.override {
-      inherit devMode numComm mpi gitBranch;
+      inherit numComm mpi gitBranch;
     };
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];

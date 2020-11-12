@@ -6,7 +6,6 @@
 , cc 
 , vtk
 , boost
-, devMode ? false
 , gitBranch ? "master"
 , numComm ? null
 , vectFlags ? null
@@ -16,12 +15,10 @@
 stdenv.mkDerivation rec {
   name = "saiph";
 
-  src = (if (devMode == true) then ~/repos/saiph
-         else
-	 builtins.fetchGit {
-           url = "ssh://git@bscpm02.bsc.es/DSLs/saiph.git";
-           ref = "${gitBranch}";
-         });
+  src = builtins.fetchGit {
+    url = "ssh://git@bscpm02.bsc.es/DSLs/saiph.git";
+    ref = "${gitBranch}";
+  };
 
   programPath = "/bin/ExHeat3D";
 
@@ -46,9 +43,8 @@ stdenv.mkDerivation rec {
     cd saiphv2/cpp/src 
     export VTK_VERSION=8.2
     export VTK_HOME=${vtk}
-  ''
-  + (if (devMode == true) then "make clean" else "")
-  ;
+    make clean
+  '';
 
   makeFlags = [
     "-f" "Makefile.${cc.cc.CC}"
