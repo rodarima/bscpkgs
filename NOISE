@@ -107,17 +107,18 @@ ABSTRACT
   This can induce compilation errors not happening inside nix-build.
   Do not use to ensure reproducibility.
 
-/* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
-
 1.8 Make doesn't rebuild objects
 
   When using local repo as src code, (e.g. developer mode on) a make
   clean at the preBuild stage is required.
 
-  Nix sets the same modification date (one second after the Epoch (1970-01-01 at 00:00:01 in UTC timezone) to all the files in the nix store (also those copied from repos).
-  Makefile checks the files modification date in order to call or not
-  the compilation instructions.
-  If any object/binary file exists out of Nix, at the time we build 
-  within Nix, they will be copied with the current data and consequently 
-  not updated during the Nix compilation process.
+  Nix sets the same modification date (one second after the Epoch 
+  (1970-01-01 at 00:00:01 in UTC timezone) to all the files in the nix 
+  store (also those copied from repos). Makefile checks the files 
+  modification date in order to call or not the compilation 
+  instructions. If any object/binary file exists out of Nix, at the time 
+  we build within Nix, they will be copied with the current data and 
+  consequently not updated during the Nix compilation process.
+
+/* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
 
