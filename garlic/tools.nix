@@ -41,6 +41,30 @@ let
 
     /* Given a trebuchet, returns the experiment */
     getExperimentStage = drv: drv.nextStage.nextStage.nextStage;
+
+    # Computes the exponentiation operation
+    pow = x: n: fold (a: b: a*b) 1 (map (a: x) (range 1 n));
+
+    # Generates a list of exponents from a to b inclusive, and raises base to
+    # each element of the list.
+    expRange = base: a: b: (map (ex: pow base ex) (range a b));
+
+    # Generates a list of integers by halving number N until it reaches 1. Is
+    # sorted from the smallest to largest.
+    divList = N:
+    let
+      _divList = n: if (n == 0) then [] else (_divList (n / 2)) ++ [ n ];
+    in
+      _divList N;
+
+    # Generates a set given a list of keys, where all values are null.
+    genNullAttr = l: genAttrs l (name: null);
+
+    # From the keys in the lis l, generates a set with the values in the set a,
+    # if they don't exist, they are not taken. Values set to null are removed.
+    optionalInherit = l: a: filterAttrs (n: v: v!=null)
+      (overrideExisting (genNullAttr l) a);
+
   };
 in
   gen
