@@ -9,6 +9,8 @@ stdenv.mkDerivation rec {
   dontUnpack = true;
   dontBuild = true;
 
+  programPath = "/bin/dummy";
+
   installPhase = ''
     mkdir -p $out/bin
 
