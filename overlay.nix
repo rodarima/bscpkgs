@@ -330,6 +330,7 @@ let
 
         saiph = {
           numcomm = callPackage ./garlic/exp/saiph/numcomm.nix { };
+          granularity = callPackage ./garlic/exp/saiph/granularity.nix { };
         };
 
         creams = {
@@ -371,6 +372,7 @@ let
 
         saiph = with exp.saiph; {
           numcomm = merge [ numcomm ];
+          granularity = merge [ granularity ];
         };
 
         heat = with exp.heat; {
@@ -399,6 +401,13 @@ let
           oss = with ds.hpcg; pp.rPlot {
             script = ./garlic/fig/hpcg/oss.R;
             dataset = oss;
+          };
+        };
+
+        saiph = {
+          granularity = with ds.saiph; pp.rPlot {
+            script = ./garlic/fig/saiph/granularity.R;
+	    dataset = granularity;
           };
         };
 

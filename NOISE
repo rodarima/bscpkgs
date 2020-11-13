@@ -121,6 +121,3 @@ ABSTRACT
   within Nix, they will be copied with the current data and consequently 
   not updated during the Nix compilation process.
 
-  See saiph devMode option and its implications at   
-  bscpkgs/garlic/saiph/default.nix
-  
