@@ -43,7 +43,14 @@ rec {
       # experiment, if the reservation is set like with nodes or ntasksPerNode.
       optionalAttrs (config ? garlic.sbatch.reservation) {
         inherit (config.garlic.sbatch) reservation;
-      } // {
+      } //
+      # However, if the experiment contains a reservation, that takes priority
+      # over the one set in the ~/.config/nixpkgs/config.nix file
+      optionalAttrs (conf ? reservation) {
+        inherit (conf) reservation;
+      } //
+      # Finally, add all the other required parameters
+      {
         exclusive = true;
         inherit nextStage nixPrefix nodes ntasksPerNode time qos jobName;
       }
