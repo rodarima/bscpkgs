@@ -346,6 +346,10 @@ let
         heat = {
           test = callPackage ./garlic/exp/heat/test.nix { };
         };
+
+        slurm = {
+          cpu = callPackage ./garlic/exp/slurm/cpu.nix { };
+        };
       };
 
       # Datasets used in the figures
