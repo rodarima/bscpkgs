@@ -46,14 +46,15 @@ rec {
         inherit (config.garlic.sbatch) reservation;
       } //
       # However, if the experiment contains a reservation, that takes priority
-      # over the one set in the ~/.config/nixpkgs/config.nix file
-      optionalAttrs (conf ? reservation) {
-        inherit (conf) reservation;
-      } //
+      # over the one set in the ~/.config/nixpkgs/config.nix file. Add other
+      # options if they are defined as well.
+      optionalInherit [ "reservation" "time" "qos" ] conf //
       # Finally, add all the other required parameters
       {
+        inherit nextStage nixPrefix;
+        # These sbatch options are mandatory
+        inherit cpusPerTask ntasksPerNode nodes jobName;
         exclusive = true;
-        inherit nextStage nixPrefix nodes ntasksPerNode time qos jobName;
       }
     );
 
@@ -62,10 +63,17 @@ rec {
       inherit nextStage;
     };
 
-    srun = {nextStage, conf, ...}: stages.srun {
-      inherit (conf) nixPrefix cpuBind;
-      inherit nextStage;
-    };
+    srun = {nextStage, conf, ...}: (
+      assert (assertMsg (!(conf ? cpuBind))
+        "cpuBind is no longer available in the standard srun stage");
+      stages.srun {
+        inherit (conf) nixPrefix;
+        inherit nextStage;
+
+        # Binding is set to cores always
+        cpuBind = "cores,verbose";
+      }
+    );
 
     isolate = {nextStage, conf, ...}: stages.isolate {
       clusterName = machineConf.name;
