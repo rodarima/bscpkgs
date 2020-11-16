@@ -246,6 +246,12 @@ let
           gitBranch = "garlic/oss";
         };
 
+	bigsort = callPackage ./garlic/apps/bigsort/default.nix {
+	  cc = self.bsc.icc;
+	  mpi = self.bsc.mpi;
+	  gitBranch = "garlic/mpi+send+omp+task";
+	};
+
         heat = callPackage ./garlic/apps/heat/default.nix { };
 #        heat = callPackage ./garlic/apps/heat/default.nix {
 #          # FIXME: The heat program must be able to compile with gcc9 and newer
