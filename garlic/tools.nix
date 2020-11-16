@@ -51,7 +51,7 @@ let
 
     # Generates a list of integers by halving number N until it reaches 1. Is
     # sorted from the smallest to largest.
-    divList = N:
+    halfList = N:
     let
       _divList = n: if (n == 0) then [] else (_divList (n / 2)) ++ [ n ];
     in
