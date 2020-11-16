@@ -18,9 +18,9 @@ let
 
   # Initial variable configuration
   varConf = with bsc; {
-    # Create a list of cpus per task by dividing cpusPerSocket by 2
-    # successively. Example: divList 24 = [ 1 3 6 12 24 ]
-    cpusPerTask = divList hw.cpusPerSocket;
+    # Create a list of cpus per task by computing the divisors of the number of
+    # cpus per socket, example: divisors 24 = [ 1 2 3 4 6 8 12 24 ]
+    cpusPerTask = divisors hw.cpusPerSocket;
   };
 
   # Generate the complete configuration for each unit
@@ -36,6 +36,8 @@ let
     # Resources
     qos = "debug";
     inherit (c) cpusPerTask;
+    # As cpusPerTask is a divisor of the cpusPerSocket and thus cpusPerNode, we
+    # know the remainder is zero:
     ntasksPerNode = hw.cpusPerNode / cpusPerTask;
     nodes = 1;
     jobName = unitName;
