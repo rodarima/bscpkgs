@@ -57,6 +57,9 @@ let
     in
       _divList N;
 
+    # A list of all divisors of n, sorted in increased order:
+    divisors = n: filter (x: (mod n x == 0)) (range 1 n);
+
     # Generates a set given a list of keys, where all values are null.
     genNullAttr = l: genAttrs l (name: null);
 
