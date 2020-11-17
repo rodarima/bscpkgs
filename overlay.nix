@@ -370,6 +370,10 @@ let
           test = callPackage ./garlic/exp/heat/test.nix { };
         };
 
+	bigsort = {
+	  test = callPackage ./garlic/exp/bigsort/mpi+omp.nix { };
+	};
+
         slurm = {
           cpu = callPackage ./garlic/exp/slurm/cpu.nix { };
         };
