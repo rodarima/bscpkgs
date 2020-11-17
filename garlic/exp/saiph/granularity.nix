@@ -18,6 +18,7 @@ let
   genConf = with bsc; c: targetMachine.config // rec {
     expName = "saiph.granularity";
     unitName = "${expName}.nbx-nby-nbz-${toString nbx}-${toString nby}-${toString nbz}";
+    inherit (targetMachine.config) hw;
 
     # saiph options
     nbx = c.nb;
@@ -34,7 +35,7 @@ let
     time = "00:30:00";
     ntasksPerNode = 1;
     nodes = 1;
-    cpuBind = "sockets,verbose";
+    cpusPerTask = hw.cpusPerSocket;
     jobName = "${unitName}-${gitBranch}";
   };
 

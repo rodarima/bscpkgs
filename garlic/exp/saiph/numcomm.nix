@@ -18,6 +18,7 @@ let
   genConf = with bsc; c: targetMachine.config // rec {
     expName = "saiph.numcomm";
     unitName = "${expName}.nc-${toString numComm}";
+    inherit (targetMachine.config) hw;
 
     # saiph options
     inherit (c) numComm;
@@ -32,7 +33,7 @@ let
     time = "02:00:00";
     ntasksPerNode = 2;
     nodes = 1;
-    cpuBind = "sockets,verbose";
+    cpusPerTask = hw.cpusPerSocket;
     jobName = "saiph-${toString numComm}-${gitBranch}";
   };
 

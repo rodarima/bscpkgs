@@ -35,7 +35,7 @@ let
     nodes = 1;
     time = "02:00:00";
     # Assign one socket to each task (only one process)
-    cpuBind = "verbose,sockets";
+    cpusPerTask = hw.cpusPerSocket;
     jobName = unitName;
   };
 

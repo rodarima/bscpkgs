@@ -18,6 +18,7 @@ let
     expName = "${c.expName}.gen";
     unitName = "${expName}.n${toString n.x}";
 
+    inherit (targetMachine.config) hw;
     # hpcg options
     cc = bsc.icc;
     mcxx = bsc.mcxx;
@@ -36,7 +37,7 @@ let
     nodes = 1;
     time = "02:00:00";
     # task in one socket
-    cpuBind = "verbose,mask_cpu:0xffffff";
+    cpusPerTask = hw.cpusPerSocket;
     jobName = unitName;
   };
 
@@ -74,7 +75,7 @@ let
     inputTre = genExp configs;
     #inputExp = getExperimentStage inputTrebuchet;
     #inputExp = trace inputTrebuchet inputTrebuchet.nextStage;
-    inputExp = trace (inputTre.name) (getExperimentStage inputTre);
+    inputExp = getExperimentStage inputTre;
     # Then load the result. This is only used to ensure that we have the
     # results, so it has been executed.
     inputRes = resultFromTrebuchet inputTre;

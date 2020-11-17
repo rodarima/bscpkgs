@@ -29,22 +29,25 @@ let
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
+    expName = "creams-ss";
+    unitName = "${expName}-${toString nodes}-${gitBranch}";
+    inherit (targetMachine.config) hw;
     # Options for creams
     cc = icc;
     mpi = impi;
     inherit (c.input) granul;
     inherit (c) gitBranch;
-    nprocz = 2 * nodes;
+    nprocz = hw.socketsPerNode * nodes;
 
     # Repeat the execution of each unit 30 times
     loops = 30;
 
     # Resources
     qos = "debug";
-    ntasksPerNode = 2;
+    ntasksPerNode = hw.socketsPerNode;
     inherit (c.input) time nodes;
-    cpuBind = "socket,verbose";
-    jobName = "creams-ss-${toString nodes}-${gitBranch}";
+    cpusPerTask = hw.cpusPerSocket;
+    jobName = unitName;
   };
 
   # Compute the array of configurations

@@ -22,6 +22,9 @@ let
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
+    expName = "creams-ss";
+    unitName = "${expName}-${toString nodes}-${gitBranch}";
+    inherit (targetMachine.config) hw;
     # Options for creams
     cc = icc;
     mpi = impi;
@@ -36,8 +39,8 @@ let
     qos = "debug";
     ntasksPerNode = 48;
     inherit (c.input) time nodes;
-    cpuBind = "rank,verbose";
-    jobName = "creams-ss-${toString nodes}-${gitBranch}";
+    cpusPerTask = hw.cpusPerSocket;
+    jobName = unitName;
   };
 
   # Compute the array of configurations

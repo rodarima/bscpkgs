@@ -24,6 +24,7 @@ let
     expName = "hpcg.oss";
     unitName = "${expName}.nb${toString nblocks}";
 
+    inherit (targetMachine.config) hw;
     # hpcg options
     n = c.n;
     nblocks = c.nblocks;
@@ -42,7 +43,7 @@ let
     nodes = 1;
     time = "02:00:00";
     # task in one socket
-    cpuBind = "verbose,mask_cpu:0xffffff";
+    cpusPerTask = hw.cpusPerSocket;
     jobName = "hpcg-${toString n.x}-${toString n.y}-${toString n.z}-${gitBranch}";
   };
 
