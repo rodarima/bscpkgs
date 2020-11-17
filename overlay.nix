@@ -1,6 +1,8 @@
 self:  /* Future last stage */
 super: /* Previous stage */
 
+with self.lib;
+
 let
   inherit (self.lib) callPackageWith;
   inherit (self.lib) callPackagesWith;
@@ -10,10 +12,10 @@ let
   #  BSC Packages
   # --------------------------------------------------------- #
 
-  bsc = {
+  _bsc = makeExtensible (bsc: {
     # Default MPI implementation to use. Will be overwritten by the
     # experiments.
-    mpi = self.bsc.impi;
+    mpi = bsc.impi;
 
     perf = callPackage ./bsc/perf/default.nix {
       kernel = self.linuxPackages_4_9.kernel;
@@ -28,15 +30,15 @@ let
 
     mpich = callPackage ./bsc/mpich/default.nix { };
 
-    mpichDebug = self.bsc.mpich.override { enableDebug = true; };
+    mpichDebug = bsc.mpich.override { enableDebug = true; };
 
     # Updated version of libpsm2: TODO push upstream.
     #libpsm2 = callPackage ./bsc/libpsm2/default.nix { };
 
     # Default Intel MPI version is 2019 (the last one)
-    impi = self.bsc.intelMpi;
+    impi = bsc.intelMpi;
 
-    intelMpi = self.bsc.intelMpi2019;
+    intelMpi = bsc.intelMpi2019;
 
     intelMpi2019 = callPackage ./bsc/intel-mpi/default.nix {
       # Intel MPI provides a debug version of the MPI library, but
@@ -45,17 +47,17 @@ let
     };
 
     # By default we use Intel compiler 2020 update 1
-    iccUnwrapped = self.bsc.icc2020Unwrapped;
+    iccUnwrapped = bsc.icc2020Unwrapped;
 
     icc2020Unwrapped = callPackage ./bsc/intel-compiler/icc2020.nix {
-      intel-mpi = self.bsc.intelMpi;
+      intel-mpi = bsc.intelMpi;
     };
 
     # A wrapper script that puts all the flags and environment vars properly and
     # calls the intel compiler binary
     icc = callPackage ./bsc/intel-compiler/default.nix {
-      iccUnwrapped = self.bsc.iccUnwrapped;
-      intelLicense = self.bsc.intelLicense;
+      iccUnwrapped = bsc.iccUnwrapped;
+      intelLicense = bsc.intelLicense;
     };
 
     # We need to set the cc.cc.CC and cc.cc.CXX attributes, in order to
@@ -75,29 +77,29 @@ let
     pmix2 = callPackage ./bsc/pmix/pmix2.nix { };
 
     slurm17 = callPackage ./bsc/slurm/default.nix {
-      pmix = self.bsc.pmix2;
+      pmix = bsc.pmix2;
     };
 
     slurm17-libpmi2 = callPackage ./bsc/slurm/pmi2.nix {
-      pmix = self.bsc.pmix2;
+      pmix = bsc.pmix2;
     };
 
     # Use a slurm compatible with MN4
-    slurm = self.bsc.slurm17;
+    slurm = bsc.slurm17;
 
     openmpi-mn4 = callPackage ./bsc/openmpi/default.nix {
-      pmix = self.bsc.pmix2;
-      pmi2 = self.bsc.slurm17-libpmi2;
+      pmix = bsc.pmix2;
+      pmi2 = bsc.slurm17-libpmi2;
       enableCxx = true;
     };
 
-    openmpi = self.bsc.openmpi-mn4;
+    openmpi = bsc.openmpi-mn4;
 
     fftw = callPackage ./bsc/fftw/default.nix { };
 
     extrae = callPackage ./bsc/extrae/default.nix { };
 
-    tampi = self.bsc.tampiRelease;
+    tampi = bsc.tampiRelease;
     tampiRelease = callPackage ./bsc/tampi/default.nix { };
     tampiGit = callPackage ./bsc/tampi/git.nix { };
 
@@ -109,10 +111,10 @@ let
       bison = self.bison_3_5;
     };
 
-    mcxx = self.bsc.mcxxGit;
+    mcxx = bsc.mcxxGit;
 
     # Use nanos6 git by default
-    nanos6 = self.bsc.nanos6Git;
+    nanos6 = bsc.nanos6Git;
     nanos6Latest = callPackage ./bsc/nanos6/default.nix { };
     nanos6Git = callPackage ./bsc/nanos6/git.nix { };
 
@@ -147,17 +149,17 @@ let
     };
 
     clangOmpss2 = callPackage bsc/llvm-ompss2/default.nix {
-      clangOmpss2Unwrapped = self.bsc.clangOmpss2Unwrapped;
+      clangOmpss2Unwrapped = bsc.clangOmpss2Unwrapped;
     };
 
     stdenvOmpss2 = self.clangStdenv.override {
-      cc = self.bsc.clangOmpss2;
+      cc = bsc.clangOmpss2;
     };
 
     cpic = callPackage ./bsc/apps/cpic/default.nix {
-      stdenv = self.bsc.stdenvOmpss2;
-      mpi = self.bsc.mpi;
-      tampi = self.bsc.tampi;
+      stdenv = bsc.stdenvOmpss2;
+      mpi = bsc.mpi;
+      tampi = bsc.tampi;
     };
 
     mpptest = callPackage ./bsc/mpptest/default.nix { };
@@ -172,6 +174,12 @@ let
 
     garlicTools = callPackage ./garlic/tools.nix {};
 
+    # Aliases
+    apps = bsc.garlic.apps;
+    fig = bsc.garlic.fig;
+    exp = bsc.garlic.exp;
+    ds = bsc.garlic.ds;
+
     garlic = {
       # TODO: move into garlic/default.nix
 
@@ -179,19 +187,19 @@ let
       machines = callPackage ./garlic/machines.nix {};
 
       report = callPackage ./garlic/report.nix {
-        fig = self.bsc.garlic.fig;
+        fig = bsc.garlic.fig;
       };
       sedReport = callPackage ./garlic/sedReport.nix {
-        fig = self.bsc.garlic.fig;
+        fig = bsc.garlic.fig;
       };
 
       # Use the configuration for the following target machine
-      targetMachine = self.garlic.machines.mn4;
+      targetMachine = bsc.garlic.machines.mn4;
 
       # Load some helper functions to generate app variants
 
       stdexp = callPackage ./garlic/stdexp.nix {
-        inherit (self.garlic) targetMachine stages;
+        inherit (bsc.garlic) targetMachine stages;
       };
 
       # Apps for Garlic
@@ -199,23 +207,23 @@ let
       apps = {
 
         nbody = callPackage ./garlic/apps/nbody/default.nix {
-          cc = self.bsc.icc;
-          mpi = self.bsc.mpi;
-          tampi = self.bsc.tampi;
-          mcxx = self.bsc.mcxx;
+          cc = bsc.icc;
+          mpi = bsc.mpi;
+          tampi = bsc.tampi;
+          mcxx = bsc.mcxx;
           gitBranch = "garlic/seq";
         };
 
         saiph = callPackage ./garlic/apps/saiph/default.nix {
-          cc = self.bsc.clangOmpss2;
+          cc = bsc.clangOmpss2;
         };
 
         creams = callPackage ./garlic/apps/creams/default.nix {
           gnuDef   = self.gfortran10 ; # Default GNU   compiler version
-          intelDef = self.bsc.icc    ; # Default Intel compiler version
+          intelDef = bsc.icc    ; # Default Intel compiler version
           gitBranch = "garlic/mpi+send+seq";
-          cc  = self.bsc.icc; # self.bsc.icc OR self.gfortran10;
-          mpi = self.bsc.mpi; # self.bsc.mpi OR self.bsc.openmpi-mn4;
+          cc  = bsc.icc; # bsc.icc OR self.gfortran10;
+          mpi = bsc.mpi; # bsc.mpi OR bsc.openmpi-mn4;
         };
 
         creamsInput = callPackage ./garlic/apps/creams/input.nix {
@@ -223,25 +231,10 @@ let
         };
 
         hpcg = callPackage ./garlic/apps/hpcg/default.nix {
-          cc = self.bsc.icc;
-          mcxx = self.bsc.mcxx;
-          nanos6 = self.bsc.nanos6;
+          cc = bsc.icc;
+          mcxx = bsc.mcxx;
+          nanos6 = bsc.nanos6;
           gitBranch = "garlic/oss";
-
-          # cc = self.bsc.icc;
-          # gitBranch = "garlic/seq";
-
-          # cc = self.bsc.icc;
-          # mpi = self.bsc.mpi;
-          # gitBranch = "garlic/mpi";
-
-          # cc = self.bsc.icc;
-          # gitBranch = "garlic/omp";
-
-          # cc = self.bsc.icc;
-          # mpi = self.bsc.mpi;
-          # gitBranch = "garlic/mpi+omp";
-
         };
 
         heat = callPackage ./garlic/apps/heat/default.nix { };
@@ -253,8 +246,8 @@ let
 #
 #          # FIXME: Nanos6 fails to load if we are not using a compatible stdc++
 #          # version, so we use the same provided by gcc7
-#          mcxx = self.bsc.mcxx.override {
-#            nanos6 = self.bsc.nanos6.override {
+#          mcxx = bsc.mcxx.override {
+#            nanos6 = bsc.nanos6.override {
 #              stdenv = self.gcc7Stdenv;
 #            };
 #          };
@@ -290,7 +283,7 @@ let
       mpptest = callPackage ./garlic/mpptest { };
 
       ppong = callPackage ./garlic/ppong {
-        mpi = self.bsc.mpi;
+        mpi = bsc.mpi;
       };
 
       hist = callPackage ./garlic/pp/hist { };
@@ -300,7 +293,7 @@ let
       };
 
       # Post processing tools
-      pp = with self.bsc.garlicTools; rec {
+      pp = with bsc.garlicTools; rec {
         store = callPackage ./garlic/pp/store.nix { };
         resultFromTrebuchet = trebuchetStage: (store {
           experimentStage = getExperimentStage trebuchetStage;
@@ -346,10 +339,10 @@ let
           omp = callPackage ./garlic/exp/hpcg/omp.nix { };
           mpi_omp = callPackage ./garlic/exp/hpcg/mpi+omp.nix { };
           input = callPackage ./garlic/exp/hpcg/gen.nix {
-            inherit (self.bsc.garlic.pp) resultFromTrebuchet;
+            inherit (bsc.garlic.pp) resultFromTrebuchet;
           };
           oss = callPackage ./garlic/exp/hpcg/oss.nix {
-            genInput = self.bsc.garlic.exp.hpcg.input;
+            genInput = bsc.garlic.exp.hpcg.input;
           };
         };
 
@@ -359,7 +352,7 @@ let
       };
 
       # Datasets used in the figures
-      ds = with self.bsc.garlic; with pp; {
+      ds = with bsc.garlic; with pp; {
         nbody = with exp.nbody; {
           baseline = merge [ baseline ];
           jemalloc = merge [ baseline jemalloc ];
@@ -381,7 +374,7 @@ let
       };
 
       # Figures generated from the experiments
-      fig = with self.bsc.garlic; {
+      fig = with bsc.garlic; {
         nbody = {
           baseline = pp.rPlot {
             script = ./garlic/fig/nbody/baseline.R;
@@ -419,13 +412,12 @@ let
         };
       };
     };
-  };
+  });
 
 in
   {
-    bsc = bsc;
+    bsc = _bsc;
 
     # Aliases
-    garlic = bsc.garlic;
-    inherit (bsc.garlic) exp fig apps ds;
+    garlic = _bsc.garlic;
   }

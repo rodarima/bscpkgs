@@ -4,6 +4,7 @@
 , stages
 , targetMachine
 , garlicTools
+, bsc
 }:
 
 with stdenv.lib;
@@ -82,18 +83,8 @@ rec {
 
   stdPipeline = stdPipelineOverride {};
 
-  # FIXME: Remove this hack and allow custom nixpkgs
-  bscOverlay = import ../overlay.nix;
-  nixpkgs = import <nixpkgs>;
-  genPkgs = newOverlay: nixpkgs {
-    overlays = [
-      bscOverlay
-      newOverlay
-    ];
-  };
-
-  replaceMpi = mpi: genPkgs (self: super: {
-    bsc = super.bsc // { inherit mpi; };
+  replaceMpi = customMpi: bsc.extend (self: super: {
+    mpi = customMpi;
   });
 
   # Generate the experimental units
