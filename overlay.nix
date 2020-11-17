@@ -331,16 +331,20 @@ let
           };
         };
 
-        hpcg = {
-          serial = callPackage ./garlic/exp/hpcg/serial.nix { };
-          mpi = callPackage ./garlic/exp/hpcg/mpi.nix { };
-          omp = callPackage ./garlic/exp/hpcg/omp.nix { };
-          mpi_omp = callPackage ./garlic/exp/hpcg/mpi+omp.nix { };
-          input = callPackage ./garlic/exp/hpcg/gen.nix {
+        hpcg = rec {
+          #serial = callPackage ./garlic/exp/hpcg/serial.nix { };
+          #mpi = callPackage ./garlic/exp/hpcg/mpi.nix { };
+          #omp = callPackage ./garlic/exp/hpcg/omp.nix { };
+          #mpi_omp = callPackage ./garlic/exp/hpcg/mpi+omp.nix { };
+          #input = callPackage ./garlic/exp/hpcg/gen.nix {
+          #  inherit (bsc.garlic.pp) resultFromTrebuchet;
+          #};
+          genInput = callPackage ./garlic/exp/hpcg/gen.nix {
             inherit (bsc.garlic.pp) resultFromTrebuchet;
           };
+
           oss = callPackage ./garlic/exp/hpcg/oss.nix {
-            genInput = bsc.garlic.exp.hpcg.input;
+            inherit genInput;
           };
         };
 
