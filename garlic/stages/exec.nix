@@ -6,7 +6,9 @@
 {
   nextStage
 , env ? ""
+, pre ? ""
 , argv ? []
+, post ? ""
 }:
 
 with builtins;
@@ -14,6 +16,7 @@ with garlicTools;
 
 let
   argvString = concatStringsSep " " (map (e: toString e) argv);
+  execMethod = if (post == "") then "exec " else "";
 in
 stdenv.mkDerivation {
   name = "exec";
@@ -24,7 +27,9 @@ stdenv.mkDerivation {
     #!/bin/sh
     ${env}
 
-    exec ${stageProgram nextStage} ${argvString}
+    ''+pre+''
+    ${execMethod}${stageProgram nextStage} ${argvString}
+    ''+post+''
     EOF
     chmod +x $out
   '';
