@@ -39,6 +39,7 @@ let
 
   jsonConf = writeText "garlic_config.json" (builtins.toJSON conf);
 in
+  builtins.trace "evaluating unit ${conf.unitName}"
 stdenv.mkDerivation {
   name = "unit";
   preferLocalBuild = true;
