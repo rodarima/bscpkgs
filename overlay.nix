@@ -174,11 +174,8 @@ let
 
     garlicTools = callPackage ./garlic/tools.nix {};
 
-    # Aliases
-    apps = bsc.garlic.apps;
-    fig = bsc.garlic.fig;
-    exp = bsc.garlic.exp;
-    ds = bsc.garlic.ds;
+    # Aliases bsc.apps -> bsc.garlic.apps
+    inherit (bsc.garlic) apps fig exp ds;
 
     garlic = {
       # TODO: move into garlic/default.nix
@@ -417,7 +414,8 @@ let
 in
   {
     bsc = _bsc;
-
-    # Aliases
     garlic = _bsc.garlic;
+
+    # Aliases apps -> bsc.garlic.apps
+    inherit (_bsc.garlic) apps fig exp ds;
   }
