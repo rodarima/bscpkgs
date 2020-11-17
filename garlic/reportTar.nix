@@ -5,20 +5,24 @@
 , busybox
 , jq
 , texlive
-, sedReport
+, bundleReport
 }:
 let
-  sedCmd = (import sedReport) fig;
+
+  genCmd = (import bundleReport) fig;
 in
   stdenv.mkDerivation {
-    name = "report.pdf";
+    name = "report.tar.gz";
     src = ./report;
     buildInputs = [ jq texlive.combined.scheme-basic ];
     buildPhase = ''
-      ${sedCmd}
+      ${genCmd}
+      ls -ltR
+      cat report.tex
       make
     '';
     installPhase = ''
-      cp report.pdf $out
+      cd ..
+      tar -czf $out report
     '';
   }

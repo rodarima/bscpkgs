@@ -186,7 +186,16 @@ let
       report = callPackage ./garlic/report.nix {
         fig = bsc.garlic.fig;
       };
+
       sedReport = callPackage ./garlic/sedReport.nix {
+        fig = bsc.garlic.fig;
+      };
+
+      bundleReport = callPackage ./garlic/bundleReport.nix {
+        fig = bsc.garlic.fig;
+      };
+
+      reportTar = callPackage ./garlic/reportTar.nix {
         fig = bsc.garlic.fig;
       };
 
