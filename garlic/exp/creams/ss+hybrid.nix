@@ -37,7 +37,7 @@ let
     mpi = impi;
     inherit (c.input) granul;
     inherit (c) gitBranch;
-    nprocz = hw.socketsPerNode * nodes;
+    nprocz = ntasksPerNode * nodes;
 
     # Repeat the execution of each unit 30 times
     loops = 30;

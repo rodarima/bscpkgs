@@ -30,16 +30,16 @@ let
     mpi = impi;
     granul = 0;
     gitBranch = "garlic/mpi+send+seq";
-    nprocz = 48 * nodes;
+    nprocz = ntasksPerNode * nodes;
 
     # Repeat the execution of each unit 30 times
     loops = 30;
 
     # Resources
     qos = "debug";
-    ntasksPerNode = 48;
+    ntasksPerNode = hw.cpusPerNode;
     inherit (c.input) time nodes;
-    cpusPerTask = hw.cpusPerSocket;
+    cpusPerTask = 1;
     jobName = unitName;
   };
 
