@@ -357,6 +357,9 @@ let
         };
       };
 
+      allExperiments = self.writeText "experiments.json"
+        (builtins.toJSON bsc.garlic.exp);
+
       # Datasets used in the figures
       ds = with bsc.garlic; with pp; {
         nbody = with exp.nbody; {
