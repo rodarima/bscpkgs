@@ -37,6 +37,7 @@ mounts=(
 	-m /var/run/munge
 	# FIXME: We should only need nix and the output path
 	-m /gpfs/projects/bsc15
+	-m /gpfs/scratch/bsc15
 	-m /bin:@nixPrefix@@busybox@/bin
 )
 

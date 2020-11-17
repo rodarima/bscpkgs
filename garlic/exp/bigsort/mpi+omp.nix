@@ -11,8 +11,8 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    n = [ 1024 ];
-    bs = [ 256 ];
+    n = [ 134217728 ];
+    bs = [ 134217728 ];
   };
 
   # Generate the complete configuration for each unit
@@ -53,11 +53,12 @@ let
     argv = [
       "${toString n}"
       "${toString bs}"
-      "test"
-      "test2"
+      "/gpfs/scratch/bsc15/bsc15065/BigSort/1g_unsorted.dat"
+      "/gpfs/scratch/bsc15/bsc15065/BigSort/1g_sorted.dat"
+      "/gpfs/scratch/bsc15/bsc15065/BigSort/tmp"
       #"${toString inputFile}"
       #"${toString outputFile}"
-      "$TMPDIR"
+      #"$TMPDIR"
       "${toString (builtins.div bs 2)}"
     ];
   };
