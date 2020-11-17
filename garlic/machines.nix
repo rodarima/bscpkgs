@@ -18,6 +18,18 @@
         cachelineBytes = 64;
       };
     };
+
+    # Experimental naming convention for the FS
+    #fs = {
+    #  cluster = {
+    #    fast = "/gpfs/scratch/bsc15/bsc15557/garlic";
+    #    reliable = "/gpfs/projects/bsc15/garlic";
+    #  };
+    #  node = {
+    #    fast = "$TMPDIR";
+    #  };
+    #};
+
     # TODO: Add the specific details for SLURM and the interconection here
   };
 }
