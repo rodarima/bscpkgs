@@ -381,6 +381,11 @@ let
         heat = with exp.heat; {
           test = merge [ test ];
         };
+
+        creams = with exp.creams.ss; {
+          ss.hybrid = merge [ hybrid ];
+          ss.pure = merge [ pure ];
+        };
       };
 
       # Figures generated from the experiments
