@@ -312,9 +312,10 @@ let
           tampi = callPackage ./garlic/exp/nbody/tampi.nix { };
 
           # Experiment variants
-          medium = tampi.override { particles = 24 * 4096; };
-          baseline = medium;
-          freeCpu = baseline.override { freeCpu = true; };
+          baseline = tampi;
+          small = baseline.override { particles = 12 * 4096; };
+          # TODO: Update freeCpu using a non-standard pipeline
+          #freeCpu = baseline.override { freeCpu = true; };
           jemalloc = baseline.override { enableJemalloc = true; };
         };
 
@@ -357,7 +358,7 @@ let
         nbody = with exp.nbody; {
           baseline = merge [ baseline ];
           jemalloc = merge [ baseline jemalloc ];
-          freeCpu  = merge [ baseline freeCpu ];
+          #freeCpu  = merge [ baseline freeCpu ];
         };
 
         hpcg = with exp.hpcg; {
@@ -385,10 +386,10 @@ let
             script = ./garlic/fig/nbody/jemalloc.R;
             dataset = ds.nbody.jemalloc;
           };
-          freeCpu = pp.rPlot {
-            script = ./garlic/fig/nbody/freeCpu.R;
-            dataset = ds.nbody.freeCpu;
-          };
+          #freeCpu = pp.rPlot {
+          #  script = ./garlic/fig/nbody/freeCpu.R;
+          #  dataset = ds.nbody.freeCpu;
+          #};
         };
 
         hpcg = {

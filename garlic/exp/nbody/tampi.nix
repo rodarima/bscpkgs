@@ -4,64 +4,67 @@
 , bsc
 , targetMachine
 , stages
+, garlicTools
 , enableJemalloc ? false
-
-# Leave the first CPU per socket unused?
-, freeCpu ? false
-, particles ? 4096 * 24
+, particles ? null
 }:
 
 with stdenv.lib;
+with garlicTools;
 
 let
-  # Initial variable configuration
-  varConf = with bsc; {
-    nblocks = [ 12 24 48 96 192 384 768 ];
-  };
 
   machineConfig = targetMachine.config;
+  inherit (machineConfig) hw;
+
+  # Number of cases tested
+  steps = 7;
+
+  # First value for nblocks: we want to begin by using 1/2 blocks/cpu so we set
+  # the first number of blocks to cpusPerSocket / 2
+  nblocks0 = hw.cpusPerSocket / 2;
+
+  # Initial variable configuration
+  varConf = with bsc; {
+    # Create a list with values 2^n with n from 0 to (steps - 1) inclusive
+    i = expRange 2 0 (steps - 1);
+  };
+
+  # Set here the particles, so we don't have an infinite recursion in the
+  # genConf attrset.
+  _particles = if (particles != null)
+    then particles
+    else 4096 * hw.cpusPerSocket;
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
-    expName = "nbody.tampi";
-    unitName = "${expName}.nb-${toString nblocks}";
+    expName = "nbody-nblocks";
+    unitName = "${expName}${toString nblocks}";
 
     inherit (machineConfig) hw;
     # nbody options
-    inherit particles;
+    particles = _particles;
     timesteps = 10;
-    inherit (c) nblocks;
+    nblocks = c.i * nblocks0;
     totalTasks = ntasksPerNode * nodes;
     particlesPerTask = particles / totalTasks;
     blocksize = particlesPerTask / nblocks;
-    assert1 = assertMsg (nblocks >= hw.cpusPerSocket)
-      "nblocks too low: ${toString nblocks} < ${toString hw.cpusPerSocket}";
-    assert2 = assertMsg (particlesPerTask >= nblocks)
-      "too few particles: ${toString particlesPerTask} < ${toString nblocks}";
     cc = icc;
     mpi = impi;
     gitBranch = "garlic/tampi+send+oss+task";
     cflags = "-g";
     inherit enableJemalloc;
     
-    # Repeat the execution of each unit 30 times
+    # Repeat the execution of each unit 10 times
     loops = 10;
 
     # Resources
     qos = "debug";
+    cpusPerTask = hw.cpusPerSocket;
     ntasksPerNode = hw.socketsPerNode;
     nodes = 1;
-    time = "02:00:00";
 
-
-    # If we want to leave one CPU per socket unused
-    inherit freeCpu;
-
-    cpuBind = if (freeCpu)
-      then "verbose,mask_cpu:0xfffffe,0xfffffe000000"
-      else "verbose,sockets";
-
-    jobName = "bs-${toString blocksize}-${gitBranch}-nbody";
+    jobName = unitName;
   };
 
   # Compute the array of configurations
