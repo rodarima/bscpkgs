@@ -364,6 +364,7 @@ let
       ds = with bsc.garlic; with pp; {
         nbody = with exp.nbody; {
           baseline = merge [ baseline ];
+          small = merge [ small ];
           jemalloc = merge [ baseline jemalloc ];
           #freeCpu  = merge [ baseline freeCpu ];
         };
@@ -388,6 +389,10 @@ let
           baseline = pp.rPlot {
             script = ./garlic/fig/nbody/baseline.R;
             dataset = ds.nbody.baseline;
+          };
+          small = pp.rPlot {
+            script = ./garlic/fig/nbody/baseline.R;
+            dataset = ds.nbody.small;
           };
           jemalloc = pp.rPlot {
             script = ./garlic/fig/nbody/jemalloc.R;
