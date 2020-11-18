@@ -19,6 +19,7 @@ let
   genConf = with bsc; c: targetMachine.config // rec {
     expName = "bigsort.mpi+omp";
     unitName = "${expName}.bs${toString bs}";
+    inherit (targetMachine.config) hw;
 
     # hpcg options
     n = c.n;
@@ -35,8 +36,8 @@ let
     ntasksPerNode = 1;
     nodes = 1;
     time = "01:00:00";
-    # task in one socket
-    cpuBind = "verbose,mask_cpu:0xffffff";
+    # All CPUs of the socket to each task
+    cpusPerTask = hw.cpusPerSocket;
     jobName = "bigsort-${toString n}-${toString bs}-${gitBranch}";
   };
 
