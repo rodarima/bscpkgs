@@ -97,6 +97,13 @@ let
 
     fftw = callPackage ./bsc/fftw/default.nix { };
 
+    paraver = callPackage ./bsc/paraver/default.nix { };
+    paraverDebug = bsc.paraver.overrideAttrs (old:
+    {
+      dontStrip = true;
+      enableDebugging = true;
+    });
+
     extrae = callPackage ./bsc/extrae/default.nix { };
 
     tampi = bsc.tampiRelease;
