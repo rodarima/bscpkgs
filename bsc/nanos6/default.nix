@@ -1,43 +1,53 @@
 {
   stdenv
-, fetchurl
+, fetchFromGitHub
 , automake
 , autoconf
+, autoreconfHook
 , libtool
 , pkg-config
 , numactl
 , hwloc
 , papi
-#, gnumake
 , extrae
 , boost
+, enableJemalloc ? false
+, jemalloc ? null
+, cachelineBytes ? 64
 }:
 
 with stdenv.lib;
 
 stdenv.mkDerivation rec {
   pname = "nanos6";
-  version = "2.4";
+  version = "2.5";
 
-  src = fetchurl {
-    url = "https://pm.bsc.es/ftp/ompss-2/releases/ompss-2-2020.06.tar.gz";
-    sha256 = "0f9hy2avblv31wi4910x81wc47dwx8x9nd72y02lgrhl7fc9i2sf";
+  src = fetchFromGitHub {
+    owner = "bsc-pm";
+    repo = "nanos6";
+    rev = "version-${version}";
+    sha256 = "1wyr8liyz1l7rbf5flxihabasm887bq2jcp2csma7b9rhrfyhkm1";
   };
 
-  enableParallelBuilding = false;
-  preConfigure = ''
-    cd ${pname}-${version}
-    sed -i 's|/bin/echo|echo|g' loader/scripts/common.sh loader/scripts/lint/common.sh
+  prePatch = ''
+    patchShebangs scripts/generate_config.sh
   '';
 
-  configureFlags = [
-    "--with-symbol-resolution=indirect"
-  ];
+  enableParallelBuilding = true;
 
-  #configureFlags = []
-  #  ++ (if (extrae != null) then ["--with-extrae=${extrae}"] else [""]);
+  preConfigure = ''
+    export CACHELINE_WIDTH=${toString cachelineBytes}
+  '';
+
+  configureFlags = [] ++
+    optional enableJemalloc "--with-jemalloc=${jemalloc}";
+
+  # The "bindnow" flags are incompatible with ifunc resolution mechanism. We
+  # disable all by default, which includes bindnow.
+  hardeningDisable = [ "all" ];
 
   buildInputs = [
+    autoreconfHook
     autoconf
     automake
     libtool

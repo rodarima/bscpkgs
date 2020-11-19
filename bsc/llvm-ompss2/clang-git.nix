@@ -1,6 +1,6 @@
 {
   stdenv
-, fetchFromGitHub
+, fetchgit
 , cmake
 , lld
 , bash
@@ -10,22 +10,15 @@
 , libelf
 , libffi
 , pkg-config
-, enableDebug ? false
+, enableDebug ? true
 }:
 
 stdenv.mkDerivation rec {
-  version = "2020.11";
+  version = "${src.shortRev}";
   pname = "clang-ompss2";
-
-  src = fetchFromGitHub {
-    owner = "bsc-pm";
-    repo = "llvm";
-    rev = "github-release-${version}";
-    sha256 = "00z3xlw36lbiz84a47k95gin9fzsni5jd1f71dpg5l2qjy961qma";
-  };
-
   enableParallelBuilding = true;
   isClang = true;
+  #isGNU = true;
 
   passthru = {
     CC = "clang";
@@ -46,9 +39,6 @@ stdenv.mkDerivation rec {
     pkg-config
   ];
 
-  # Error with -D_FORTIFY_SOURCE=2, see https://bugs.gentoo.org/636604:
-  # /build/source/compiler-rt/lib/tsan/dd/dd_interceptors.cpp:225:20:
-  # error: redefinition of 'realpath'
   hardeningDisable = [ "fortify" ];
 
   cmakeBuildType = if enableDebug then "Debug" else "Release";
@@ -81,4 +71,9 @@ stdenv.mkDerivation rec {
 # nanos6 installation, but this is would require a recompilation of clang each
 # time nanos6 is changed. Better to use the environment variable NANOS6_HOME,
 # and specify nanos6 at run time.
+
+  src = builtins.fetchGit {
+    url = "ssh://git@bscpm02.bsc.es/llvm-ompss/llvm-mono.git";
+    ref = "master";
+  };
 }

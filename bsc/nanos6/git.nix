@@ -13,6 +13,7 @@
 , autoreconfHook
 , enableJemalloc ? false
 , jemalloc ? null
+, cachelineBytes ? 64
 }:
 
 with stdenv.lib;
@@ -21,12 +22,10 @@ stdenv.mkDerivation rec {
   pname = "nanos6";
   version = "${src.shortRev}";
   branch = "master";
-  cacheline-width = "64";
 
   src = builtins.fetchGit {
     url = "ssh://git@bscpm02.bsc.es/nanos6/nanos6";
     ref = branch;
-    rev = "bd306f903c7a4396f579402666082f5a7c34570b";
   };
 
   prePatch = ''
@@ -36,7 +35,7 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   preConfigure = ''
-    export CACHELINE_WIDTH=${cacheline-width}
+    export CACHELINE_WIDTH=${toString cacheline-width}
     export NANOS6_GIT_VERSION=${src.rev}
     export NANOS6_GIT_BRANCH=${branch}
   '';
@@ -54,7 +53,6 @@ stdenv.mkDerivation rec {
     automake
     libtool
     pkg-config
-    perl
     boost
     numactl
     hwloc

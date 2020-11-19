@@ -1,4 +1,6 @@
-{ stdenv
+{
+  stdenv
+, fetchFromGitHub
 , autoreconfHook
 , nanos6
 , gperf
@@ -13,17 +15,19 @@
 
 stdenv.mkDerivation rec {
   pname = "mcxx";
-  version = "${src.shortRev}";
+  version = "2.3-8e998824";
 
   passthru = {
     CC = "mcc";
     CXX = "mcxx";
   };
 
-  # Use patched Extrae version
-  src = builtins.fetchGit {
-    url = "https://github.com/bsc-pm/mcxx";
-    ref = "master";
+  # mcxx doesn't use tags, so we pick the same version of the ompss2 release
+  src = fetchFromGitHub {
+    owner = "bsc-pm";
+    repo = pname;
+    rev = "8e998824f0fde001340dbec369ef59e40e53761e";
+    sha256 = "0ix20l50m52kcw12a6dhrasgzjjc2y73j55c994sbhyd133n3pln";
   };
 
   enableParallelBuilding = true;

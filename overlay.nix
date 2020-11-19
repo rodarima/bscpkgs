@@ -111,19 +111,14 @@ let
     tampiRelease = callPackage ./bsc/tampi/default.nix { };
     tampiGit = callPackage ./bsc/tampi/git.nix { };
 
-    mcxxGit = callPackage ./bsc/mcxx/default.nix {
-      bison = self.bison_3_5;
-    };
-
+    mcxx = bsc.mcxxRelease;
+    mcxxRelease = callPackage ./bsc/mcxx/default.nix { };
     mcxxRarias = callPackage ./bsc/mcxx/rarias.nix {
       bison = self.bison_3_5;
     };
 
-    mcxx = bsc.mcxxGit;
-
-    # Use nanos6 git by default
-    nanos6 = bsc.nanos6Git;
-    nanos6Latest = callPackage ./bsc/nanos6/default.nix { };
+    nanos6 = bsc.nanos6Release;
+    nanos6Release = callPackage ./bsc/nanos6/default.nix { };
     nanos6Git = callPackage ./bsc/nanos6/git.nix { };
 
     jemalloc = self.jemalloc.overrideAttrs (old:
@@ -135,7 +130,7 @@ let
       ];
     });
 
-    nanos6Jemalloc = callPackage ./bsc/nanos6/git.nix {
+    nanos6Jemalloc = nanos6.override {
       enableJemalloc = true;
     };
 
@@ -189,7 +184,7 @@ let
       # TODO: move into garlic/default.nix
 
       # Configuration for the machines
-      machines = callPackage ./garlic/machines.nix {};
+      machines = callPackage ./garlic/machines.nix { };
 
       report = callPackage ./garlic/report.nix {
         fig = bsc.garlic.fig;
