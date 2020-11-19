@@ -97,6 +97,7 @@ let
 
     fftw = callPackage ./bsc/fftw/default.nix { };
 
+    wxpropgrid = callPackage ./bsc/wxpropgrid/default.nix { };
     paraver = callPackage ./bsc/paraver/default.nix { };
     paraverDebug = bsc.paraver.overrideAttrs (old:
     {

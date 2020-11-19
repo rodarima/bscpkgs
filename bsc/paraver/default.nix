@@ -5,13 +5,14 @@
 , libxml2
 , xml2
 , fetchurl
-, wxGTK31
+, wxGTK28
 , autoconf
 , automake
+, wxpropgrid
 }:
 
 let
-  wx = wxGTK31;
+  wx = wxGTK28;
 in
 stdenv.mkDerivation rec {
   pname = "wxparaver";
@@ -36,9 +37,9 @@ stdenv.mkDerivation rec {
     # Patch shebang as /usr/bin/env is missing in nix
     sed -i '1c#!/bin/sh' src/paraver-cfgs/install.sh
 
-    sed -i '1524d' src/wxparaver/src/gtimeline.cpp
-    sed -i '806d' src/wxparaver/src/gtimeline.cpp
-    sed -i '142d' src/wxparaver/src/paravermain.cpp
+    #sed -i '1524d' src/wxparaver/src/gtimeline.cpp
+    #sed -i '806d' src/wxparaver/src/gtimeline.cpp
+    #sed -i '142d' src/wxparaver/src/paravermain.cpp
   '';
   #TODO: Move the sed commands to proper patches (and maybe send them upstream?)
 
@@ -51,6 +52,7 @@ stdenv.mkDerivation rec {
   configureFlags = [
     "--with-boost=${boost}"
     "--with-wx-config=${wx}/bin/wx-config"
+    "--with-wxpropgrid-dir=${wxpropgrid}"
   ];
 
   buildInputs = [
