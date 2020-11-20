@@ -246,11 +246,20 @@ let
           gitBranch = "garlic/oss";
         };
 
-	bigsort = callPackage ./garlic/apps/bigsort/default.nix {
-	  cc = self.bsc.icc;
-	  mpi = self.bsc.mpi;
-	  gitBranch = "garlic/mpi+send+omp+task";
-	};
+        bigsort = {
+          sort = callPackage ./garlic/apps/bigsort/default.nix {
+            gitBranch = "garlic/mpi+send+omp+task";
+            cc = bsc.icc;
+          };
+
+          genseq = callPackage ./garlic/apps/bigsort/genseq.nix {
+            cc = bsc.icc;
+          };
+
+          shuffle = callPackage ./garlic/apps/bigsort/shuffle.nix {
+            cc = bsc.icc;
+          };
+        };
 
         heat = callPackage ./garlic/apps/heat/default.nix { };
 #        heat = callPackage ./garlic/apps/heat/default.nix {
