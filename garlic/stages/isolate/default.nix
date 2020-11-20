@@ -9,10 +9,16 @@
   nextStage
 , nixPrefix
 , clusterName ? "mn4"
+, extraMounts ? []
 }:
 
 with garlicTools;
+with builtins;
 
+let
+  slashM = map (line: "-m ${line}") extraMounts;
+  extraMountOptions = concatStringsSep "\n" slashM;
+in
 stdenv.mkDerivation {
   name = "isolate";
   preferLocalBuild = true;
@@ -20,7 +26,7 @@ stdenv.mkDerivation {
   src = ./.;
   dontPatchShebangs = true;
   programPath = "/bin/stage1";
-  inherit nixPrefix clusterName nixtools busybox;
+  inherit nixPrefix clusterName nixtools busybox extraMountOptions;
   inherit nextStage;
   program = stageProgram nextStage;
   desc = "#  $out\n" + (if builtins.hasAttr "desc" nextStage then nextStage.desc else "");

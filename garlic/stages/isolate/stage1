@@ -19,6 +19,7 @@ env=(
   $(env | grep ^PMI || true)
   $(env | grep ^GARLIC || true)
   $(env | grep ^USER || true)
+  $(env | grep ^TMPDIR || true)
   HOME="/homeless-shelter"
 )
 
@@ -39,6 +40,7 @@ mounts=(
 	-m /gpfs/projects/bsc15
 	-m /gpfs/scratch/bsc15
 	-m /bin:@nixPrefix@@busybox@/bin
+  @extraMountOptions@
 )
 
 join_flags="${mounts[@]}"

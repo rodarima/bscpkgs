@@ -75,11 +75,17 @@ rec {
       }
     );
 
-    isolate = {nextStage, conf, ...}: stages.isolate {
-      clusterName = machineConf.name;
-      inherit (conf) nixPrefix;
-      inherit nextStage;
-    };
+    isolate = {nextStage, conf, ...}: stages.isolate (
+      (
+        if (conf ? extraMounts) then { inherit (conf) extraMounts; }
+        else {}
+      ) //
+      {
+        clusterName = machineConf.name;
+        inherit (conf) nixPrefix;
+        inherit nextStage;
+      }
+    );
   };
 
   stdPipelineOverride = {overrides ? {}}:
