@@ -23,7 +23,7 @@ stdenv.mkDerivation {
   preferLocalBuild = true;
   phases = [ "installPhase" ];
   installPhase = ''
-    cat > $out <<EOF
+    cat > $out <<'EOF'
     #!/bin/sh
     ${env}
 
