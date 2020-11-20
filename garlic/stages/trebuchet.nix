@@ -20,6 +20,9 @@ stdenv.mkDerivation {
   preferLocalBuild = true;
   dontPatchShebangs = true;
   inherit nextStage;
+
+  experiment = getExperimentStage nextStage;
+
   installPhase = ''
     cat > $out <<EOF
     #!/bin/sh -e
