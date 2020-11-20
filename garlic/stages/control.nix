@@ -19,6 +19,7 @@ stdenv.mkDerivation {
     cat > $out <<EOF
     #!/bin/sh
     for n in \$(seq 1 ${toString loops}); do
+      export GARLIC_RUN="\$n"
       echo "running \$n of ${toString loops}" > status
       mkdir "\$n"
       cd "\$n"
