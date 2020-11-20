@@ -379,8 +379,24 @@ let
           test = callPackage ./garlic/exp/heat/test.nix { };
         };
 
-	bigsort = {
-	  test = callPackage ./garlic/exp/bigsort/mpi+omp.nix { };
+	bigsort = rec {
+          genseq = callPackage ./garlic/exp/bigsort/genseq.nix {
+            n = toString (1024 * 1024 * 1024 / 8); # 1 GB input size
+            dram = toString (1024 * 1024 * 1024); # 1 GB chunk
+          };
+
+          shuffle = callPackage ./garlic/exp/bigsort/shuffle.nix {
+            inputTre = genseq;
+            n = toString (1024 * 1024 * 1024 / 8); # 1 GB input size
+            dram = toString (1024 * 1024 * 1024); # 1 GB chunk
+            inherit (bsc.garlic.pp) resultFromTrebuchet;
+          };
+
+          sort = callPackage ./garlic/exp/bigsort/sort.nix {
+            inputTre = shuffle;
+            inherit (bsc.garlic.pp) resultFromTrebuchet;
+            removeOutput = false;
+          };
 	};
 
         slurm = {
