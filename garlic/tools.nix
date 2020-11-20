@@ -40,7 +40,9 @@ let
       else "${stage}";
 
     /* Given a trebuchet, returns the experiment */
-    getExperimentStage = drv: drv.nextStage.nextStage.nextStage;
+    getExperimentStage = drv:
+      if (drv ? isExperiment) && drv.isExperiment then drv
+      else getExperimentStage drv.nextStage;
 
     # Computes the exponentiation operation
     pow = x: n: fold (a: b: a*b) 1 (map (a: x) (range 1 n));

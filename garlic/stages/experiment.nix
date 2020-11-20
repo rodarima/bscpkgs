@@ -24,6 +24,8 @@ stdenv.mkDerivation {
   dontPatchShebangs = true;
   inherit units;
 
+  isExperiment = true;
+
   installPhase = ''
     cat > $out << EOF
     #!/bin/sh
