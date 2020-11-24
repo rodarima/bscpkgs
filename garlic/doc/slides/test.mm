@@ -79,7 +79,161 @@ Experiments run on demand based on article \fBfigures\fP
 Fast pkg overrides (MPI)
 .LE 1
 .\"==================================================================
-.NS "Execution pipeline (review)"
+.NS "Overview"
+Dependency graph of a complete experiment that produces a figure. Each box
+is a derivation and arrows represent \fBbuild dependencies\fP.
+.DS CB
+.S -3.5
+.PS
+circlerad=0.3;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+P: box "Program"
+arrow
+box "..."
+arrow
+T: box "Trebuchet"
+arrow
+box "Result" "(MN4)" dashed
+arrow
+R: box "ResultTree"
+arrow
+box "..."
+arrow
+F: box "Figure"
+arrow <-> from P.nw + (0, 0.2) to T.ne + (0, 0.2) \
+"Execution pipeline (EP)" above
+arrow <-> from R.nw + (0, 0.2) to F.ne + (0, 0.2) \
+"Postprocess pipeline (PP)" above
+.PE
+.S P P
+.DE
+.P
+The \fBResult\fP is not covered by nix (yet). This is what it looks like
+when executed:
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+circle "Build EP"
+arrow
+circle "Run EP"
+arrow
+box "Result" "(MN4)" dashed
+arrow
+circle "Fetch"
+arrow
+R: box "ResultTree"
+arrow
+circle "Build PP"
+arrow
+F: box "Figure"
+.PE
+.S P P
+.DE
+.P
+Notice dependency order is not the same as execution order.
+.\"==================================================================
+.NS "Building the execution pipeline (EP)"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+B: circle "Build EP" fill
+arrow
+R: circle "Run EP"
+arrow
+box "Result" "(MN4)" dashed
+arrow
+circle "Fetch"
+arrow
+box "ResultTree"
+arrow
+circle "Build PP"
+arrow
+F: box "Figure"
+arrow from B.w + (0, 0.35) to F.e + (0, 0.35) \
+"Order or execution" above
+.PE
+.S P P
+.DE
+.P
+Run nix-build with the experiment name:
+.P
+.VERBON
+xeon07$ nix-build -A exp.nbody.baseline
+\&...
+/nix/store/5zhmdzi5mf0mfsran74cxngn07ba522m-trebuchet
+.VERBOFF
+.P
+Outputs the first stage (the trebuchet). All other stages
+are built as dependencies, as they are required to build the trebuchet.
+.\"==================================================================
+.NS "Running the EP"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+B: circle "Build EP"
+arrow
+R: circle "Run EP" fill
+arrow
+box "Result" "(MN4)" dashed
+arrow
+circle "Fetch"
+arrow
+box "ResultTree"
+arrow
+circle "Build PP"
+arrow
+F: box "Figure"
+circlerad=0.2;
+linewid=0.3;
+T: circle at B + (0,-1.3) "trebu."
+arrow
+circle "runexp"
+arrow
+circle "isolate"
+arrow
+circle "exp."
+arrow
+circle "..."
+arrow
+circle "exec"
+arrow
+P: circle "program"
+line from R.sw to T.nw dashed
+line from R.se to P.n dashed
+arrow <-> from T.w - (0, 0.35) to P.e - (0, 0.35) \
+"Execution pipeline stages" below
+arrow from B.w + (0, 0.35) to F.e + (0, 0.35) \
+"Order or execution" above
+.PE
+.S P P
+.DE
+.SP 1m
+.P
+The stages are launched sequentially. Let see what happens in each one.
+.\"==================================================================
+.NS "Execution pipeline"
 .2C
 List of stages required to run the program of the experiment:
 .BL
@@ -102,6 +256,8 @@ if there are several instances running in parallel and
 if is part of the standard execution pipeline.
 .LE
 .S P P
+.P
+Sorted by the \fBexecution order\fP.
 .\" Go to the next column
 .NCOL
 .KF
@@ -659,19 +815,18 @@ r  lw(5.5m)  c  c  c  c  c.
 	_	_	_	_	_	_
 	Stage     	Target	Safe	Copies	User	Std
 	_	_	_	_	_	_
-	trebuchet	xeon	no	no	yes	yes
-	runexp  	login	no	no	yes	yes
-	isolate 	login	no	no	no	yes
-	experiment	login	yes	no	no	yes
-	unit    	login	yes	no	no	yes
-	sbatch  	login	yes	no	no	yes
+\(rh	\fBtrebuchet\fP	xeon	no	no	yes	\fByes\fP
+\(rh	\fBrunexp\fP  	login	no	no	yes	\fByes\fP
+\(rh	\fBisolate\fP 	login	no	no	no	\fByes\fP
+\(rh	\fBexperiment\fP	login	yes	no	no	\fByes\fP
+\(rh	\fBunit\fP    	login	yes	no	no	\fByes\fP
+\(rh	\fBsbatch\fP  	login	yes	no	no	\fByes\fP
 	_	_	_	_	_	_
-	isolate 	comp	no	no	no	yes
-	control 	comp	yes	no	no	yes
-	srun    	comp	yes	no	no	yes
-	isolate 	comp	no	yes	no	yes
+\(rh	\fBisolate\fP 	comp	no	no	no	\fByes\fP
+\(rh	\fBcontrol\fP 	comp	yes	no	no	\fByes\fP
+\(rh	\fBsrun\fP    	comp	yes	no	no	\fByes\fP
+\(rh	\fBisolate\fP 	comp	no	yes	no	\fByes\fP
 	_	_	_	_	_	_
-\m[white]\(rh\m[]\
 	exec    	comp	yes	yes	no	no
 	program    	comp	yes	yes	no	no
 	_	_	_	_	_	_
@@ -735,123 +890,579 @@ r  lw(5.5m)  c  c  c  c  c.
 .KE
 .1C
 .\"==================================================================
-.NS "Generating figures"
-The postprocess pipeline takes the results of the execution and produces
-figures or tables to be used in a publication.
+.NS "Running the EP"
 .DS CB
-.PS 5.3
-circlerad=0.3;
-ellipsewid=1.2;
+.S -3.5
+.PS
+circlerad=0.25;
 linewid=0.3;
-boxwid=1;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
 right
-box "Experiment"
+B: circle "Build EP"
 arrow
-ellipse "Execution"
+R: circle "Run EP" fill
 arrow
-box "Result"
+box "Result" "(MN4)" dashed
 arrow
-ellipse "Postprocess"
+circle "Fetch"
 arrow
-box "Figure"
+box "ResultTree"
+arrow
+circle "Build PP"
+arrow
+F: box "Figure"
+arrow from B.w + (0, 0.35) to F.e + (0, 0.35) \
+"Order or execution" above
 .PE
+.S P P
 .DE
-.P
-Once the results are available, multiple figures can be created without
-re-running the experiment.
-.P
-The postprocess pipeline is \fBexperimental\fP; there is no standard
-yet.
-.\"==================================================================
-.NS "Executing experiments"
 .P
 We cannot access MN4 from nix, as it doesn't has the SSH keys nor
 network access when building derivations.
 .P
 The garlic(1) tool is used to run experiments and fetch the results. See
 the manual for details.
-.P
-.VERBON
-xeon07$ nix-build -A fig.nbody.small
-\&...
-/tmp/garlic/1qcc44lx2nxwi7rmr6389sksq3gwy9w5-experiment: not found
-Run the experiment and fetch the results with:
-
-\f[CB]garlic -RFv /nix/store/5zhmdzi5mf0mfsran74cxngn07ba522m-trebuchet\fP
-
-See garlic(1) for more details.
-cannot continue building /nix/store/jql4...2cb0-resultTree, aborting
-.VERBOFF
 .\"==================================================================
-.NS "Executing experiments"
+.NS "Running the EP"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+B: circle "Build EP"
+arrow
+R: circle "Run EP" fill
+arrow
+box "Result" "(MN4)" dashed
+arrow
+circle "Fetch"
+arrow
+box "ResultTree"
+arrow
+circle "Build PP"
+arrow
+F: box "Figure"
+arrow from B.w + (0, 0.35) to F.e + (0, 0.35) \
+"Order or execution" above
+.PE
+.S P P
+.DE
 .P
-To run an experiment use \fB-R\fP and provide the trebuchet path:
+To launch the EP use \fBgarlic -R\fP and provide the trebuchet path:
 .P
 .VERBON
-xeon07$ garlic -Rv /nix/store/5zh...22m-trebuchet
+.S -2
+xeon07$ garlic -Rv /nix/store/5zhmdzi5mf0mfsran74cxngn07ba522m-trebuchet
 Running experiment 1qcc...9w5-experiment
 sbatch: error: spank: x11.so: Plugin file not found
 Submitted batch job 12719522
 \&...
 xeon07$ 
+.S P P
 .VERBOFF
 .P
-Once the experiment is submited, you can leave the session: it will run
+Once the jobs are submited, you can leave the session: it will run
 in MN4 automatically at some point.
 
 .\"==================================================================
-.NS "Executing experiments"
+.NS "Execution complete"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+B: circle "Build EP"
+arrow
+R: circle "Run EP"
+arrow
+box "Result" "(MN4)" dashed fill
+arrow
+circle "Fetch"
+arrow
+box "ResultTree"
+arrow
+circle "Build PP"
+arrow
+F: box "Figure"
+arrow from B.w + (0, 0.35) to F.e + (0, 0.35) \
+"Order or execution" above
+.PE
+.S P P
+.DE
 .P
-To wait and fetch the results, use \fB-F\fP:
+When the EP is complete, the generated results are stored in MN4.
+.P
+As stated previously, nix cannot access MN4 (yet), so we need to manually
+fetch the results.
+.\"==================================================================
+.NS "Fetching the results"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+B: circle "Build EP"
+arrow
+R: circle "Run EP"
+arrow
+box "Result" "(MN4)" dashed
+arrow
+circle "Fetch" fill
+arrow
+box "ResultTree"
+arrow
+circle "Build PP"
+arrow
+F: box "Figure"
+arrow from B.w + (0, 0.35) to F.e + (0, 0.35) \
+"Order or execution" above
+.PE
+.S P P
+.DE
+.P
+To fetch the results, use \fBgarlic -F\fP:
 .P
 .VERBON
-xeon07$ garlic -Fv /nix/store/5zhmd...522m-trebuchet
+.S -3.5
+xeon07$ garlic -Fv /nix/store/5zhmdzi5mf0mfsran74cxngn07ba522m-trebuchet
 /mnt/garlic/bsc15557/out/1qc...9w5-experiment: checking units
 3qnm6drx5y95kxrr43gnwqz8v4x641c7-unit: running 7 of 10
 awd3jzbcw0cwwvjrcrxzjvii3mgj663d-unit: completed
 bqnnrwcbcixag0dfflk1zz34zidk97nf-unit: no status
-l32097db7hbggvj7l5hz44y1glzz6jcy-unit: no status
-n1a26qa13fdz0ih1gg1m0wfcybs71hm9-unit: completed
-rywcwvnpz3mk0gyp5dzk94by3q1h3ljp-unit: completed
-yl8ygadghd1fyzjwab3csd8hq1q93cw3-unit: completed
 \&...
 /mn...w5-experiment: \f[CB]execution complete, fetching results\fP
 these derivations will be built:
   /nix/store/mqdr...q4z-resultTree.drv
 \&...
 \f[CB]/nix/store/jql41hms1dr49ipbjcw41i4dj4pq2cb0-resultTree\fP
+.S P P
 .VERBOFF
+.P
+Notice that if the experiments are still running, it waits for the
+completion of all units first.
 .\"==================================================================
-.NS "Execution"
-The dependency graph shows the role of the garlic tool:
+.NS "Fetching the results"
 .DS CB
+.S -3.5
 .PS
-scale=1;
 circlerad=0.25;
 linewid=0.3;
-diag=linewid + circlerad;
-far=circlerad*3 + linewid*4
-circle "Prog"
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+B: circle "Build EP"
 arrow
-E: circle "EP"
-R: circle "Result" at E + (far,0)
-RUN: circle "Run" at E + (diag,-diag) dashed
-FETCH: circle "Fetch" at R + (-diag,-diag) dashed
-move to R.e
+R: circle "Run EP"
 arrow
-P: circle "PP"
+box "Result" "(MN4)" dashed
 arrow
-circle "Plot"
-arrow dashed from E to RUN chop
-arrow dashed from RUN to FETCH chop
-arrow dashed from FETCH to R chop
-arrow from E to R chop
+circle "Fetch"
+arrow
+box "ResultTree" fill
+arrow
+circle "Build PP"
+arrow
+F: box "Figure"
+arrow from B.w + (0, 0.35) to F.e + (0, 0.35) \
+"Order or execution" above
 .PE
+.S P P
 .DE
-With the two pipelines
-.BL
+.P
+.VERBON
+.S -3.5
+\&...
+\f[CB]/nix/store/jql41hms1dr49ipbjcw41i4dj4pq2cb0-resultTree\fP
+.S P P
+.VERBOFF
+.P
+When the fetch operation success, the \fBresultTree\fP derivation is
+built, with the \fBlogs\fP of the execution.
+.P
+All other generated data is \fBignored by now\fP, as we don't want to
+store large files in the nix store of xeon07.
+.\"==================================================================
+.NS "Running and fetching"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+B: circle "Build EP"
+arrow
+R: circle "Run EP" fill
+arrow
+box "Result" "(MN4)" dashed fill
+arrow
+circle "Fetch" fill
+arrow
+box "ResultTree" fill
+arrow
+circle "Build PP"
+arrow
+F: box "Figure"
+arrow from B.w + (0, 0.35) to F.e + (0, 0.35) \
+"Order or execution" above
+.PE
+.S P P
+.DE
+.P
+You can run an experiment and fetch the results with \fBgarlic -RF\fP in
+one go:
+.P
+.VERBON
+.S -2
+xeon07$ garlic -RF /nix/store/5zhmdzi5mf0mfsran74cxngn07ba522m-trebuchet
+.S P P
+.VERBOFF
+.P
+Remember that you can interrupt the fetching while is waiting, and come
+later if the experiment takes too long.
+.P
+If nix tries to build \fBResultTree\fP and doesn't find the experiment
+results, it will tell you to run this command to run and fetch the
+experiment. Example: building the figure before running the experiment:
+.P
+.VERBON
+.S -2
+xeon07$ nix-build -A fig.nbody.baseline
+.S P P
+.VERBOFF
+.\"==================================================================
+.NS "Postprocess pipeline (PP)"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+B: circle "Build EP"
+arrow
+R: circle "Run EP"
+arrow
+box "Result" "(MN4)" dashed
+arrow
+circle "Fetch"
+arrow
+box "ResultTree"
+arrow
+circle "Build PP" fill
+arrow
+F: box "Figure"
+arrow from B.w + (0, 0.35) to F.e + (0, 0.35) \
+"Order or execution" above
+.PE
+.S P P
+.DE
+.P
+Once the \fBresultTree\fP derivation is built, multiple figures can be created
+without re-running the experiment.
+.P
+The postprocess pipeline is formed of several stages as well, but is
+considered \fBexperimental\fP; there is no standard yet.
+.P
+It only needs to be built, as nix can perform all tasks to create the
+figures (no manual intervention)
+.\"==================================================================
+.NS "Building the postprocess pipeline (PP)"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+B: circle "Build EP"
+arrow
+circle "Run EP"
+arrow
+box "Result" "(MN4)" dashed
+arrow
+circle "Fetch"
+arrow
+R: box "ResultTree"
+arrow
+PP: circle "Build PP" fill
+arrow
+F: box "Figure"
+circlerad=0.2;
+linewid=0.3;
+T: box at R + (-0.02,-0.8) "timetable"
+arrow
+box "merge"
+arrow
+P: box "rPlot"
+line from PP.sw to T.n dashed
+line from PP.se to P.n dashed
+arrow <-> from T.w - (0, 0.35) to P.e - (0, 0.35) \
+ "Execution pipeline stages" below
+arrow from B.w + (0, 0.35) to F.e + (0, 0.35) \
+ "Order or execution" above
+.PE
+.S P P
+.DE
+.P
+To build the figure, only three stages are required: timetable, merge
+and rPlot.
+.\"==================================================================
+.NS "PP stages: timetable"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+box "timetable" fill
+arrow
+box "merge"
+arrow
+P: box "rPlot"
+.PE
+.S P P
+.DE
+.P
+The timetable transforms the logs of the execution into a NDJSON file,
+which contains all the unit configuration and the execution time in one
+line in JSON:
+.P
+.VERBON
+.S -2
+{ "unit":"...", "experiment":"...", "run":1, "config":{...}, "time":1.2345 }
+{ "unit":"...", "experiment":"...", "run":2, "config":{...}, "time":1.2333 }
+{ "unit":"...", "experiment":"...", "run":3, "config":{...}, "time":1.2323 }
+.S P P
+.VERBOFF
+.P
+This format allows R (and possibly other programs) to load \fBall\fP
+information regarding the experiment configuration into a table.
+.P
+It requires the execution logs to contain a line with the time:
+.P
+.VERBON
+.S -2
+time 1.2345
+.S P P
+.VERBOFF
+.\"==================================================================
+.NS "PP stages: merge"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+box "timetable"
+arrow
+box "merge" fill
+arrow
+P: box "rPlot"
+.PE
+.S P P
+.DE
+.P
+The merge stage allows multiple results of several experiments to be
+merged in one dataset.
+.P
+In this way, multiple results can be presented in one figure.
+.P
+It simple concatenates all the NDJSON files together.
+.P
+This stage can be build directly with:
+.P
+.VERBON
+$ nix-build ds.nbody.baseline
+.VERBOFF
+.P
+So you can inspect the dataset and play with it before generating the
+plots (is automatically built by nix as a dependency).
+.\"==================================================================
+.NS "PP stages: rPlot"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+box "timetable"
+arrow
+box "merge"
+arrow
+P: box "rPlot" fill
+.PE
+.S P P
+.DE
+.P
+Finally, the rPlot stage runs a R script that loads the NDJSON dataset
+and generates some plots.
+.\"==================================================================
+.NS "Building the figures"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.25;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+B: circle "Build EP"
+arrow
+circle "Run EP"
+arrow
+box "Result" "(MN4)" dashed
+arrow
+circle "Fetch"
+arrow
+R: box "ResultTree"
+arrow
+PP: circle "Build PP"
+arrow
+F: box "Figure" fill
+arrow from B.w + (0, 0.35) to F.e + (0, 0.35) \
+ "Order or execution" above
+.PE
+.S P P
+.DE
+.P
+The complete PP and the figures can be build by using:
+.P
+.VERBON
+xeon07$ nix-build -A fig.nbody.baseline
+.VERBOFF
+.P
+A interactive R shell can be used to play with the presentation of the
+plots:
+.P
+.VERBON
+xeon07$ nix-shell garlic/fig/dev/shell.nix
+$ cp /nix/store/...-merge.json input.json
+$ R
+> source("garlic/fig/nbody/baseline.R")
+.VERBOFF
+.P
+More about this later.
+.\"==================================================================
+.NS "Figure dependencies"
+.DS CB
+.S -3.5
+.PS
+circlerad=0.3;
+linewid=0.3;
+boxwid=0.52;
+boxht=0.35;
+fillval=0.2;
+right
+P: box "Program"
+arrow
+box "..."
+arrow
+T: box "Trebuchet"
+arrow
+box "Result" "(MN4)" dashed
+arrow
+R: box "ResultTree"
+arrow
+box "..."
+arrow
+F: box "Figure" fill
+arrow <-> from P.nw + (0, 0.2) to T.ne + (0, 0.2) \
+"Execution pipeline (EP)" above
+arrow <-> from R.nw + (0, 0.2) to F.ne + (0, 0.2) \
+"Postprocess pipeline (PP)" above
+.PE
+.S P P
+.DE
+.P
+The figure contains as dependencies all the EP, results and PP.
+.P
+Any change in any of the stages (or dependencies) will lead to a new
+figure, \fBautomatically\fP.
+.P
+Figures contain the hash of the dataset in the title, so they can
+be tracked.
+.\"==================================================================
+.NS "Article with figures"
+.P
+An example LaTeX document uses the name of the figures in nix:
+.P
+.VERBON
+  \\includegraphics[]{@fig.nbody.small@/scatter.png}
+.VERBOFF
+.P
+Then, nix will extract all figure references, build them (re-running the
+experiment if required) and build the report: \fC$ nix-build
+garlic.report\fP
+.P
+We also have \fBreportTar\fP that puts the figures, LaTeX sources and
+a Makefile required to build the report into a self-contained tar.gz.
+.P
+It can be compiled with \fBmake\fP (no nix required) so it can be sent
+to a journal for further changes in the LaTeX source.
+.\"==================================================================
+.NS "Other changes"
+.DL
 .LI
-EP: Execution pipeline
+We can provide the complete benchmark and BSC packages as a simple
+overlay. This allows others to load their own changes on top or below our
+benchmark.
 .LI
-PP: Postprocess pipeline
+We now avoid reevaluation of nixpkgs when setting the MPI
+implementation (allows faster evaluations: 2 s/unit \(-> 2 s total).
+.LI
+Dependencies between experiments results are posible (experimental):
+allows generation of a dataset + computation with dependencies.
 .LE
+.\"==================================================================
+.NS "Questions?"
+.defcolor gray rgb #bbbbbb
+\m[gray]
+.P
+Example questions:
+.DL
+.LI
+What software was used to build this presentation?
+.LI
+I used groff.
+.LI
+And the diagrams?
+.LI
+Same :-D
+.LI
+How long takes to build?
+.LI
+0,39s user 0,02s system 129% cpu 0,316 total
+.LE
+\m[]
