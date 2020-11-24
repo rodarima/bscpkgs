@@ -1,5 +1,7 @@
-all: test.mm Makefile
-	groff -Tpdf -t -p -P-p12c,16c -mm test.mm > test.pdf
+all: 2.pdf Makefile
+
+%.pdf: %.mm
+	groff -Tpdf -t -p -P-p12c,16c -mm $< > $@
 	-killall -HUP mupdf
 
 watch:
