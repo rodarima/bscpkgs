@@ -21,6 +21,7 @@ stdenv.mkDerivation rec {
     sha256 = "1804pyq7fz6rkcz4r1abkkn0pfnss13m6fd8if32s42l4lajadm5";
   };
 
+  enableParallelBuilding = true;
   nativeBuildInputs = [ pkgconfig ];
   buildInputs = [ glib libuuid popt elfutils python3 swig4 ncurses breakpointHook ];
 
