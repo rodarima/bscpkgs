@@ -1,0 +1,11 @@
+--- a/tools/otfconfig/otfconfig.c	2020-11-21 13:55:23.195530435 +0100
++++ b/tools/otfconfig/otfconfig.c	2020-11-21 13:55:53.112402154 +0100
+@@ -75,7 +75,7 @@ int main( int argc, char** argv ) {
+ 
+ 			strcat( tmp, "\n" );
+ 
+-			printf( tmp );
++			printf("%s", tmp );
+ 		}
+ 	}
+ 

@@ -97,6 +97,9 @@ let
 
     fftw = callPackage ./bsc/fftw/default.nix { };
 
+    otf = callPackage ./bsc/otf/default.nix { };
+    vite = self.qt5.callPackage ./bsc/vite/default.nix { };
+
     wxpropgrid = callPackage ./bsc/wxpropgrid/default.nix { };
     paraver = callPackage ./bsc/paraver/default.nix { };
     paraverExtra = bsc.paraver.override { enableMouseLabel = true; };

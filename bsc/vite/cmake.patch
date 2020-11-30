@@ -1,0 +1,263 @@
+--- a/src/CMakeLists.txt	2020-11-21 14:05:24.912896596 +0100
++++ b/src/CMakeLists.txt	2020-11-21 14:19:30.978284644 +0100
+@@ -130,8 +130,7 @@ SET(VITE_HDRS
+   # Plugin header
+   plugin/Command_window.hpp
+   plugin/Plugin_window.hpp
+-  plugin/Plugin.hpp
+-  )
++  plugin/Plugin.hpp)
+ 
+ SET(VITE_UIS
+   interface/info_window.ui
+@@ -142,8 +141,7 @@ SET(VITE_UIS
+   interface/list_of_counter_to_export.ui
+   interface/node_select.ui
+   interface/interval_select.ui
+-  interface/statistics.ui
+-  )
++  interface/statistics.ui)
+ 
+ SET(VITE_SRCS
+   # Messages & Errors
+@@ -220,29 +218,23 @@ SET(VITE_SRCS
+   core/Core.cpp
+   core/getopt.c
+   # Main
+-  main.cpp
+-  )
++  main.cpp)
+ 
+-SET(VITE_RCCS
+-  interface/vite.qrc
+-  )
++SET(VITE_RCCS interface/vite.qrc)
+ 
+ #############################################
+ #           QtColorPicker
+ #############################################
+ set(QTCOLORPICKERDIR
+-  ${CMAKE_SOURCE_DIR}/externals/qtcolorpicker/src
+-  )
++  ${CMAKE_SOURCE_DIR}/externals/qtcolorpicker/src)
+ 
+ set(VITE_HDRS
+   ${VITE_HDRS}
+-  ${QTCOLORPICKERDIR}/qtcolorpicker.h
+-  )
++  ${QTCOLORPICKERDIR}/qtcolorpicker.h)
+ 
+ set(VITE_SRCS
+   ${VITE_SRCS}
+-  ${QTCOLORPICKERDIR}/qtcolorpicker.cpp
+-  )
++  ${QTCOLORPICKERDIR}/qtcolorpicker.cpp)
+ 
+ #############################################
+ #                VBO
+@@ -252,15 +244,13 @@ IF(VITE_ENABLE_VBO)
+     ${VITE_HDRS}
+     render/vbo.hpp
+     render/Shader.hpp
+-    render/Render_alternate.hpp
+-    )
++    render/Render_alternate.hpp)
+ 
+   SET(VITE_SRCS
+     ${VITE_SRCS}
+     render/vbo.cpp
+     render/Shader.cpp
+-    render/Render_alternate.cpp
+-    )
++    render/Render_alternate.cpp)
+ ENDIF(VITE_ENABLE_VBO)
+ 
+ #############################################
+@@ -271,29 +261,25 @@ IF(VITE_ENABLE_OTF)
+     ${VITE_HDRS}
+     parser/OTFParser/ParserDefinitionOTF.hpp
+     parser/OTFParser/ParserEventOTF.hpp
+-    parser/OTFParser/ParserOTF.hpp
+-    )
++    parser/OTFParser/ParserOTF.hpp)
+ 
+   SET(VITE_SRCS
+     ${VITE_SRCS}
+     parser/OTFParser/ParserDefinitionOTF.cpp
+     parser/OTFParser/ParserEventOTF.cpp
+-    parser/OTFParser/ParserOTF.cpp
+-    )
++    parser/OTFParser/ParserOTF.cpp)
+ 
+   IF(VITE_ENABLE_MT_PARSERS)
+     SET(VITE_HDRS
+       ${VITE_HDRS}
+       parser/OTFParser/mt_ParserEventOTF.hpp
+       parser/OTFParser/mt_ParserOTF.hpp
+-      parser/OTFParser/OTFTraceBuilderThread.hpp
+-      )
++      parser/OTFParser/OTFTraceBuilderThread.hpp)
+     SET(VITE_SRCS
+       ${VITE_SRCS}
+       parser/OTFParser/mt_ParserEventOTF.cpp
+       parser/OTFParser/mt_ParserOTF.cpp
+-      parser/OTFParser/OTFTraceBuilderThread.cpp
+-      )
++      parser/OTFParser/OTFTraceBuilderThread.cpp)
+   ENDIF()
+ 
+   INCLUDE_DIRECTORIES(BEFORE ${OTF_INCLUDE_DIR})
+@@ -310,15 +296,13 @@ IF(VITE_ENABLE_OTF2)
+     ${VITE_HDRS}
+     parser/OTF2Parser/ParserDefinitionOTF2.hpp
+     parser/OTF2Parser/ParserEventOTF2.hpp
+-    parser/OTF2Parser/ParserOTF2.hpp
+-    )
++    parser/OTF2Parser/ParserOTF2.hpp)
+ 
+   SET(VITE_SRCS
+     ${VITE_SRCS}
+     parser/OTF2Parser/ParserDefinitionOTF2.cpp
+     parser/OTF2Parser/ParserEventOTF2.cpp
+-    parser/OTF2Parser/ParserOTF2.cpp
+-    )
++    parser/OTF2Parser/ParserOTF2.cpp)
+ 
+   INCLUDE_DIRECTORIES(${OTF2_INCLUDE_DIR})
+ 
+@@ -332,13 +316,11 @@ IF(VITE_ENABLE_TAU)
+   SET(VITE_HDRS
+     ${VITE_HDRS}
+     parser/TauParser/ParserTau.hpp
+-    parser/TauParser/TauStructs.hpp
+-    )
++    parser/TauParser/TauStructs.hpp)
+ 
+   SET(VITE_SRCS
+     ${VITE_SRCS}
+-    parser/TauParser/ParserTau.cpp
+-    )
++    parser/TauParser/ParserTau.cpp)
+ 
+   INCLUDE_DIRECTORIES(${TAU_INCLUDE_DIR})
+ 
+@@ -357,8 +339,7 @@ IF(VITE_ENABLE_MT_PARSERS)
+     parser/PajeParser/mt_ParserPaje.hpp
+     parser/PajeParser/mt_PajeFileManager.hpp
+     parser/PajeParser/BuilderThread.hpp
+-    trace/TraceBuilderThread.hpp
+-    )
++    trace/TraceBuilderThread.hpp)
+ 
+   SET(VITE_SRCS
+     ${VITE_SRCS}
+@@ -367,8 +348,7 @@ IF(VITE_ENABLE_MT_PARSERS)
+     parser/PajeParser/mt_ParserPaje.cpp
+     parser/PajeParser/mt_PajeFileManager.cpp
+     parser/PajeParser/BuilderThread.cpp
+-    trace/TraceBuilderThread.cpp
+-    )
++    trace/TraceBuilderThread.cpp)
+ 
+ ENDIF()
+ 
+@@ -385,16 +365,14 @@ IF(VITE_ENABLE_SERIALIZATION)
+     parser/ParserSplitted.hpp
+     trace/IntervalOfContainer.hpp
+     trace/SerializerWriter.hpp
+-    trace/SerializerDispatcher.hpp
+-    )
++    trace/SerializerDispatcher.hpp)
+ 
+   SET(VITE_SRCS
+     ${VITE_SRCS}
+     parser/ParserSplitted.cpp
+     trace/IntervalOfContainer.cpp
+     trace/SerializerWriter.cpp
+-    trace/SerializerDispatcher.cpp
+-    )
++    trace/SerializerDispatcher.cpp)
+ 
+ ENDIF(VITE_ENABLE_SERIALIZATION)
+ 
+@@ -421,24 +399,22 @@ INCLUDE_DIRECTORIES(
+   ${CMAKE_CURRENT_BINARY_DIR}/common
+   ${CMAKE_CURRENT_BINARY_DIR}
+   ${CMAKE_CURRENT_SOURCE_DIR}
+-  ${QTCOLORPICKERDIR}
+-  )
++  ${QTCOLORPICKERDIR})
+ #ADD_LIBRARY(vite2 SHARED ${VITE_SRCS} ${VITE_MOC} ${VITE_RCC_SRCS})
+ 
+-IF( VITE_ENABLE_OTF )
+-  LINK_DIRECTORIES( ${OTF_LIBRARY_DIR} )
+-ENDIF( VITE_ENABLE_OTF )
++IF(VITE_ENABLE_OTF)
++  LINK_DIRECTORIES(${OTF_LIBRARY_DIR})
++ENDIF(VITE_ENABLE_OTF)
+ 
+ IF(VITE_ENABLE_OTF2)
+-  LINK_DIRECTORIES(${OTF2_LIBRARY_DIR} )
++  LINK_DIRECTORIES(${OTF2_LIBRARY_DIR})
+ ENDIF(VITE_ENABLE_OTF2)
+ 
+ #resource
+ IF(WIN32)
+   set(VITE_RES
+     "${PROJECT_SOURCE_DIR}/src/interface/icon/logo.ico"
+-	"${PROJECT_SOURCE_DIR}/src/interface/windows_icon.rc"
+-  )
++	"${PROJECT_SOURCE_DIR}/src/interface/windows_icon.rc")
+ ENDIF(WIN32)
+ 
+ if( APPLE )
+@@ -456,7 +432,11 @@ if( APPLE )
+     MACOSX_BUNDLE_COPYRIGHT "INRIA 2006-2012"
+     MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/vite-info.plist.in)
+ else( APPLE )
+-  ADD_EXECUTABLE(vite ${VITE_SRCS} ${VITE_MOC} ${VITE_RCC_SRCS} ${VITE_RES})
++	message("VITE_SRCS" ${VITE_SRCS} "END")
++	message("VITE_MOC" ${VITE_MOC} "END")
++	message("VITE_RCC_SRCS" ${VITE_RCC_SRCS} "END")
++	message("VITE_RES" ${VITE_RES} "END")
++  ADD_EXECUTABLE(vite ${VITE_SRCS} ${VITE_MOC} ${VITE_RCC_SRCS})
+ endif( APPLE )
+ 
+ #############################################
+@@ -470,31 +450,22 @@ TARGET_LINK_LIBRARIES(vite
+   ${QT_LIBRARIES}
+   ${OPENGL_gl_LIBRARY}
+   ${OPENGL_glu_LIBRARY}
+-  ${Boost_LIBRARIES}
+-  )
++  ${Boost_LIBRARIES})
+ 
+ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+-  TARGET_LINK_LIBRARIES(vite
+-    rt
+-    )
++  TARGET_LINK_LIBRARIES(vite rt)
+    #ADD_DEFINITIONS("-DBOOST_GZIP")
+ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+ 
+ IF(VITE_ENABLE_VBO)
+-  TARGET_LINK_LIBRARIES(vite
+-    ${GLEW_LIBRARY}
+-    )
++  TARGET_LINK_LIBRARIES(vite ${GLEW_LIBRARY})
+ ENDIF(VITE_ENABLE_VBO)
+ 
+ IF(VITE_ENABLE_OTF)
+-  TARGET_LINK_LIBRARIES(vite
+-    ${OTF_LIBRARY}
+-    )
++  TARGET_LINK_LIBRARIES(vite ${OTF_LIBRARY})
+   # if OTF is compiled with zlib support we need to add it
+   IF(WIN32)
+-    TARGET_LINK_LIBRARIES(vite
+-      ${ZLIB_LIBRARY}
+-      )
++    TARGET_LINK_LIBRARIES(vite ${ZLIB_LIBRARY})
+   ENDIF(WIN32)
+ ENDIF(VITE_ENABLE_OTF)
+ 
