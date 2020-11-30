@@ -9,7 +9,11 @@
 , autoconf
 , automake
 , wxpropgrid
+# Custom patches :)
+, enableMouseLabel ? false
 }:
+
+with stdenv.lib;
 
 let
   wx = wxGTK28;
@@ -22,6 +26,9 @@ stdenv.mkDerivation rec {
     url = "https://ftp.tools.bsc.es/wxparaver/wxparaver-${version}-src.tar.bz2";
     sha256 = "0b8rrhnf7h8j72pj6nrxkrbskgg9b5w60nxi47nxg6275qvfq8hd";
   };
+
+  patches = []
+    ++ optional (enableMouseLabel) ./mouse-label.patch;
 
   enableParallelBuilding = true;
 

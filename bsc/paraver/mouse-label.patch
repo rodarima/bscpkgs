@@ -1,0 +1,286 @@
+--- a/src/wxparaver/src/gtimeline.cpp	2019-09-13 13:18:03.000000000 +0200
++++ b/src/wxparaver/src/gtimeline.cpp	2020-11-30 13:18:50.121429888 +0100
+@@ -607,8 +607,8 @@
+   // Paint blank image while redrawing
+   wxClientDC dc( drawZone );
+ #ifdef __WXGTK__
+-  dc.DrawBitmap( bufferImage, 0, 0, false );
+-  drawZone->Update();
++//  dc.DrawBitmap( bufferImage, 0, 0, false );
++//  drawZone->Update();
+ #endif
+ 
+   if( !drawAxis( bufferDraw, selectedSet ) )
+@@ -1365,13 +1365,66 @@
+ 
+ void gTimeline::drawRowEvents( wxDC& eventdc, wxDC& eventmaskdc, TObjectOrder rowPos, hash_set< PRV_INT32 >& eventsToDraw )
+ {
++    int last_x = -100, x, xx;
++    int i, neigh, max_x;
++
++    /* Keep track of other events in nearby pixels */
++    max_x = myWindow->getWidth();
++    int *table = new int[max_x];
++
++    for(i=0; i<max_x; i++)
++    {
++        table[i] = 0;
++    }
++
+   for( hash_set< PRV_INT32 >::iterator it = eventsToDraw.begin(); it != eventsToDraw.end(); ++it )
+   {
++    /* Add a new event in the x position in the table */
++      x = *it;
++      assert(0 <= x);
++      assert(x < max_x);
++      table[*it]++;
++  }
++
++  for( hash_set< PRV_INT32 >::iterator it = eventsToDraw.begin(); it != eventsToDraw.end(); ++it )
++  {
++      /*
++       * Draws an event with 4 segments: AE, BF, CG and DH
++       *         
++       *        A B C D
++       *        * * * *
++       *        * * * *
++       *        * * * *
++       *        * F G H
++       *        *
++       *        *
++       *        E
++       */
++
++    /* If the event is very close to another one, we paint it red, so we
++     * now that we may need to zoom to see more closely how many events
++     * are there. Otherwise we paint it green. */
++    x = *it;
++
++    /* Count neighbour events */
++    neigh = 0;
++    for(xx=x-5; xx<=x+5; xx++)
++    {
++        if(0 <= xx && xx < max_x)
++            neigh += table[xx];
++    }
++
++    /* Paint the event red if there are more events close */
++    if(neigh > 1)
++        eventdc.SetPen( *wxRED_PEN );
++    else
++        eventdc.SetPen( *wxGREEN_PEN );
++
+     eventdc.DrawLine( *it, rowPos - 6, *it, rowPos );
+-    eventdc.DrawLine( *it+1, rowPos - 6, *it+1, rowPos-3 );
+-    eventdc.DrawLine( *it+2, rowPos - 6, *it+2, rowPos-3 );
+-    eventdc.DrawLine( *it+3, rowPos - 6, *it+3, rowPos-3 );
+-    eventdc.DrawLine( *it+4, rowPos - 6, *it+4, rowPos-3 );
++//    eventdc.DrawLine( *it+1, rowPos - 6, *it+1, rowPos-3 );
++//    eventdc.DrawLine( *it+2, rowPos - 6, *it+2, rowPos-3 );
++//    eventdc.DrawLine( *it+3, rowPos - 6, *it+3, rowPos-3 );
++//    eventdc.DrawLine( *it+4, rowPos - 6, *it+4, rowPos-3 );
+ #ifndef __WXMAC__
+     eventmaskdc.DrawLine( *it, rowPos - 6, *it, rowPos );
+     eventmaskdc.DrawLine( *it+1, rowPos - 6, *it+1, rowPos-3 );
+@@ -1379,8 +1432,12 @@
+     eventmaskdc.DrawLine( *it+3, rowPos - 6, *it+3, rowPos-3 );
+     eventmaskdc.DrawLine( *it+4, rowPos - 6, *it+4, rowPos-3 );
+ #endif
++
++    last_x = x;
+   }
+ 
++  delete table;
++
+ }
+ 
+ 
+@@ -2427,7 +2484,7 @@
+ 
+   motionEvent = event;
+   if( !event.ShiftDown() )
+-    timerMotion->Start( 20, true );
++    timerMotion->Start( 2, true );
+ 
+   wxMemoryDC dc( bufferImage );
+   // PRV_UINT32 precision = ParaverConfig::getInstance()->getTimelinePrecision();
+@@ -4651,12 +4708,18 @@
+ 
+ void gTimeline::OnTimerMotion( wxTimerEvent& event )
+ {
++  int mx, my;
++
++  mx = motionEvent.GetX();
++  my = motionEvent.GetY();
++
+   if( motionEvent.GetX() < objectAxisPos + 1 || motionEvent.GetX() > bufferImage.GetWidth() - drawBorder ||
+       motionEvent.GetY() < drawBorder || motionEvent.GetY() > timeAxisPos - 1 )
+     return;
+ 
+   wxMemoryDC dc( bufferImage );
+   wxColour tmpColor;
++  wxClientDC paintDC( drawZone );
+ 
+   wxString label;
+   if( zooming || timing || wxGetApp().GetGlobalTiming() )
+@@ -4704,7 +4767,11 @@
+ #endif
+ 
+     if( tmpColor == backgroundColour )
++    {
++      /* Just clean and exit */
++      paintDC.DrawBitmap( drawImage, 0, 0 );
+       return;
++    }
+ 
+     rgb color = { (ParaverColor)tmpColor.Red(), (ParaverColor)tmpColor.Green(), (ParaverColor)tmpColor.Blue() };
+     TSemanticValue firstValue, secondValue;
+@@ -4762,38 +4829,109 @@
+     }
+   }
+ 
+-#ifndef __WXGTK__
+-  wxClientDC paintDC( drawZone );
+-  #ifdef __WXMAC__
+-  drawStackedImages( paintDC );
+-  #else
+-  paintDC.DrawBitmap( drawImage, 0, 0 );
+-  #endif
+-#else
+-  #if wxMAJOR_VERSION<3
+-  wxPaintDC paintDC( drawZone );
+-  #else
+-  wxClientDC paintDC( drawZone );
+-  #endif
+-  paintDC.DrawBitmap( drawImage, 0, 0 );
+-#endif
+-
+   paintDC.SetFont( semanticFont );
++  paintDC.SetPen( backgroundColour );
++  paintDC.SetBrush( backgroundColour );
++  paintDC.SetTextForeground( foregroundColour );
++
++  /* Draw the label close to the mouse, so it's easier to follow */
++  int label_x0, label_y0;
++  label_x0 = mx + 20;
++  label_y0 = my + 20;
++  paintDC.SetPen( *wxBLACK_PEN );
++  paintDC.SetBrush( *wxBLACK_BRUSH );
++
++  /* Draw a filled black rectangle behind the label, so is easy to read
++   * when placed over multiple colors from the trace */
++  int rect_x0, rect_y0, rect_w, rect_h;
++  rect_x0 = label_x0 - 5;
++  rect_y0 = label_y0 - 5;
++
++  TObjectOrder row;
++  TTime time;
++
++  /* Fills "row" and "time" objects if is over a TimeObject (?) */
++  bool print_duration = true;
++  double tp, tn;
++
++  /* This whole thing to get the event is completely crap. We may get a
++   * pixel here that belong to a different event, probably due to
++   * rounding operations when dealing with time.
++   *
++   * To avoid giving misleading information, we only print the time when
++   * both neighbour pixels are also from the same event */
++  print_duration &= pixelToTimeObject(mx, my, time, row);
++  print_duration &= pixelToTimeObject(mx-2, my, tp, row);
++  print_duration &= pixelToTimeObject(mx+2, my, tn, row);
++
++  if(time <= tp) print_duration = false;
++  if(tn <= time) print_duration = false;
++
++  //computeWhatWhere(time, row, 0.0, false, false);
++
++  //printf("time = %e\n", time);
++  //printf("begin time = %e\n", myWindow->getBeginTime(row));
++
++  if(print_duration)
++  {
++    double t0, t1, t, dt;
++    t = time;
++
++    myWindow->init(t, CREATEEVENTS + CREATECOMMS, false );
++    myWindow->initRow(row, t, CREATEEVENTS + CREATECOMMS, false );
++
++    t0 = myWindow->getBeginTime(row);
++    t1 = myWindow->getEndTime(row);
++
++    //printf("t0=%e t=%e t1=%e\n", t0, t, t1);
++    while(!(t0 <= t && t <= t1))
++    {
++      myWindow->calcNext(row);
++      t0 = myWindow->getBeginTime(row);
++      t1 = myWindow->getEndTime(row);
++      //printf("t0=%e t=%e t1=%e\n", t0, t, t1);
++      if(t0 > t)
++      {
++        //printf("we are out\n");
++        break;
++      }
++    }
++
++    /* Only add the duration if we are more than one pixel away from the
++     * border */
++    if(t0 < tp && tn < t1)
++    {
++        if(t0 > t)
++            dt = 0;
++        else
++            dt = t1 - t0;
++
++        assert(t0 <= time);
++        assert(time <= t1);
++
++        wxString duration = wxString::FromAscii( LabelConstructor::timeLabel(
++                    myWindow->traceUnitsToWindowUnits( dt ),
++                    myWindow->getTimeUnit(), 
++                    ParaverConfig::getInstance()->getTimelinePrecision() ).c_str() );
++
++        label << wxT( " (" ) <<  duration << wxT(")");
++    }
++  }
++
+   wxSize objectExt = paintDC.GetTextExtent( label );
++  rect_w = objectExt.GetWidth() + 10;
++  rect_h = objectExt.GetHeight() + 10;
++
++  /* Erase previous bitmap */
++  paintDC.DrawBitmap( drawImage, 0, 0 );
++
++  /* Draw black rectangle */
++  paintDC.DrawRectangle( rect_x0, rect_y0, rect_w, rect_h );
+ 
++  /* Then place the label */
++  paintDC.DrawText( label, label_x0, label_y0);
+   paintDC.SetPen( backgroundColour );
+   paintDC.SetBrush( backgroundColour );
+-//  paintDC.DrawRectangle( ( bufferImage.GetWidth() - objectAxisPos ) / 2, timeAxisPos + 1, objectExt.GetWidth() + 30, bufferImage.GetHeight() - timeAxisPos );
+-  if( !( zooming || timing || wxGetApp().GetGlobalTiming() ) )
+-  {
+-    paintDC.SetBrush( tmpColor );
+-    paintDC.DrawRectangle( ( bufferImage.GetWidth() - objectAxisPos ) / 2, timeAxisPos + 2, 10, bufferImage.GetHeight() - timeAxisPos - 3 );
+-  }
+-  paintDC.SetTextForeground( foregroundColour );
+-  if( zooming )
+-    paintDC.DrawText( label, ( bufferImage.GetWidth() - objectAxisPos ) / 2 + objectAxisPos - ( objectExt.GetWidth() / 2 ), timeAxisPos + 3 );
+-  else
+-    paintDC.DrawText( label, ( bufferImage.GetWidth() - objectAxisPos ) / 2 + 12, timeAxisPos + 3 );
+ }
+ 
+ void gTimeline::OnTimerWheel( wxTimerEvent& event )
+@@ -5075,7 +5213,11 @@
+   endRow = TObjectOrder( floor( ( y - drawBorder - 1 ) / heightPerRow ) );
+ 
+   if( endRow >= numObjects )
++  {
+     endRow = numObjects - 1;
++    printf("endRow exceeds numObjects, capped to %d\n", endRow);
++  }
++  //printf("endRow = %d\n", endRow);
+   onObject = selected[ endRow ];
+ 
+   return true;
