@@ -131,7 +131,7 @@ let
       ];
     });
 
-    nanos6Jemalloc = nanos6.override {
+    nanos6Jemalloc = bsc.nanos6.override {
       enableJemalloc = true;
     };
 
