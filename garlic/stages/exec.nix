@@ -9,6 +9,7 @@
 , pre ? ""
 , argv ? []
 , post ? ""
+, nixPrefix ? ""
 }:
 
 with builtins;
@@ -28,7 +29,7 @@ stdenv.mkDerivation {
     ${env}
 
     ''+pre+''
-    ${execMethod}${stageProgram nextStage} ${argvString}
+    ${execMethod}${nixPrefix}${stageProgram nextStage} ${argvString}
     ''+post+''
     EOF
     chmod +x $out
