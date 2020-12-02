@@ -184,8 +184,34 @@ let
     # Aliases bsc.apps -> bsc.garlic.apps
     inherit (bsc.garlic) apps fig exp ds;
 
+    # TODO: move into garlic/default.nix
     garlic = {
-      # TODO: move into garlic/default.nix
+
+      unsafeDevelop = callPackage ./garlic/develop.nix {
+            extraInputs = with self; [
+              coreutils htop procps-ng vim which strace
+              tmux gdb kakoune universal-ctags bashInteractive
+              glibcLocales ncurses
+              # Add more nixpkgs packages here...
+              bsc.slurm bsc.clangOmpss2 bsc.icc bsc.mcxx bsc.perf
+              # Add more bscpkgs packages here...
+            ];
+      };
+
+      develop = bsc.garlic.stages.exec {
+        nextStage = bsc.garlic.stages.isolate {
+          nextStage = bsc.garlic.unsafeDevelop;
+          nixPrefix = bsc.garlic.targetMachine.config.nixPrefix;
+          extraMounts = [ "/tmp:$TMPDIR" ];
+        };
+        nixPrefix = bsc.garlic.targetMachine.config.nixPrefix;
+        # This hack uploads all dependencies to MN4
+        pre = ''
+          # Hack to upload this to MN4: @upload-to-mn@
+          # Run the following command in a normal interactive shell (outside nix)
+        '';
+        post = "\n";
+      };
 
       # Configuration for the machines
       machines = callPackage ./garlic/machines.nix { };
