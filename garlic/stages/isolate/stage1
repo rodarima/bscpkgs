@@ -20,6 +20,7 @@ env=(
   $(env | grep ^GARLIC || true)
   $(env | grep ^USER || true)
   $(env | grep ^TMPDIR || true)
+  $(env | grep '^TERM=' || true)
   HOME="/homeless-shelter"
 )
 
