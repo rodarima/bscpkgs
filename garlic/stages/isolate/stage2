@@ -13,4 +13,4 @@ if [ -e /usr ]; then
   exit 1
 fi
 
-exec @program@
+exec @program@ "$@"

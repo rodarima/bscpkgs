@@ -46,4 +46,4 @@ mounts=(
 join_flags="${mounts[@]}"
 
 exec $nixjoin -i $join_flags $nixhome -- \
-	env -i "${env[@]}" @out@/bin/stage2
+	env -i "${env[@]}" @out@/bin/stage2 "$@"
