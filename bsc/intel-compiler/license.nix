@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
 
   src = requireFile {
     name = "license.lic";
-    sha256 = "06g2xgm1lch6zqfkhb768wacdx46kf61mfvj5wfpyssw0anr0x9q";
+    sha256 = "1wi4a2f7hpc0v3gvbcdawvlj6yaqpkk20y1184d0zbx1cxrmwqxp";
     message = ''
       The Intel Compiler requires a license. You can get one (free of charge) if
       you meet the requeriments at the website:
