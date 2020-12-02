@@ -21,12 +21,10 @@ stdenv.mkDerivation {
     export "buildInputs=$buildInputs"
     # ${stdenv}
     export "PATH=$PATH"
-    export "TERM=linux"
     export "out=/fake-output-directory"
     export NIX_BUILD_TOP=.
     export NIX_STORE=/nix/store
-    export PS1='\033[1;32mdevelop\$\033[0m '
-    #export PS1='\[\033[1;32m\]develop\$\[\033[0m\] '
+    export PS1='\[\033[1;32m\]develop\$\[\033[0m\] '
 
     export TMUX_TMPDIR=/tmp
     export TMPDIR=/tmp
