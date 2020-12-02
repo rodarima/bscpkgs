@@ -198,7 +198,7 @@ let
             ];
       };
 
-      develop = bsc.garlic.stages.exec {
+      develop = bsc.garlic.stages.exec rec {
         nextStage = bsc.garlic.stages.isolate {
           nextStage = bsc.garlic.unsafeDevelop;
           nixPrefix = bsc.garlic.targetMachine.config.nixPrefix;
@@ -206,9 +206,15 @@ let
         };
         nixPrefix = bsc.garlic.targetMachine.config.nixPrefix;
         # This hack uploads all dependencies to MN4
-        pre = ''
+        pre = let
+          nixPrefix = bsc.garlic.targetMachine.config.nixPrefix;
+          stageProgram = bsc.garlicTools.stageProgram;
+        in
+        ''
           # Hack to upload this to MN4: @upload-to-mn@
-          # Run the following command in a normal interactive shell (outside nix)
+
+          # Create a link to the develop script
+          ln -fs ${nixPrefix}${stageProgram nextStage} .nix-develop
         '';
         post = "\n";
       };

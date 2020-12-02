@@ -33,9 +33,12 @@ stdenv.mkDerivation {
     export TEMP=/tmp
 
     export LANG=en_US.UTF-8
-    export TERM=linux
 
     source ${stdenv}/setup
+
+    # Access to bin and nix tools for srun, as it keeps the PATH
+    export "PATH=\$PATH:/bin"
+    export "PATH=$PATH:/gpfs/projects/bsc15/nix/bin"
 
     if [[ -z "\$@" ]]; then
       exec ${bashInteractive}/bin/bash
