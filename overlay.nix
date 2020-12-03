@@ -187,7 +187,7 @@ let
     # TODO: move into garlic/default.nix
     garlic = {
 
-      unsafeDevelop = callPackage ./garlic/develop.nix {
+      unsafeDevelop = callPackage ./garlic/develop/default.nix {
             extraInputs = with self; [
               coreutils htop procps-ng vim which strace
               tmux gdb kakoune universal-ctags bashInteractive

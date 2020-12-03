@@ -6,6 +6,9 @@
 , extraInputs  ? []
 }:
 
+let
+  inputrc = ./inputrc;
+in
 stdenv.mkDerivation {
   name = "develop";
   preferLocalBuild = true;
@@ -42,6 +45,7 @@ stdenv.mkDerivation {
     export "PATH=$PATH:/gpfs/projects/bsc15/nix/bin"
     export "SHELL=${bashInteractive}/bin/bash"
     export HISTFILE="\$curdir/.histfile"
+    export INPUTRC=${inputrc}
 
     if [[ -z "\$@" ]]; then
       exec ${bashInteractive}/bin/bash
