@@ -308,6 +308,8 @@ let
           variant = "ompss-2";
         };
 
+        ifsker = callPackage ./garlic/apps/ifsker/default.nix { };
+
 #        heat = callPackage ./garlic/apps/heat/default.nix {
 #          # FIXME: The heat program must be able to compile with gcc9 and newer
 #          stdenv = self.gcc7Stdenv;
