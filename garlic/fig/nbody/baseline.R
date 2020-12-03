@@ -51,7 +51,7 @@ png("box.png", width=w*ppi, height=h*ppi, res=ppi)
 p = ggplot(data=D, aes(x=blocksPerCpuFactor, y=tnorm, color=bad)) +
 
 	# Labels
-	labs(x="Num blocks", y="Normalized time",
+	labs(x="Blocks/CPU", y="Normalized time",
               title=sprintf("Nbody normalized time. Particles=%d", particles), 
               subtitle=input_file) +
 
