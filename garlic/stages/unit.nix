@@ -10,6 +10,7 @@
 }:
 
 with stdenv.lib;
+with builtins;
 
 let
 
@@ -38,6 +39,9 @@ let
   firstStage = (x: x.programPath) (elemAt linkStages 0);
 
   jsonConf = writeText "garlic_config.json" (builtins.toJSON conf);
+
+  safeUnitName = replaceStrings ["/" "$"] ["_" "_"] conf.unitName;
+  safeExpName = replaceStrings ["/" "$"] ["_" "_"] conf.expName;
 in
   builtins.trace "evaluating unit ${conf.unitName}"
 stdenv.mkDerivation {
@@ -72,14 +76,14 @@ stdenv.mkDerivation {
     export GARLIC_UNIT=$(basename $out)
 
     # Create an index entry
-    rm -f "\$GARLIC_INDEX/${conf.unitName}" \
-      "\$GARLIC_INDEX/${conf.expName}" 
+    rm -f "\$GARLIC_INDEX/${safeUnitName}" \
+      "\$GARLIC_INDEX/${safeExpName}" 
 
     ln -Tfs "../out/\$GARLIC_UNIT" \
-      "\$GARLIC_INDEX/${conf.unitName}"
+      "\$GARLIC_INDEX/${safeUnitName}"
 
     ln -Tfs "../out/\$GARLIC_EXPERIMENT" \
-      "\$GARLIC_INDEX/${conf.expName}"
+      "\$GARLIC_INDEX/${safeExpName}"
 
     if [ -e "\$GARLIC_UNIT" ]; then
       >&2 echo "skipping, unit path already exists: \$GARLIC_UNIT"
