@@ -28,8 +28,8 @@ stdenv.mkDerivation rec {
   ++ optional (mpi != null) mpi;
 
   makeFlags = [
-    "CC=${cc.cc.CC}"
-    "CXX=${cc.cc.CXX}"
+    "CC=${cc.CC}"
+    "CXX=${cc.CXX}"
   ];
 
   enableParallelBuilding = true;

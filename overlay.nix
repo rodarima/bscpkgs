@@ -8,6 +8,10 @@ let
   inherit (self.lib) callPackagesWith;
   callPackage = callPackageWith (self // self.bsc // self.garlic);
 
+  appendPasstru = drv: attrs: drv.overrideAttrs (old:{
+    passthru = old.passthru // attrs;
+  });
+
   # --------------------------------------------------------- #
   #  BSC Packages
   # --------------------------------------------------------- #
@@ -55,22 +59,14 @@ let
 
     # A wrapper script that puts all the flags and environment vars properly and
     # calls the intel compiler binary
-    icc = callPackage ./bsc/intel-compiler/default.nix {
+    icc = appendPasstru (callPackage ./bsc/intel-compiler/default.nix {
       iccUnwrapped = bsc.iccUnwrapped;
       intelLicense = bsc.intelLicense;
-    };
+    }) { CC = "icc"; CXX = "icpc"; };
 
-    # We need to set the cc.cc.CC and cc.cc.CXX attributes, in order to
+    # We need to set the cc.CC and cc.CXX attributes, in order to 
     # determine the name of the compiler
-    # FIXME: Use a proper and automatic way to compute the compiler name
-    gcc = self.gcc.overrideAttrs (old1: {
-      cc = old1.cc.overrideAttrs (old2: {
-        passthru = old2.passthru // {
-          CC = "gcc";
-          CXX = "g++";
-        };
-      });
-    });
+    gcc = appendPasstru self.gcc { CC = "gcc"; CXX = "g++"; };
 
     intelLicense = callPackage ./bsc/intel-compiler/license.nix { };
 
@@ -151,7 +147,12 @@ let
     #rdma-core = callPackage ./bsc/rdma-core/default.nix { };
 
     # Last llvm release by default
-    llvmPackages = self.llvmPackages_11;
+    llvmPackages = self.llvmPackages_11 // {
+      clang = appendPasstru self.llvmPackages_11.clang {
+        CC = "clang"; CXX = "clang++";
+      };
+    };
+
     lld = bsc.llvmPackages.lld;
 
     clangOmpss2Unwrapped = callPackage ./bsc/llvm-ompss2/clang.nix {
@@ -159,9 +160,9 @@ let
       enableDebug = false;
     };
 
-    clangOmpss2 = callPackage bsc/llvm-ompss2/default.nix {
+    clangOmpss2 = appendPasstru (callPackage bsc/llvm-ompss2/default.nix {
       clangOmpss2Unwrapped = bsc.clangOmpss2Unwrapped;
-    };
+    }) { CC = "clang"; CXX = "clang++"; };
 
     stdenvOmpss2 = self.clangStdenv.override {
       cc = bsc.clangOmpss2;

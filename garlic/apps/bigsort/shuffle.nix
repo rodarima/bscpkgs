@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
   ];
 
   makeFlags = [
-    "I_MPI_CXX=${cc.cc.CXX}"
+    "I_MPI_CXX=${cc.CXX}"
     "CPP_BIN=mpicxx"
   ];
 

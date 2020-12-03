@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
   '' else "");
 
   makeFlags = [
-    "CC=${cc.cc.CC}"
+    "CC=${cc.CC}"
     "BS=${toString blocksize}"
   ]
   ++ optional (tampi != null) "TAMPI_HOME=${tampi}";

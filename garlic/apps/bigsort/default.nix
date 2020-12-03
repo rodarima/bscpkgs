@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
 
   preBuild = ''
     cd BigSort
-    export I_MPI_CXX=${cc.cc.CXX}
+    export I_MPI_CXX=${cc.CXX}
   '';
 
   buildInputs = [
@@ -31,8 +31,8 @@ stdenv.mkDerivation rec {
   ++ optional (nanos6 != null) nanos6;
 
   makeFlags = [
-    "CC=${cc.cc.CC}"
-    "CXX=${cc.cc.CXX}"
+    "CC=${cc.CC}"
+    "CXX=${cc.CXX}"
     "CPP_BIN=mpicxx"
     "CLUSTER=MareNostrum4"
     "OPENMP=yes"

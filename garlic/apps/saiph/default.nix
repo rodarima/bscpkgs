@@ -52,7 +52,7 @@ stdenv.mkDerivation rec {
   '';
 
   makeFlags = [
-    "-f" "Makefile.${cc.cc.CC}"
+    "-f" "Makefile.${cc.CC}"
     "apps"
     "APP=Heat3D_vect"
   ] ++ optional (nbx != null) "NB_X=${toString nbx}"
