@@ -191,7 +191,7 @@ let
             extraInputs = with self; [
               coreutils htop procps-ng vim which strace
               tmux gdb kakoune universal-ctags bashInteractive
-              glibcLocales ncurses
+              glibcLocales ncurses git screen curl
               # Add more nixpkgs packages here...
               bsc.slurm bsc.clangOmpss2 bsc.icc bsc.mcxx bsc.perf
               # Add more bscpkgs packages here...
