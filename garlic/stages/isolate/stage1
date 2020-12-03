@@ -27,7 +27,7 @@ env=(
 mounts=(
 	#-m @nixPrefix@
 	#FIXME: Use only the strictly neccesary from /etc
-	-m /etc
+	-m /original-etc:/etc
 	# The /etc/hosts file is a symlink to this etc/
 	-m /.statelite/tmpfs/etc
 	-m /sys
@@ -44,7 +44,14 @@ mounts=(
   @extraMountOptions@
 )
 
-join_flags="${mounts[@]}"
+symlinks=(
+  -s /etc/hosts:/original-etc/hosts
+  -s /etc/passwd:/original-etc/passwd
+  -s /etc/resolv.conf:/original-etc/resolv.conf
+  -s /etc/host.conf:/original-etc/host.conf
+  -s /etc/slurm/slurm.conf:/original-etc/slurm/slurm.conf
+  -s /etc/services:/original-etc/services
+)
 
-exec $nixjoin -i $join_flags $nixhome -- \
+exec $nixjoin -i "${mounts[@]}" "${symlinks[@]}" $nixhome -- \
 	env -i "${env[@]}" @out@/bin/stage2 "$@"
