@@ -372,14 +372,30 @@ let
       # Experiments
       exp = {
         nbody = rec {
-          tampi = callPackage ./garlic/exp/nbody/tampi.nix { };
+          baseline = callPackage ./garlic/exp/nbody/nblocks.nix { };
 
           # Experiment variants
-          baseline = tampi;
-          small = baseline.override { particles = 12 * 4096; };
+          small = baseline.override {
+            particles = 12 * 4096;
+          };
           # TODO: Update freeCpu using a non-standard pipeline
           #freeCpu = baseline.override { freeCpu = true; };
           jemalloc = baseline.override { enableJemalloc = true; };
+
+          # Some experiments with traces
+          trace = {
+            # Only one unit repeated 30 times
+            baseline = small.override {
+              enableCTF = true;
+              loops = 30;
+              steps = 1;
+            };
+
+            # Same but with jemalloc enabled
+            jemalloc = trace.baseline.override {
+              enableJemalloc = true;
+            };
+          };
         };
 
         saiph = {
@@ -450,6 +466,7 @@ let
           small = merge [ small ];
           jemalloc = merge [ baseline jemalloc ];
           #freeCpu  = merge [ baseline freeCpu ];
+          ctf = merge [ ctf ];
         };
 
         hpcg = with exp.hpcg; {
@@ -490,6 +507,10 @@ let
           #  script = ./garlic/fig/nbody/freeCpu.R;
           #  dataset = ds.nbody.freeCpu;
           #};
+          ctf = pp.rPlot {
+            script = ./garlic/fig/nbody/baseline.R;
+            dataset = ds.nbody.ctf;
+          };
         };
 
         hpcg = {
