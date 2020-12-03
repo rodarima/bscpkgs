@@ -18,6 +18,7 @@ stdenv.mkDerivation {
     # This program loads a environment with the given programs available.
     # Requires /nix to be available.
 
+    curdir="\$(pwd)"
     export "buildInputs=$buildInputs"
     # ${stdenv}
     export "PATH=$PATH"
@@ -39,6 +40,8 @@ stdenv.mkDerivation {
     # Access to bin and nix tools for srun, as it keeps the PATH
     export "PATH=\$PATH:/bin"
     export "PATH=$PATH:/gpfs/projects/bsc15/nix/bin"
+    export "SHELL=${bashInteractive}/bin/bash"
+    export HISTFILE="\$curdir/.histfile"
 
     if [[ -z "\$@" ]]; then
       exec ${bashInteractive}/bin/bash
