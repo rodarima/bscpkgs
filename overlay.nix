@@ -303,6 +303,11 @@ let
         };
 
         heat = callPackage ./garlic/apps/heat/default.nix { };
+
+        miniamr = callPackage ./garlic/apps/miniamr/default.nix {
+          variant = "ompss-2";
+        };
+
 #        heat = callPackage ./garlic/apps/heat/default.nix {
 #          # FIXME: The heat program must be able to compile with gcc9 and newer
 #          stdenv = self.gcc7Stdenv;
