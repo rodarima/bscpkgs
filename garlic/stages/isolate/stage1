@@ -41,7 +41,8 @@ mounts=(
 	-m /gpfs/projects/bsc15
 	-m /gpfs/scratch/bsc15
 	-m /bin:@nixPrefix@@busybox@/bin
-  @extraMountOptions@
+	-m "$TMPDIR"
+	@extraMountOptions@
 )
 
 symlinks=(
