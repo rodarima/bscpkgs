@@ -150,8 +150,12 @@ let
     # Our custom version that lacks the binaries. Disabled by default.
     #rdma-core = callPackage ./bsc/rdma-core/default.nix { };
 
+    # Last llvm release by default
+    llvmPackages = self.llvmPackages_11;
+    lld = bsc.llvmPackages.lld;
+
     clangOmpss2Unwrapped = callPackage ./bsc/llvm-ompss2/clang.nix {
-      stdenv = self.llvmPackages_10.stdenv;
+      stdenv = bsc.llvmPackages.stdenv;
       enableDebug = false;
     };
 
