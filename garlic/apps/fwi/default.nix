@@ -8,15 +8,13 @@
 }:
 
 stdenv.mkDerivation rec {
-  name = "nbody";
-  variant = "4_MPI_ompss";
+  name = "fwi";
+  variant = "oss+task";
 
   src = builtins.fetchGit {
     url = "https://gitlab.com/srodrb/BSC-FWI.git";
-    ref = "ompss-mpi-nocache";
+    ref = "${variant}";
   };
-
-  postUnpack = "sourceRoot=$sourceRoot/${variant}";
 
   enableParallelBuilding = true;
 
@@ -33,8 +31,17 @@ stdenv.mkDerivation rec {
   # to define them before mcc includes nanos6.h from the command line. So the
   # only chance is by setting it at the command line with -D. Using the DEFINES
   # below, reaches the command line of the preprocessing stage with gcc.
-  preBuild = ''
+  preConfigure = ''
     export DEFINES=-D_GNU_SOURCE
+    export NANOS6_CONFIG_OVERRIDE=version.debug=true
+  '';
+  
+  # We compile the ModelGenerator using gcc *only*, as otherwise it will
+  # be compiled with nanos6, which requires access to /sys to determine
+  # hardware capabilities. So it will fail in the nix-build environment,
+  # as there is no /sys mounted.
+  preBuild = ''
+    make COMPILER=GNU ModelGenerator
   '';
 
   makeFlags = [
@@ -46,7 +53,7 @@ stdenv.mkDerivation rec {
 
   installPhase = ''
     mkdir -p $out/bin
-    cp fwi.* $out/bin
+    cp fwi $out/bin
     cp ModelGenerator $out/bin
   '';
 }

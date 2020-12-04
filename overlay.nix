@@ -310,6 +310,8 @@ let
 
         ifsker = callPackage ./garlic/apps/ifsker/default.nix { };
 
+        fwi = callPackage ./garlic/apps/fwi { };
+
 #        heat = callPackage ./garlic/apps/heat/default.nix {
 #          # FIXME: The heat program must be able to compile with gcc9 and newer
 #          stdenv = self.gcc7Stdenv;
@@ -330,8 +332,6 @@ let
 #        };
 #  
 #        hpccg = callPackage ./garlic/apps/hpccg { };
-#  
-#        fwi = callPackage ./garlic/apps/fwi { };
       };
 
       # Execution stages
