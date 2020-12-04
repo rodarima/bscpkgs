@@ -314,7 +314,11 @@ let
 
         ifsker = callPackage ./garlic/apps/ifsker/default.nix { };
 
-        fwi = callPackage ./garlic/apps/fwi { };
+        lulesh = callPackage ./garlic/apps/lulesh/default.nix { };
+
+        hpccg = callPackage ./garlic/apps/hpccg/default.nix { };
+
+        fwi = callPackage ./garlic/apps/fwi/default.nix { };
 
 #        heat = callPackage ./garlic/apps/heat/default.nix {
 #          # FIXME: The heat program must be able to compile with gcc9 and newer
@@ -330,12 +334,6 @@ let
 #            };
 #          };
 #        };
-#  
-#        lulesh = callPackage ./garlic/apps/lulesh {
-#          mpi = intel-mpi;
-#        };
-#  
-#        hpccg = callPackage ./garlic/apps/hpccg { };
       };
 
       # Execution stages
