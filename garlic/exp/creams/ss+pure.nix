@@ -12,11 +12,11 @@ let
   # Initial variable configuration
   varConf = {
     input = [
-      { time="10:00:00"; nodes=1;  }
-      { time="05:00:00"; nodes=2;  }
-      { time="03:00:00"; nodes=4;  }
+      { time="02:00:00"; nodes=1;  }
+      { time="02:00:00"; nodes=2;  }
+      { time="02:00:00"; nodes=4;  }
       { time="02:00:00"; nodes=8;  }
-      { time="01:00:00"; nodes=16; }
+      { time="02:00:00"; nodes=16; }
     ];
   };
 
@@ -37,9 +37,9 @@ let
 
     # Resources
     qos = "debug";
-    ntasksPerNode = hw.cpusPerNode;
+    ntasksPerNode = 48;
+    cpusPerTask   =  1;
     inherit (c.input) time nodes;
-    cpusPerTask = 1;
     jobName = unitName;
   };
 

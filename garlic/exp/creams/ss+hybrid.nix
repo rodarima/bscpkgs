@@ -12,17 +12,17 @@ let
   # Initial variable configuration
   varConf = {
     input = [
-      { nodes=1 ; nprocz=2 ; granul=37; time= "10:00:00"; }
-      { nodes=2 ; nprocz=4 ; granul=19; time= "05:00:00"; }
-      { nodes=4 ; nprocz=8 ; granul=10; time= "03:00:00"; }
+      { nodes=1 ; nprocz=2 ; granul=37; time= "02:00:00"; }
+      { nodes=2 ; nprocz=4 ; granul=19; time= "02:00:00"; }
+      { nodes=4 ; nprocz=8 ; granul=10; time= "02:00:00"; }
       { nodes=8 ; nprocz=16; granul=9 ; time= "02:00:00"; }
-      { nodes=16; nprocz=32; granul=9 ; time= "01:00:00"; }
+      { nodes=16; nprocz=32; granul=9 ; time= "02:00:00"; }
     ];
 
     gitBranch = [
-      "garlic/mpi+isend+oss+task"
       "garlic/mpi+send+omp+fork"
       "garlic/mpi+send+oss+task"
+      "garlic/mpi+isend+oss+task"
       "garlic/tampi+isend+oss+task"
     ];
   };
@@ -44,9 +44,9 @@ let
 
     # Resources
     qos = "debug";
-    ntasksPerNode = hw.socketsPerNode;
+    ntasksPerNode =  2;
+    cpusPerTask   = 24;
     inherit (c.input) time nodes;
-    cpusPerTask = hw.cpusPerSocket;
     jobName = unitName;
   };
 
