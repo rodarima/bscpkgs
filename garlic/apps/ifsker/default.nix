@@ -13,7 +13,7 @@ stdenv.mkDerivation rec {
   name = "ifsker";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/ksala/ifsker.git";
+    url = "ssh://git@bscpm03.bsc.es/ksala/ifsker.git";
     ref = "master";
   };
 

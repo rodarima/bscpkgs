@@ -19,7 +19,7 @@ stdenv.mkDerivation rec {
   name = "miniamr";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/ksala/miniamr.git";
+    url = "ssh://git@bscpm03.bsc.es/ksala/miniamr.git";
     ref = "master";
   };
 

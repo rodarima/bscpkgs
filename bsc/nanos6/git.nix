@@ -24,7 +24,7 @@ stdenv.mkDerivation rec {
   branch = "master";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/nanos6/nanos6";
+    url = "ssh://git@bscpm03.bsc.es/nanos6/nanos6";
     ref = branch;
   };
 

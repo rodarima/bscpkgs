@@ -10,7 +10,7 @@ stdenv.mkDerivation rec {
 
   # src = /home/Computational/pmartin1/creams-simplified;
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/pmartin1/creams-simplified.git";
+    url = "ssh://git@bscpm03.bsc.es/pmartin1/creams-simplified.git";
     ref = "${gitBranch}";
   };
 

@@ -9,7 +9,7 @@ stdenv.mkDerivation rec {
   name = "lulesh";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/mmaronas/lulesh.git";
+    url = "ssh://git@bscpm03.bsc.es/mmaronas/lulesh.git";
     ref = "master";
   };
 

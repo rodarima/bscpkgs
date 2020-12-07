@@ -6,7 +6,7 @@
 , mcxx ? null
 , cflags ? null
 , gitBranch
-, gitURL ? "ssh://git@bscpm02.bsc.es/garlic/apps/nbody.git"
+, gitURL ? "ssh://git@bscpm03.bsc.es/garlic/apps/nbody.git"
 , blocksize ? 2048
 }:
 

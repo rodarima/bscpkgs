@@ -24,7 +24,7 @@ stdenv.mkDerivation rec {
 
   src = ~/heat;
   #src = builtins.fetchGit {
-  #  url = "ssh://git@bscpm02.bsc.es/garlic/apps/heat.git";
+  #  url = "ssh://git@bscpm03.bsc.es/garlic/apps/heat.git";
   #  ref = "garlic";
   #};
 

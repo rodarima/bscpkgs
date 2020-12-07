@@ -77,16 +77,16 @@ ABSTRACT
 
   Then, configure it for use in the ~/.ssh/config file, adding:
 
-    Host bscpm02.bsc.es
+    Host bscpm03.bsc.es
       IdentityFile ~/.ssh/id_rsa
 
   Finally verify the SSH connection to the server works and you get a 
   greeting from the GitLab server with your username:
 
-    xeon07$ ssh git@bscpm02.bsc.es
+    xeon07$ ssh git@bscpm03.bsc.es
     PTY allocation request failed on channel 0
     Welcome to GitLab, @rarias!
-    Connection to bscpm02.bsc.es closed.
+    Connection to bscpm03.bsc.es closed.
 
   Verify that you can access nanos6/nanos6 repository (otherwise you 
   first need to ask to be granted read access), at:
@@ -96,7 +96,7 @@ ABSTRACT
   Finally, you should be able to download the nanos6/nanos6 git 
   repository without any password interaction by running:
 
-    xeon07$ git clone git@bscpm02.bsc.es:nanos6/nanos6.git
+    xeon07$ git clone git@bscpm03.bsc.es:nanos6/nanos6.git
 
   You will also need to access MareNostrum 4 from the xeon07 node, in 
   order to submit experiments. Add the following lines as well to the 
@@ -129,7 +129,7 @@ ABSTRACT
   Now you are ready to build and install packages with nix. Clone the 
   bscpkgs repository:
 
-    xeon07$ git clone git@bscpm02.bsc.es:rarias/bscpkgs.git
+    xeon07$ git clone git@bscpm03.bsc.es:rarias/bscpkgs.git
 
   Nix looks in the current folder for a file named "default.nix" for 
   packages, so go to the repo directory:

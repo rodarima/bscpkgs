@@ -9,7 +9,7 @@ stdenv.mkDerivation rec {
   name = "genseq";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/dalvare1/bigsort.git";
+    url = "ssh://git@bscpm03.bsc.es/dalvare1/bigsort.git";
     ref = "garlic/mpi+send+omp+task";
   };
 

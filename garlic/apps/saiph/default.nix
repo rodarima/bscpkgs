@@ -21,7 +21,7 @@ stdenv.mkDerivation rec {
   name = "saiph";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/DSLs/saiph.git";
+    url = "ssh://git@bscpm03.bsc.es/DSLs/saiph.git";
     ref = "${gitBranch}";
   };
 

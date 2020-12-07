@@ -12,7 +12,7 @@ stdenv.mkDerivation rec {
   name = "hpcg";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/rpenacob/garlic-hpcg.git";
+    url = "ssh://git@bscpm03.bsc.es/rpenacob/garlic-hpcg.git";
     ref = "${gitBranch}";
   };
 

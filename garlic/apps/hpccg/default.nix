@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
   name = "hpccg";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/mmaronas/HPCCG.git";
+    url = "ssh://git@bscpm03.bsc.es/mmaronas/HPCCG.git";
     ref = "mmaronas-development";
   };
 

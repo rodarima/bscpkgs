@@ -19,7 +19,7 @@ stdenv.mkDerivation rec {
   dontDisableStatic = true;
   makeFlags = [ "V=1" ];
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm02.bsc.es/interoperability/tampi";
+    url = "ssh://git@bscpm03.bsc.es/interoperability/tampi";
     ref = "master";
   };
 }
