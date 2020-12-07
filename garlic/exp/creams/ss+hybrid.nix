@@ -44,8 +44,7 @@ let
 
     # Resources
     qos = "debug";
-    ntasksPerNode =  2;
-    cpusPerTask   = 24;
+    ntasksPerNode = hw.socketsPerNode;
     inherit (c.input) time nodes;
     jobName = unitName;
   };
