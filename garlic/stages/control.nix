@@ -17,7 +17,7 @@ stdenv.mkDerivation {
   dontPatchShebangs = true;
   installPhase = ''
     cat > $out <<EOF
-    #!/bin/sh
+    #!/bin/sh -e
     for n in \$(seq 1 ${toString loops}); do
       export GARLIC_RUN="\$n"
       echo "running \$n of ${toString loops}" > status
