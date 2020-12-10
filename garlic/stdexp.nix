@@ -5,6 +5,9 @@
 , targetMachine
 , garlicTools
 , bsc
+, writeTextFile
+, runCommandLocal
+, python
 }:
 
 with stdenv.lib;
@@ -113,4 +116,19 @@ rec {
     units = genUnits { inherit configs pipeline; };
   in
     buildTrebuchet units;
+
+  # Runs a python script and the standard output is directly imported as
+  # nix code
+  printPython = code:
+    let
+      p = writeTextFile {
+        name = "python-script";
+        text = ''
+          from math import *
+          ${code}
+        '';
+      };
+    in
+      import (runCommandLocal "a" { buildInputs = [ python ]; } ''
+        python ${p} > $out'');
 }
