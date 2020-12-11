@@ -6,7 +6,6 @@ with self.lib;
 let
   inherit (self.lib) callPackageWith;
   inherit (self.lib) callPackagesWith;
-  callPackage = callPackageWith (self // self.bsc // self.bsc.garlic);
 
   appendPasstru = drv: attrs: drv.overrideAttrs (old:{
     passthru = old.passthru // attrs;
@@ -16,8 +15,11 @@ let
   #  BSC Packages
   # ===================================================================
 
-  _bsc = makeExtensible (bsc: {
-
+  _bsc = makeExtensible (bsc:
+  let
+    callPackage = callPackageWith (self // bsc // bsc.garlic);
+  in
+  {
     inherit callPackage;
 
     # =================================================================
