@@ -38,6 +38,7 @@ let
     # Resources
     qos = "debug";
     ntasksPerNode = hw.cpusPerNode;
+    cpusPerTask = 1;
     inherit (c.input) time nodes;
     jobName = unitName;
   };
@@ -45,6 +46,14 @@ let
   # Compute the array of configurations
   configs = stdexp.buildConfigs {
     inherit varConf genConf;
+  };
+
+  # Use nanos6 with regions
+  nanos6Env = {nextStage, conf, ...}: with conf; stages.exec {
+    inherit nextStage;
+    env = ''
+      export NANOS6_CONFIG_OVERRIDE="version.dependencies=regions"
+    '';
   };
 
   # Custom stage to copy the creams input dataset
@@ -71,7 +80,7 @@ let
         inherit cc mpi gitBranch;
       };
 
-  pipeline = stdexp.stdPipeline ++ [ copyInput creams ];
+  pipeline = stdexp.stdPipeline ++ [ nanos6Env copyInput creams ];
 
 in
  
