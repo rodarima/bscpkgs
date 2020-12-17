@@ -36,5 +36,6 @@ in
   creams = with exp.creams.ss; {
     ss.hybrid = merge [ hybrid ];
     ss.pure = merge [ pure ];
+    ss.all = merge [ hybrid pure ];
   };
 }
