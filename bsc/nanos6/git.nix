@@ -35,7 +35,7 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   preConfigure = ''
-    export CACHELINE_WIDTH=${toString cacheline-width}
+    export CACHELINE_WIDTH=${toString cachelineBytes}
     export NANOS6_GIT_VERSION=${src.rev}
     export NANOS6_GIT_BRANCH=${branch}
   '';
