@@ -54,4 +54,11 @@ in
       dataset = test;
     };
   };
+
+  creams = {
+    ss = with ds.creams; rPlot {
+      script = ./creams/ss.R;
+      dataset = ss.all;
+    };
+  };
 }
