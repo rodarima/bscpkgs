@@ -165,6 +165,10 @@ let
     };
     # Use a slurm compatible with MN4
     slurm = bsc.slurm17;
+    # We need the unstable branch to get the fallocate problem fixed, as it is
+    # not yet in stable nix, see:
+    # https://pm.bsc.es/gitlab/rarias/bscpkgs/-/issues/83
+    nix-mn4 = self.nixUnstable;
     # Our custom version that lacks the binaries. Disabled by default.
     #rdma-core = callPackage ./bsc/rdma-core/default.nix { };
 
