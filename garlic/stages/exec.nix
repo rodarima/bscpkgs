@@ -25,7 +25,7 @@ stdenv.mkDerivation {
   phases = [ "installPhase" ];
   installPhase = ''
     cat > $out <<'EOF'
-    #!/bin/sh
+    #!/bin/sh -e
     ${env}
 
     ''+pre+''
