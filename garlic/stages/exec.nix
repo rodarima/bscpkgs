@@ -28,9 +28,12 @@ stdenv.mkDerivation {
     #!/bin/sh -e
     ${env}
 
-    ''+pre+''
+    ${pre}
+
     ${execMethod}${nixPrefix}${stageProgram nextStage} ${argvString}
-    ''+post+''
+
+    ${post}
+
     EOF
     chmod +x $out
   '';
