@@ -96,7 +96,7 @@ let
       nanos6+jemalloc as well. */
       customPkgs = bsc.extend (self: super: {
         mpi = conf.mpi;
-        nanos6 = self.nanos6.override { inherit enableJemalloc; };
+        nanos6 = super.nanos6.override { inherit enableJemalloc; };
       });
     in
       customPkgs.apps.nbody.override ({
