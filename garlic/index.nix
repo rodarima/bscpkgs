@@ -72,6 +72,7 @@
     srun       = callPackage ./stages/srun.nix { };
     control    = callPackage ./stages/control.nix { };
     exec       = callPackage ./stages/exec.nix { };
+    script     = callPackage ./stages/script.nix { };
     extrae     = callPackage ./stages/extrae.nix { };
     valgrind   = callPackage ./stages/valgrind.nix { };
     perf       = callPackage ./stages/perf.nix { };
