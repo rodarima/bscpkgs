@@ -6,7 +6,7 @@
   # MareNostrum 4 configuration
   mn4 = {
     config = {
-      name = "mn4";
+      clusterName = "mn4";
       sshHost = "mn1";
       nixPrefix = "/gpfs/projects/bsc15/nix";
       march = "skylake-avx512";

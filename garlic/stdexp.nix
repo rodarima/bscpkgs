@@ -94,8 +94,7 @@ rec {
         else {}
       ) //
       {
-        clusterName = machineConf.name;
-        inherit (conf) nixPrefix;
+        inherit (conf) nixPrefix clusterName;
         inherit nextStage;
       }
     );
