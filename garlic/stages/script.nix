@@ -5,8 +5,12 @@
 {
   script
 , shell ? "/bin/sh"
+, exitOnError ? true
 }:
 
+let
+  setcmd = if exitOnError then "set -e" else "";
+in
 stdenv.mkDerivation {
   name = "script";
   preferLocalBuild = true;
@@ -14,6 +18,7 @@ stdenv.mkDerivation {
   installPhase = ''
     cat > $out <<'EOF'
     #!${shell}
+    ${setcmd}
 
     ${script}
 
