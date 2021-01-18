@@ -151,6 +151,8 @@ let
       systemtap = self.linuxPackages_4_9.systemtap;
     };
 
+    ctfast = callPackage ./bsc/ctfast/default.nix { };
+
     # =================================================================
     #  MN4 specific
     # =================================================================
