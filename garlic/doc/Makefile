@@ -1,4 +1,5 @@
-all: execution.pdf execution.utf8 execution.ascii pp.pdf pp.utf8 pp.ascii
+all: execution.pdf execution.utf8 execution.ascii pp.pdf pp.utf8 pp.ascii\
+	branch.pdf
 
 TTYOPT=-rPO=4m -rLL=72m
 PDFOPT=-dpaper=a4 -rPO=4c -rLL=13c

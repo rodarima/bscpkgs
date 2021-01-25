@@ -1,0 +1,152 @@
+#.ps -3
+#.fam CMU
+#.PS 4.5/25.4 # Scale drawing to 20/25.4 in =
+# = 20/25.4[in]/25.4[mm/in] = 20 mm
+# FLOWCHART - Basic flow chart blocks.
+scale=25.4 #Scale units from inches to mm
+csize=2.0 #Cell size in mm
+pstricks=0
+dx=0; dy=2;
+define process
+{[
+  box $1;
+]}
+# decision(): rhomboid -> if block
+define decision {[
+  boxwid=boxwid*1.2
+  boxht=boxht*1.2
+  B: box invis $1;
+  line from B.n to B.e to B.s to B.w to B.n;
+]}
+
+#--- END OF MACROS ---
+boxwid=30
+fillval=1
+circlerad=10
+down
+START: circle "Start"
+arrow
+D_MPIB: decision("MPI-based?")
+arrow " Yes" ljust
+D_TAMPI: decision("TAMPI?")
+arrow " Yes" ljust
+TAMPI: process("\fB+tampi\fP")
+right
+move to D_TAMPI.e
+arrow "No" above
+D_MPI: decision("MPI?")
+down
+move to D_MPI.s
+arrow " Yes" ljust
+MPI: process("\fB+mpi\fP")
+move to TAMPI.s
+A_TAMPI: arrow linewid
+line from MPI.s to MPI.c - (0,boxht) \
+	to A_TAMPI.c
+circle at A_TAMPI.c rad 0.7 filled
+move at A_TAMPI
+D_ISEND: decision("MPI_Isend()?")
+arrow " Yes" ljust
+ISEND: process("\fB+isend\fP")
+A_ISEND: arrow
+right
+move to D_ISEND.e
+arrow "No" above
+D_SEND: decision("MPI_Send()?")
+down
+move to D_SEND.s
+arrow " Yes" ljust
+SEND: process("\fB+send\fP")
+right
+move to D_SEND.e
+arrow "No" above
+D_RMA: decision("MPI_Get()?")
+down
+move to D_RMA.s
+arrow " Yes" ljust
+RMA: process("\fB+rma\fP")
+line "No" above from D_MPIB.w to D_MPIB.w - (boxwid,0)
+line to (D_MPIB.w.x-boxwid, A_ISEND.c.y) \
+	to A_ISEND.c
+line from SEND.s to SEND.c - (0,boxht) \
+	to A_ISEND.c
+line from RMA.s to RMA.c - (0,boxht) \
+	to SEND.c - (0,boxht)
+circle at A_ISEND.c rad 0.7 filled
+move at A_ISEND
+D_MT: decision("multithread?")
+arrow " Yes" ljust
+D_OMP: decision("OpenMP?")
+arrow " Yes" ljust
+OMP: process("\fB+omp\fP")
+right
+move to D_OMP.e
+arrow "No" above
+D_OSS: decision("OmpSs-2?")
+down
+move to D_OSS.s
+arrow " Yes" ljust
+OSS: process("\fB+oss\fP")
+down
+move to OMP.s
+A_OMP: arrow
+circle at A_OMP.c rad 0.7 filled
+line from OSS.s to OSS.c - (0,boxht) \
+	to A_OMP.c
+move to A_OMP.s
+D_FJ: decision("fork-join?")
+arrow " Yes" ljust
+FJ: process("\fB+fork\fP")
+right
+move to D_FJ.e
+arrow "No" above
+D_TASKFOR: decision("task for?")
+arrow "No" above
+down
+move to D_TASKFOR.s
+arrow " Yes" ljust
+TASKFOR: process("\fB+taskfor\fP")
+right
+move to D_TASKFOR.e
+arrow "No" above
+D_TASK: decision("task model?")
+down
+move to D_TASK.s
+arrow " Yes" ljust
+TASK: process("\fB+task\fP")
+move to FJ.s
+A_FJ: arrow
+circle at A_FJ.c rad 0.7 filled
+line from TASKFOR.s to TASKFOR.c - (0,boxht) \
+	to A_FJ.c
+line from TASK.s to TASK.c - (0,boxht) \
+	to TASKFOR.c - (0,boxht)
+left
+move to OMP.c - (boxwid,0)
+SEQ: process("\fB+seq\fP")
+line "No" above from D_MT.w to (SEQ.x, D_MT.w.y)
+arrow to SEQ.n
+line from SEQ.s to (SEQ.s.x, A_FJ.c.y) to A_FJ.c
+down
+move to A_FJ.s
+D_SIMD: decision("SIMD opt.?")
+move to D_SIMD.e
+right
+arrow "Yes" above
+SIMD: process("\fB+simd\fP")
+down
+move to D_SIMD.s
+arrow " No" ljust
+END: circle "End"
+circle radius circlerad*0.9 at END
+arrow from SIMD.s to (SIMD.x, END.y) to END.e
+
+# Error lines
+ERR: circle "Error" at (TASK.x+boxwid, END.y)
+circle radius circlerad*0.9 at ERR
+line "No" above from D_TASK.e to (ERR.n.x,D_TASK.e.y)
+line "No" above from D_OSS.e to (ERR.n.x,D_OSS.e.y)
+line "No" above from D_RMA.e to (ERR.n.x,D_RMA.e.y)
+line "No" above from D_MPI.e to (ERR.n.x,D_MPI.e.y)
+arrow to ERR.n
+#.PE
