@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
   tgz="parallel_studio_xe_2020_update${update}_professional_edition.tgz";
 
   src = fetchurl {
-    url = "http://registrationcenter-download.intel.com/akdlm/IRC_NAS/tec/${dir_nr}/${tgz}";
+    url = "https://registrationcenter-download.intel.com/akdlm/irc_nas/tec/${dir_nr}/${tgz}";
     sha256 = "1rn9kk5bjj0jfv853b09dxrx7kzvv8dlyzw3hl9ijx9mqr09lrzr";
   };
 
