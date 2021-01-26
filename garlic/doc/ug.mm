@@ -1,11 +1,13 @@
 \"Header point size
 .ds HP "15 12 12 0 0 0 0 0 0 0 0 0 0 0"
-.COVER
-.TL
-Garlic: User guide
-.AF "Barcelona Supercomputing Center"
-.AU "Rodrigo Arias Mallo"
-.COVEND
+.S 11p 1.3m
+.PGFORM 14c 28c 3.5c
+.\" .COVER
+.\" .TL
+.\" Garlic: User guide
+.\" .AF "Barcelona Supercomputing Center"
+.\" .AU "Rodrigo Arias Mallo"
+.\" .COVEND
 .H 1 "Overview"
 .P
 The garlic framework is designed to fulfill all the requirements of an
@@ -13,8 +15,9 @@ experimenter in all the steps up to publication. The experience gained
 while using it suggests that we move along three stages despicted in the
 following diagram:
 .DS CB
-.PS
-linewid=0.9;
+.S 9p 10p
+.PS 5
+linewid=1;
 right
 box "Source" "code"
 arrow "Development" above
@@ -24,6 +27,7 @@ box "Results"
 arrow "Data" "exploration"
 box "Figures"
 .PE
+.S P P
 .DE
 In the development phase the experimenter changes the source code in
 order to introduce new features or fix bugs. Once the program is
@@ -53,49 +57,94 @@ minimize the delay times, so the programs can be executed as soon as
 needed, but under a controlled environment so that the same behavior
 occurs during the experimentation phase.
 .P
-The development phase is typically carried directly in the target
-machine, so we need the resources first.
-.H 2 "Allocating resources for development"
-.P
-Our target machine (MareNostrum 4) provides an interactive shell, that
-can be requested with the number of computational resources required for
-development.
-.P
-To do so, connect to it and allocate an interactive session:
-.DS I
-.VERBON
-build% ssh target
-target% salloc ...
-compute%
-.VERBOFF
-.DE
-This operation may take some minutes to complete depending on the load
-of the cluster. But once the session is ready, any subsequent execution
-will be immediate.
+In particular, we want that several experimenters can reproduce the
+the same development environment so they can debug each other programs
+when reporting bugs. Therefore, the environment must be carefully
+controlled to avoid non-reproducible scenarios.
+.\" ===================================================================
 .H 2 "Getting the development tools"
 .P
-In order to get the same packages provided for the experiments, we can
-use the \fInix-develop\fP utility, which creates a namespace where the
-required packages are installed. Use the build machine to generate a
-develop environment:
+To create a development
+environment, first copy or download the sources of your program (not the
+dependencies) in a new directory placed in the target machine
+(MareNostrum\~4).
+.P
+The default environment contains packages commonly used to develop
+programs, listed in the \fIgarlic/index.nix\fP file:
+.\" FIXME: Unify garlic.unsafeDevelop in garlic.develop, so we can
+.\" specify the packages directly
+.DS I
+.VERBON
+develop = let 
+  packages = with self; [
+    coreutils htop procps-ng vim which strace
+    tmux gdb kakoune universal-ctags bashInteractive
+    glibcLocales ncurses git screen curl
+    # Add more nixpkgs packages here...
+  ] ++ with bsc; [
+    slurm clangOmpss2 icc mcxx perf
+    # Add more bsc packages here...
+  ];
+  ...
+.VERBOFF
+.DE
+If you need additional packages, add them to the list, so that they
+become available in the environment. Those may include any dependency
+required to build your program.
+.P
+Then use the build machine (xeon07) to build the
+.I garlic.develop
+derivation:
 .DS I
 .VERBON
 build% nix-build -A garlic.develop
 \&...
 build% grep ln result
-ln -fs /gpfs/projects/bsc15/nix/...olate/bin/stage1 .nix-develop
+ln -fs /gpfs/projects/.../bin/stage1 .nix-develop
 .VERBOFF
 .DE
-Copy the \fIln\fP command and run it in the target machine, in a new
-directory used for your program development. The link will be placed in
-a hidden file named \fI.nix-develop\fP and will be used to remember your
-environment. Several environments can be stored using this method, with
-different packages on each.
+Copy the \fIln\fP command and run it in the target machine
+(MareNostrum\~4), in the new directory used for your program
+development. The link will be created as a hidden file named
+\fI.nix-develop\fP and will be used to remember your environment.
+Several environments can be stored using this method, with different
+packages in different directories. You will need to rebuild the
+.I garlic.develop
+derivation and update the
+.I .nix-develop
+link after the package list changes to update the environment. Once the
+environment link is created, there is no need to repeat this steps again.
 .P
-Now you can access the newly created environment by running:
+Before entering the environment, you will need to access the required
+resources for your progam, which may include several compute nodes.
+.\" ===================================================================
+.H 2 "Allocating resources for development"
+.P
+Our target machine (MareNostrum 4) provides an interactive shell, that
+can be requested with the number of computational resources required for
+development. To do so, connect to the login node and allocate an
+interactive session:
 .DS I
 .VERBON
-compute% nix-develop
+% ssh mn1
+login% salloc ...
+target%
+.VERBOFF
+.DE
+This operation may take some minutes to complete depending on the load
+of the cluster. But once the session is ready, any subsequent execution
+of programs will be immediate.
+.\" ===================================================================
+.H 2 "Accessing the developement environment"
+.P
+The utility program \fInix-develop\fP has been designed to access the
+development environment of the current directory, by looking for the
+\fI.nix-develop\fP file. It creates a namespace where the required
+packages are installed and ready to be used. Now you can access the
+newly created environment by running:
+.DS I
+.VERBON
+target% nix-develop
 develop%
 .VERBOFF
 .DE
@@ -104,31 +153,32 @@ The spawned shell contains all the packages pre-defined in the
 name of the commands.
 .DS I
 .VERBON
-develop$ which gcc
+develop% which gcc
 /nix/store/azayfhqyg9...s8aqfmy-gcc-wrapper-9.3.0/bin/gcc
-develop$ which gdb
+develop% which gdb
 /nix/store/1c833b2y8j...pnjn2nv9d46zv44dk-gdb-9.2/bin/gdb
 .VERBOFF
 .DE
 If you need additional packages, you can add them in the
-\fIgarlic/index.nix\fP file:
-.\" FIXME: Unify garlic.unsafeDevelop in garlic.develop, so we can
-.\" specify the packages directly
+\fIgarlic/index.nix\fP file as mentioned previously. To keep the
+same current resources, so you don't need to wait again for the
+resources to be allocated, exit only from the development shell:
 .DS I
 .VERBON
-unsafeDevelop = callPackage ./develop/default.nix {
-  extraInputs = with self; [
-    coreutils htop procps-ng vim which strace
-    tmux gdb kakoune universal-ctags bashInteractive
-    glibcLocales ncurses git screen curl
-    # Add more nixpkgs packages here...
-    bsc.slurm bsc.clangOmpss2 bsc.icc bsc.mcxx bsc.perf
-    # Add more bscpkgs packages here...
-  ];
-};
+develop% exit
+target%
 .VERBOFF
 .DE
-Then re-execute the steps again, to build the new develop environment.
+Then update the
+.I .nix-develop
+link and enter into the new develop environment:
+.DS I
+.VERBON
+target% nix-develop
+develop%
+.VERBOFF
+.DE
+.\" ===================================================================
 .H 2 "Execution"
 The allocated shell can only execute tasks in the current node, which
 may be enough for some tests. To do so, you can directly run your
@@ -141,7 +191,7 @@ develop$ ./program
 If you need to run a multi-node program, typically using MPI
 communications, then you can do so by using srun. Notice that you need
 to allocate several nodes when calling salloc previously. The srun
-command will execute the given program \fBoutside\fP the develop
+command will execute the given program \fBoutside\fP the development
 environment if executed as-is. So we re-enter the develop environment by
 calling nix-develop as a wrapper of the program:
 .\" FIXME: wrap srun to reenter the develop environment by its own
@@ -158,23 +208,24 @@ in only one node by using:
 develop$ gdb ./program
 .VERBOFF
 .DE
-Or it can be attached to an already running program by using its pid.
-You will need to first connect to the node running it, and run gdb
-inside the nix-develop environment. Use squeue to see the compute nodes
-running your program: 
+Or it can be attached to an already running program by using its PID.
+You will need to first connect to the node running it (say target2), and
+run gdb inside the nix-develop environment. Use
+.I squeue
+to see the compute nodes running your program: 
 .DS I
 .VERBON
-target$ ssh compute
-compute$ cd project-develop
-compute$ nix-develop
+login$ ssh target2
+target2$ cd project-develop
+target2$ nix-develop
 develop$ gdb -p $pid
 .VERBOFF
 .DE
-You can repeat this step in other nodes to control the execution in
-multiple nodes.
+You can repeat this step to control the execution of programs running in
+different nodes simultaneously.
 .P
 In those cases where the program crashes before being able to attach the
-debugger, you can enable the generation of core dumps:
+debugger, enable the generation of core dumps:
 .DS I
 .VERBON
 develop$ ulimit -c unlimited
