@@ -6,37 +6,43 @@
 }:
 
 {
-  unsafeDevelop = callPackage ./develop/default.nix {
-        extraInputs = with self; [
-          coreutils htop procps-ng vim which strace
-          tmux gdb kakoune universal-ctags bashInteractive
-          glibcLocales ncurses git screen curl
-          # Add more nixpkgs packages here...
-          bsc.slurm bsc.clangOmpss2 bsc.icc bsc.mcxx bsc.perf
-          # Add more bscpkgs packages here...
-        ];
+  develop = let
+    commonPackages = with self; [
+      coreutils htop procps-ng vim which strace
+      tmux gdb kakoune universal-ctags bashInteractive
+      glibcLocales ncurses git screen curl
+      # Add more nixpkgs packages here...
+    ];
+    bscPackages = with bsc; [
+      slurm clangOmpss2 icc mcxx perf tampi impi
+      # Add more bsc packages here...
+    ];
+    packages = commonPackages ++ bscPackages;
+  in
+    bsc.garlic.stages.exec rec {
+      nextStage = bsc.garlic.stages.isolate {
+        nextStage = bsc.garlic.unsafeDevelop.override {
+          extraInputs = packages;
+        };
+        nixPrefix = bsc.garlic.targetMachine.config.nixPrefix;
+        extraMounts = [ "/tmp:$TMPDIR" ];
+      };
+      nixPrefix = bsc.garlic.targetMachine.config.nixPrefix;
+      # This hack uploads all dependencies to MN4
+      pre = let
+        nixPrefix = bsc.garlic.targetMachine.config.nixPrefix;
+        stageProgram = bsc.garlicTools.stageProgram;
+      in
+      ''
+        # Hack to upload this to MN4: @upload-to-mn@
+
+        # Create a link to the develop script
+        ln -fs ${nixPrefix}${stageProgram nextStage} .nix-develop
+      '';
+      post = "\n";
   };
 
-  develop = bsc.garlic.stages.exec rec {
-    nextStage = bsc.garlic.stages.isolate {
-      nextStage = bsc.garlic.unsafeDevelop;
-      nixPrefix = bsc.garlic.targetMachine.config.nixPrefix;
-      extraMounts = [ "/tmp:$TMPDIR" ];
-    };
-    nixPrefix = bsc.garlic.targetMachine.config.nixPrefix;
-    # This hack uploads all dependencies to MN4
-    pre = let
-      nixPrefix = bsc.garlic.targetMachine.config.nixPrefix;
-      stageProgram = bsc.garlicTools.stageProgram;
-    in
-    ''
-      # Hack to upload this to MN4: @upload-to-mn@
-
-      # Create a link to the develop script
-      ln -fs ${nixPrefix}${stageProgram nextStage} .nix-develop
-    '';
-    post = "\n";
-  };
+  unsafeDevelop = callPackage ./develop/default.nix { };
 
   # Configuration for the machines
   machines = callPackage ./machines.nix { };
