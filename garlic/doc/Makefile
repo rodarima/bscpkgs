@@ -6,6 +6,8 @@ PDFOPT=-dpaper=a4 -rPO=4c -rLL=13c
 #MMOPT=-dpaper=a4 -rpo=5c -rll=13c
 PREPROC=-k -t -p -R
 POSTPROC=
+REGISTERS=-dcurdate="`date '+%Y-%m-%d'`"
+REGISTERS+=-dgitcommit="`git rev-parse HEAD`"
 # Embed fonts?
 #POSTPROC+=-P -e
 
@@ -13,8 +15,11 @@ blackbox.pdf: blackbox.ms Makefile
 	REFER=ref.i groff -ms $(PREPROC) -dpaper=a4 -rPO=2c -rLL=17c -Tpdf $< > $@
 
 ug.pdf: ug.mm Makefile
-	groff -mm $(PREPROC) $(POSTPROC) -dpaper=a4 -Tpdf $< > $@
+	groff -mm $(PREPROC) $(POSTPROC) $(REGISTERS) -dpaper=a4 -Tpdf $< > $@
 	-killall -HUP mupdf
+
+ug.xhtml: ug.mm Makefile
+	groff -mm $(PREPROC) $(POSTPROC) -Txhtml $< > $@
 
 %.pdf: %.ms Makefile
 	REFER=ref.i groff -ms $(PREPROC) $(PDFOPT) -Tpdf $< > $@

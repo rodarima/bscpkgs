@@ -1,13 +1,375 @@
-\"Header point size
-.ds HP "15 12 12 0 0 0 0 0 0 0 0 0 0 0"
+.ds HP "21 16 13 12 0 0 0 0 0 0 0 0 0 0"
+.nr Ej 1
+.nr Hb 3
+.nr Hs 3
 .S 11p 1.3m
-.PGFORM 14c 28c 3.5c
-.\" .COVER
-.\" .TL
-.\" Garlic: User guide
-.\" .AF "Barcelona Supercomputing Center"
-.\" .AU "Rodrigo Arias Mallo"
-.\" .COVEND
+.PH "''''"
+.PF "''''"
+.PGFORM 14c 29c 3.5c
+.\".COVER
+.\".de cov@print-date
+.\".DS C
+.\"\\*[cov*new-date]
+.\".DE
+.\"..
+.\".TL
+.\".ps 20
+.\"Garlic: User guide
+.\".AF "Barcelona Supercomputing Center"
+.\".AU "Rodrigo Arias Mallo"
+.\".COVEND
+\&
+.SP 3c
+.DS C
+.S 25 1
+Garlic: User guide
+.S P P
+.SP 1v
+.S 12 1.5m
+Rodrigo Arias Mallo
+.I "Barcelona Supercomputing Center"
+\*[curdate]
+.S P P
+.SP 15c
+.S 9 1.5m
+Git commit hash
+\f(CW\*[gitcommit]\fP
+.S P P
+.DE
+.bp
+.PF "''%''"
+.\" ===================================================================
+.H 1 "Introduction"
+.P
+The garlic framework provides all the tools to experiment with HPC
+programs and produce publication articles.
+.\" ===================================================================
+.H 2 "Machines and clusters"
+Our current setup employs multiple machines to build and execute the
+experiments. Each cluster and node has it's own name and will be
+different in other clusters. Therefore, instead of using the names of
+the machines we use machine classes to generalize our setup. Those
+machine clases currently correspond to a physical machine each:
+.BL
+.LI
+.B Builder
+(xeon07): runs the nix-daemon and performs the builds in /nix. Requires
+root access to setup de nix-daemon.
+.LI 
+.B Target
+(MareNostrum 4 compute nodes): the nodes where the experiments 
+are executed. It doesn't need to have /nix installed or root access.
+.LI 
+.B Login
+(MareNostrum 4 login nodes): used to allocate resources and run jobs. It
+doesn't need to have /nix installed or root access.
+.LI 
+.B Laptop
+(where the keyboard is attached): used to connect to the other machines.
+No root access is required or /nix, but needs to be able to connect to
+the builder.
+.LE
+.\".P
+.\"The specific details of each machine class can be summarized in the
+.\"following table:
+.\".TS
+.\"center;
+.\"lB cB cB cB cB lB lB lB
+.\"lB  c  c  c  c  l  l  l.
+.\"_
+.\"Class	daemon	store	root	dl	cpus	space	cluster	node
+.\"_
+.\"laptop	no	no	no	yes	low	1GB	-	-
+.\"build	yes	yes	yes	yes	high	50GB	Cobi	xeon07
+.\"login	no	yes	no	no	low	MN4	mn1
+.\"target	no	yes	no	no	high	MN4	compute nodes
+.\"_
+.\".TE
+.P
+The machines don't need to be different of each others, as one machine
+can implement several classes. For example the laptop can act as the
+builder too but is not recommended. Or the login machine can also
+perform the builds, but is not possible yet in our setup.
+.\" ===================================================================
+.H 2 "Properties"
+.P
+We can define the following three properties:
+.BL 1m
+.LI
+R0: \fBSame\fP people on the \fBsame\fP machine obtain the same result
+.LI
+R1: \fBDifferent\fP people on the \fBsame\fP machine obtain the same result
+.LI
+R2: \fBDifferent\fP people on a \fBdifferent\fP machine obtain the same result
+.LE
+.P
+The garlic framework distinguishes two classes of results: the result of
+building a derivation, which are usually binary programs, and the
+results of the execution of an experiment.
+.P
+Building a derivation is usually R2, the result is bit-by-bit identical
+excepting some rare cases. One example is that during the build process,
+a directory is listed by the order of the inodes, giving a random order
+which is different between builds. These problems are tracked by the
+.I https://r13y.com/
+project. In the minimal installation, less than 1% of the derivations
+don't achieve the R2 property.
+.P
+On the other hand, the results of the experiments are not yet R2, as
+they are tied to the target machine.
+.\" ===================================================================
+.H 1 "Preliminary steps"
+The peculiarities of our setup require that users perform some actions
+to use the garlic framework. The content of this section is only
+intended for the users of our machines, but can serve as reference in
+other machines.
+.P
+The names of the machine classes are used in the command line prompt
+instead of the actual name of the machine, to indicate that the command
+needs to be executed in the stated machine class, for example:
+.DS I
+.VERBON
+builder% echo hi
+hi
+.VERBOFF
+.DE
+When the machine class is not important, it is ignored and only the
+"\f(CW%\fP" prompt appears.
+.\" ===================================================================
+.H 2 "Configure your laptop"
+.P
+To easily connect to the builder (xeon07) in one step, configure the SSH
+client to perform a jump over the Cobi login node. The
+.I ProxyJump
+directive is only available in version 7.3 and upwards. Add the
+following lines in the \f(CW\(ti/.ssh/config\fP file of your laptop:
+.DS I
+.VERBON
+Host cobi
+      HostName ssflogin.bsc.es
+      User your-username-here
+
+Host xeon07
+      ProxyJump cobi
+      HostName xeon07
+      User your-username-here
+.VERBOFF
+.DE
+You should be able to connect to the builder typing:
+.DS I
+.VERBON
+laptop$ ssh xeon07
+.VERBOFF
+.DE
+To spot any problems try with the \f(CW-v\fP option to enable verbose
+output.
+.\" ===================================================================
+.H 2 "Configure the builder (xeon07)"
+.P
+In order to use nix you would need to be able to download the sources 
+from Internet. Usually the download requires the ports 22, 80 and 443 
+to be open for outgoing traffic.
+.P
+Check that you have network access in
+xeon07 provided by the environment variables \fIhttp_proxy\fP and
+\fIhttps_proxy\fP. Try to fetch a webpage with curl, to ensure the proxy
+is working:
+.DS I
+.VERBON
+  xeon07$ curl x.com
+  x
+.VERBOFF
+.DE
+.\" ===================================================================
+.H 3 "Create a new SSH key"
+.P
+There is one DSA key in your current home called "cluster" that is no
+longer supported in recent SSH versions and should not be used. Before
+removing it, create a new one without password protection leaving the
+passphrase empty (in case that you don't have one already created) by
+running:
+.DS I
+.VERBON
+xeon07$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (\(ti/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in \(ti/.ssh/id_rsa.
+Your public key has been saved in \(ti/.ssh/id_rsa.pub.
+\&...
+.VERBOFF
+.DE
+By default it will create the public key at \f(CW\(ti/.ssh/id_rsa.pub\fP.
+Then add the newly created key to the authorized keys, so you can
+connect to other nodes of the Cobi cluster:
+.DS I
+.VERBON
+xeon07$ cat \(ti/.ssh/id_rsa.pub >> \(ti/.ssh/authorized_keys
+.VERBOFF
+.DE
+Finally, delete the old "cluster" key:
+.DS I
+.VERBON
+xeon07$ rm \(ti/.ssh/cluster \(ti/.ssh/cluster.pub
+.VERBOFF
+.DE
+And remove the section in the configuration \f(CW\(ti/.ssh/config\fP
+where the key was assigned to be used in all hosts along with the
+\f(CWStrictHostKeyChecking=no\fP option. Remove the following lines (if
+they exist):
+.DS I
+.VERBON
+Host *
+    IdentityFile \(ti/.ssh/cluster
+    StrictHostKeyChecking=no
+.VERBOFF
+.DE
+By default, the SSH client already searchs for a keypair called
+\f(CW\(ti/.ssh/id_rsa\fP and \f(CW\(ti/.ssh/id_rsa.pub\fP, so there is
+no need to manually specify them.
+.P
+You should be able to access the login node with your new key by using:
+.DS I
+.VERBON
+xeon07$ ssh ssfhead
+.VERBOFF
+.DE
+.\" ===================================================================
+.H 3 "Authorize access to the repository"
+.P
+The sources of BSC packages are usually downloaded directly from the PM
+git server, so you must be able to access all repositories without a
+password prompt.
+.P
+Most repositories are open to read for logged in users, but there are
+some exceptions (for example the nanos6 repository) where you must have
+explicitly granted read access.
+.P
+Copy the contents of your public SSH key in \f(CW\(ti/.ssh/id_rsa.pub\fP
+and paste it in GitLab at
+.DS I
+.VERBON
+https://pm.bsc.es/gitlab/profile/keys
+.VERBOFF
+.DE
+Finally verify the SSH connection to the server works and you get a 
+greeting from the GitLab server with your username:
+.DS I
+.VERBON
+xeon07$ ssh git@bscpm03.bsc.es
+PTY allocation request failed on channel 0
+Welcome to GitLab, @rarias!
+Connection to bscpm03.bsc.es closed.
+.VERBOFF
+.DE
+Verify that you can access the nanos6 repository (otherwise you 
+first need to ask to be granted read access), at:
+.DS I
+.VERBON
+https://pm.bsc.es/gitlab/nanos6/nanos6
+.VERBOFF
+.DE
+Finally, you should be able to download the nanos6 git 
+repository without any password interaction by running:
+.DS I
+.VERBON
+xeon07$ git clone git@bscpm03.bsc.es:nanos6/nanos6.git
+.VERBOFF
+.DE
+Which will create the nanos6 directory.
+.\" ===================================================================
+.H 3 "Authorize access to MareNostrum 4"
+You will also need to access MareNostrum 4 from the xeon07 machine, in 
+order to run experiments. Add the following lines to the 
+\f(CW\(ti/.ssh/config\fP file and set your user name:
+.DS I
+.VERBON
+Host mn0 mn1 mn2
+    User <your user name in MN4>
+.VERBOFF
+.DE
+Then copy your SSH key to MareNostrum 4 (it will ask you for your login
+password):
+.DS I
+.VERBON
+xeon07$ ssh-copy-id -i \(ti/.ssh/id_rsa.pub mn1
+.VERBOFF
+.DE
+Finally, ensure that you can connect without a password:
+.DS I
+.VERBON
+xeon07$ ssh mn1
+\&...
+login1$
+.VERBOFF
+.DE
+.\" ===================================================================
+.H 3 "Clone the bscpkgs repository"
+.P
+Once you have Internet and you have granted access to the PM GitLab 
+repositories you can begin building software with nix. First ensure 
+that the nix binaries are available from your shell in xeon07:
+.DS I
+.VERBON
+xeon07$ nix --version
+nix (Nix) 2.3.6
+.VERBOFF
+.DE
+Now you are ready to build and install packages with nix. Clone the 
+bscpkgs repository:
+.DS I
+.VERBON
+xeon07$ git clone git@bscpm03.bsc.es:rarias/bscpkgs.git
+.VERBOFF
+.DE
+Nix looks in the current folder for a file named \f(CWdefault.nix\fP for
+packages, so go to the bscpkgs directory:
+.DS I
+.VERBON
+xeon07$ cd bscpkgs
+.VERBOFF
+.DE
+Now you should be able to build nanos6 (which is probably already
+compiled):
+.DS I
+.VERBON
+xeon07$ nix-build -A bsc.nanos6
+\&...
+/nix/store/...2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
+.VERBOFF
+.DE
+The installation is placed in the nix store (with the path stated in 
+the last line of the build process), with the \f(CWresult\fP symbolic
+link pointing to the same location:
+.DS I
+.VERBON
+xeon07$ readlink result
+/nix/store/...2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
+.VERBOFF
+.DE
+.\" ===================================================================
+.H 2 "Configure the login and target (MareNostrum 4)"
+.P
+In order to execute the programs in MareNostrum 4, you first need load
+some utilities in the PATH. Add to the end of the file
+\f(CW\(ti/.bashrc\fP in MareNostrum 4 the following line:
+.DS I
+.VERBON
+export PATH=/gpfs/projects/bsc15/nix/bin:$PATH
+.VERBOFF
+.DE
+Then logout and login again (our source the \f(CW\(ti/.bashrc\fP file)
+and check that now you have the \f(CWnix-develop\fP command available:
+.DS I
+.VERBON
+login1$ which nix-develop
+/gpfs/projects/bsc15/nix/bin/nix-develop
+.VERBOFF
+.DE
+The new utilities are available both in the login nodes and in the
+compute (target) nodes, as they share the file system over the network.
+.\" ===================================================================
 .H 1 "Overview"
 .P
 The garlic framework is designed to fulfill all the requirements of an
@@ -57,10 +419,18 @@ minimize the delay times, so the programs can be executed as soon as
 needed, but under a controlled environment so that the same behavior
 occurs during the experimentation phase.
 .P
-In particular, we want that several experimenters can reproduce the
+In particular, we want that several developers can reproduce the
 the same development environment so they can debug each other programs
 when reporting bugs. Therefore, the environment must be carefully
 controlled to avoid non-reproducible scenarios.
+.P
+The current development environment provides an isolated shell with a
+clean environment, which runs in a new mount namespace where access to
+the filesystem is restricted. Only the project directory and the nix
+store are available (with some other exceptions), to ensure that you
+cannot accidentally link with the wrong library or modify the build
+process with a forgotten environment variable in the \f(CW\(ti/.bashrc\fP
+file.
 .\" ===================================================================
 .H 2 "Getting the development tools"
 .P
@@ -76,13 +446,14 @@ programs, listed in the \fIgarlic/index.nix\fP file:
 .DS I
 .VERBON
 develop = let 
-  packages = with self; [
+  commonPackages = with self; [
     coreutils htop procps-ng vim which strace
     tmux gdb kakoune universal-ctags bashInteractive
     glibcLocales ncurses git screen curl
     # Add more nixpkgs packages here...
-  ] ++ with bsc; [
-    slurm clangOmpss2 icc mcxx perf
+  ];  
+  bscPackages = with bsc; [
+    slurm clangOmpss2 icc mcxx perf tampi impi
     # Add more bsc packages here...
   ];
   ...
@@ -104,19 +475,20 @@ ln -fs /gpfs/projects/.../bin/stage1 .nix-develop
 .VERBOFF
 .DE
 Copy the \fIln\fP command and run it in the target machine
-(MareNostrum\~4), in the new directory used for your program
-development. The link will be created as a hidden file named
-\fI.nix-develop\fP and will be used to remember your environment.
-Several environments can be stored using this method, with different
-packages in different directories. You will need to rebuild the
+(MareNostrum\~4), inside the new directory used for your program
+development, to create the link \fI.nix-develop\fP (which is used to
+remember your environment). Several environments can be stored in
+different directories using this method, with different packages in each
+environment. You will need
+to rebuild the
 .I garlic.develop
 derivation and update the
 .I .nix-develop
-link after the package list changes to update the environment. Once the
-environment link is created, there is no need to repeat this steps again.
+link after the package list is changed. Once the
+environment link is created, there is no need to repeat these steps again.
 .P
 Before entering the environment, you will need to access the required
-resources for your progam, which may include several compute nodes.
+resources for your program, which may include several compute nodes.
 .\" ===================================================================
 .H 2 "Allocating resources for development"
 .P
@@ -200,6 +572,7 @@ calling nix-develop as a wrapper of the program:
 develop$ srun nix-develop ./program
 .VERBOFF
 .DE
+.\" ===================================================================
 .H 2 "Debugging"
 The debugger can be used to directly execute the program if is executed
 in only one node by using:
@@ -235,6 +608,79 @@ And rerun the program, which will generate a core file that can be
 opened by gdb and contains the state of the memory when the crash
 happened. Beware that the core dump file can be very large, depending on
 the memory used by your program at the crash.
+.H 2 "Git branch name convention"
+.P
+The garlic benchmark imposes a set of requirements to be meet for each 
+application in order to coordinate the execution of the benchmark and 
+the gathering process of the results.
+.P
+Each application must be available in a git repository so it can be 
+included into the garlic benchmark. The different combinations of 
+programming models and communication schemes should be each placed in 
+one git branch, which are referred to as \fIbenchmark branches\fP. At
+least one benchmark branch should exist and they all must begin with the
+prefix \f(CWgarlic/\fP (other branches will be ignored).
+.P
+The branch name is formed by adding keywords separated by the "+" 
+character. The keywords must follow the given order and can only 
+appear zero or once each. At least one keyword must be included. The 
+following keywords are available:
+.LB 12 2 0 0
+.LI \f(CWmpi\fP
+A significant fraction of the communications uses only the standard MPI
+(without extensions like TAMPI).
+.LI \f(CWtampi\fP
+A significant fraction of the communications uses TAMPI.
+.LI \f(CWsend\fP
+A significant part of the MPI communication uses the blocking family of
+methods (MPI_Send, MPI_Recv, MPI_Gather...).
+.LI \f(CWisend\fP
+A significant part of the MPI communication uses the non-blocking family
+of methods (MPI_Isend, MPI_Irecv, MPI_Igather...).
+.LI \f(CWrma\fP
+A significant part of the MPI communication uses remote memory access
+(one-sided) methods (MPI_Get, MPI_Put...).
+.LI \f(CWseq\fP
+The complete execution is sequential in each process (one thread per
+process).
+.LI \f(CWomp\fP
+A significant fraction of the execution uses the OpenMP programming
+model.
+.LI \f(CWoss\fP
+A significant fraction of the execution uses the OmpSs-2 programming
+model.
+.LI \f(CWtask\fP
+A significant part of the execution involves the use of the tasking
+model.
+.LI \f(CWtaskfor\fP
+A significant part of the execution uses the taskfor construct.
+.LI \f(CWfork\fP
+A significant part of the execution uses the fork-join model (including
+hybrid programming techniques with  parallel computations and sequential
+communications).
+.LI \f(CWsimd\fP
+A significant part of the computation has been optimized to use SIMD
+instructions.
+.LE
+.P
+In the \fBAppendix A\fP there is a flowchart to help the decision
+process of the branch name.
+.P
+Additional user defined keywords may be added at the end using the 
+separator "+" as well. User keywords must consist of capital 
+alphanumeric characters only and be kept short. These additional 
+keywords must be different (case insensitive) to the already defined 
+above. Some examples:
+.DS I
+.VERBON
+garlic/mpi+send+seq
+garlic/mpi+send+omp+fork
+garlic/mpi+isend+oss+task
+garlic/tampi+isend+oss+task
+garlic/tampi+isend+oss+task+COLOR
+garlic/tampi+isend+oss+task+COLOR+BTREE
+.VERBOFF
+.DE
 .\" ===================================================================
 .H 1 "Experimentation"
 The experimentation phase begins with a functional program which is the
@@ -386,12 +832,12 @@ shared among experiments gets assigned the same hash. Therefore, you can
 iteratively add more units to an experiment, and if they are already
 executed (and the results were generated) is reused.
 .SK
-.H 1 "Annex A: Branch name diagram"
+.APP "" "Branch name diagram"
 .DS CB
-.S -2
-.PS 4.6/25.4
+.S -3 10
+.PS 4.4/25.4
 copy "gitbranch.pic"
 .PE
-.S P
+.S P P
 .DE
 .TC
