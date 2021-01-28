@@ -90,4 +90,8 @@
   slurm = {
     cpu = callPackage ./slurm/cpu.nix { };
   };
+
+  lulesh = {
+    test = callPackage ./lulesh/test.nix { };
+  };
 }
