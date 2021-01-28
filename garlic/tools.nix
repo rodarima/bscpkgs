@@ -51,6 +51,13 @@ let
     # each element of the list.
     expRange = base: a: b: (map (ex: pow base ex) (range a b));
 
+    # Generates a range from start to end (inclusive) by multiplying start by 2.
+    range2 = start: end:
+    let
+      _range2 = s: e: if (s > e) then [] else [ s ] ++ (_range2 (s * 2) e);
+    in
+      _range2 start end;
+
     # Generates a list of integers by halving number N until it reaches 1. Is
     # sorted from the smallest to largest.
     halfList = N:
