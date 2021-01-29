@@ -97,6 +97,10 @@
     test = callPackage ./lulesh/test.nix { };
   };
 
+  fwi = {
+    test = callPackage ./fwi/test.nix { };
+  };
+
   osu = rec {
     latency = callPackage ./osu/latency.nix { };
     latencyShm = latency.override { interNode = false; };

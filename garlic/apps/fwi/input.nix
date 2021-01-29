@@ -1,40 +1,18 @@
 {
   stdenv
-, mpi ? null
-, tampi ? null
-, mcxx ? null
-, cc
-, gitBranch ? "garlic/tampi+send+oss+task"
-, fwiInput
 }:
 
 with stdenv.lib;
 
-assert !(tampi != null && mcxx == null);
-
 stdenv.mkDerivation rec {
-  inherit gitBranch;
-  name = "fwi";
+  name = "fwi-header";
 
   src = builtins.fetchGit {
     url = "https://gitlab.com/srodrb/BSC-FWI.git";
-    ref = "${gitBranch}";
+    ref = "garlic/seq";
   };
 
   enableParallelBuilding = false;
-
-  buildInputs = [
-    cc
-  ]
-  ++ optional (mpi   != null) mpi
-  ++ optional (tampi != null) tampi
-  ++ optional (mcxx  != null) mcxx;
-
-  # FIXME: Correct this on the Makefile so we can just type "make fwi"
-  # FIXME: Allow multiple MPI implementations
-  postPatch = ''
-    sed -i 's/= OPENMPI$/= INTEL/g' Makefile
-  '';
 
   # FIXME: This is an ugly hack.
   # When using _GNU_SOURCE or any other definition used in features.h, we need
@@ -43,26 +21,20 @@ stdenv.mkDerivation rec {
   # below, reaches the command line of the preprocessing stage with gcc.
   preConfigure = ''
     export DEFINES=-D_GNU_SOURCE
-
-    make depend
-
-    cp ${fwiInput}/generated_model_params.h src/
   '';
   
   # We compile the ModelGenerator using gcc *only*, as otherwise it will
   # be compiled with nanos6, which requires access to /sys to determine
   # hardware capabilities. So it will fail in the nix-build environment,
   # as there is no /sys mounted.
-  makeFlags = [
-    #"COMPILER=GNU"
-    #"CC=${cc.cc.CC}"
-    "fwi"
-  ];
+  # Also, we need to compile it with the builder platform as target, as is going
+  # to be executed during the build to generate the src/generated_model_params.h
+  # header.
+  makeFlags = [ "COMPILER=GNU" "params" "input" ];
 
   installPhase = ''
-    mkdir -p $out/bin
-    cp fwi $out/bin
+    mkdir -p $out/
+    cp src/generated_model_params.h $out/
+    cp -r InputModels $out/
   '';
-
-  programPath = "/bin/fwi";
 }

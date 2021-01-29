@@ -53,5 +53,10 @@
 
   hpccg = callPackage ./hpccg/default.nix { };
 
-  fwi = callPackage ./fwi/default.nix { };
+  fwi = rec {
+    input = callPackage ./fwi/input.nix { };
+    solver = callPackage ./fwi/default.nix {
+      fwiInput = input;
+    };
+  };
 }
