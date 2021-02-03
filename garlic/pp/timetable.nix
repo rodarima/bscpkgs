@@ -21,7 +21,7 @@ stdenv.mkDerivation {
         for run in $(ls -d [0-9]* | sort -n); do
           time=$(awk '/^ ?time /{print $2}' $run/stdout.log)
           if [ -z "$time" ]; then
-            echo "error: cannot match \"time\" line
+            echo "error: cannot match \"time\" line"
             echo "check stdout log file: ${inputResult}/$exp/$unit/$run/stdout.log"
             exit 1
           fi
