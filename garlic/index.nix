@@ -69,7 +69,7 @@
   # Load some helper functions to generate app variants
 
   stdexp = callPackage ./stdexp.nix {
-    inherit (bsc.garlic) targetMachine stages;
+    inherit (bsc.garlic) targetMachine stages pp;
   };
 
   # Execution stages

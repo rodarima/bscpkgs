@@ -8,6 +8,7 @@
 , writeTextFile
 , runCommandLocal
 , python
+, pp
 }:
 
 with stdenv.lib;
@@ -19,17 +20,23 @@ in
 rec {
   /* Takes a list of units and builds an experiment, after executing the
   trebuchet, runexp and isolate stages. Returns the trebuchet stage. */
-  buildTrebuchet = units: stages.trebuchet {
-    inherit (machineConf) nixPrefix sshHost;
-    nextStage = stages.runexp {
-      inherit (machineConf) nixPrefix;
-      nextStage = stages.isolate {
+  buildTrebuchet = units:
+  let
+    trebuchet = stages.trebuchet {
+      inherit (machineConf) nixPrefix sshHost;
+      nextStage = stages.runexp {
         inherit (machineConf) nixPrefix;
-        nextStage = stages.experiment {
-          inherit units;
+        nextStage = stages.isolate {
+          inherit (machineConf) nixPrefix;
+          nextStage = stages.experiment {
+            inherit units;
+          };
         };
       };
     };
+  in trebuchet // rec {
+    result = pp.resultFromLauncher (pp.launcher trebuchet);
+    timetable = pp.timetable result;
   };
 
   /* Given an attrset of lists `varConf` and a function `genConf` that accepts a
