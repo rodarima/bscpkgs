@@ -118,6 +118,10 @@
     # Takes a list of experiments and returns a file that contains
     # all timetable results from the experiments.
     merge = exps: mergeDatasets (map timetableFromTrebuchet exps);
+
+    # Automatic launcher
+    launcher = callPackage ./pp/launcher.nix { };
+    resultFromLauncher = l: import (builtins.readFile l);
   };
 
   # Apps for Garlic
