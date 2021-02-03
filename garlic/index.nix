@@ -130,9 +130,6 @@
   # Experiments
   exp = callPackage ./exp/index.nix { };
 
-  # Datasets used in the figures
-  ds = callPackage ./ds/index.nix { };
-
   # Figures generated from the experiments
   fig = callPackage ./fig/index.nix { };
 

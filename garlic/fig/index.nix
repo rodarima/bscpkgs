@@ -8,7 +8,6 @@
 
 let
   rPlot = garlic.pp.rPlot;
-  ds = garlic.ds;
   exp = garlic.exp;
   pp = garlic.pp;
 
