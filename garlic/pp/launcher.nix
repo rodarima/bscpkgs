@@ -17,7 +17,7 @@ stdenv.mkDerivation {
       echo
       echo "You can manually run the experiment and fetch the results with:"
       echo
-      echo -e "\e[30;48;5;2mgarlic -RFv ${trebuchetStage}\e[0m"
+      echo -e "\e[30;48;5;2mgarlic -RFv ${trebuchet}\e[0m"
       echo
       echo "See garlic(1) for more details."
       exit 1
