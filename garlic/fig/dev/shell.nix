@@ -4,7 +4,7 @@ with pkgs;
 
 let
   rWrapper = pkgs.rWrapper.override {
-    packages = with pkgs.rPackages; [ tidyverse rjson jsonlite ];
+    packages = with pkgs.rPackages; [ tidyverse rjson jsonlite egg ];
   };
 in
 stdenv.mkDerivation {
