@@ -12,56 +12,33 @@ let
   exp = garlic.exp;
   pp = garlic.pp;
 
-  rPlotExp = rScript: exp: rPlot { script = rScript; dataset = exp; };
+  exptt = exlist: map (e: e.timetable) exlist;
+  rPlotExp = rScript: exp: rPlot {
+    script = rScript;
+    dataset = pp.mergeDatasets (exptt exp);
+  };
 in
 {
   nbody = with exp.nbody; {
-    baseline = rPlot {
-      script = ./nbody/baseline.R;
-      dataset = ds.nbody.baseline;
-    };
-
-    small = rPlotExp ./nbody/baseline.R small.timetable;
-
-    jemalloc = rPlot {
-      script = ./nbody/jemalloc.R;
-      dataset = ds.nbody.jemalloc;
-    };
-    #freeCpu = rPlot {
-    #  script = ./nbody/freeCpu.R;
-    #  dataset = ds.nbody.freeCpu;
-    #};
-    ctf = rPlot {
-      script = ./nbody/baseline.R;
-      dataset = ds.nbody.ctf;
-    };
+    baseline  = rPlotExp ./nbody/baseline.R [ baseline ];
+    small     = rPlotExp ./nbody/baseline.R [ small ];
+    jemalloc  = rPlotExp ./nbody/jemalloc.R [ baseline jemalloc ];
+    ctf       = rPlotExp ./nbody/baseline.R [ ctf ];
   };
 
-  hpcg = {
-    oss = with ds.hpcg; rPlot {
-      script = ./hpcg/oss.R;
-      dataset = oss;
-    };
+  hpcg = with exp.hpcg; {
+    oss = rPlotExp ./hpcg/oss.R [ oss ];
   };
 
-  saiph = {
-    granularity = with ds.saiph; rPlot {
-      script = ./saiph/granularity.R;
-      dataset = granularity;
-    };
+  saiph = with exp.saiph; {
+    granularity = rPlotExp ./saiph/granularity.R [ granularity ];
   };
 
-  heat = {
-    test = with ds.heat; rPlot {
-      script = ./heat/test.R;
-      dataset = test;
-    };
+  heat = with exp.heat; {
+    test = rPlotExp ./heat/test.R [ test ];
   };
 
-  creams = {
-    ss = with ds.creams; rPlot {
-      script = ./creams/ss.R;
-      dataset = ss.all;
-    };
+  creams = with exp.creams; {
+    ss = rPlotExp ./creams/ss.R [ ss.hybrid ss.pure ];
   };
 }
