@@ -2,6 +2,7 @@ library(ggplot2)
 library(dplyr)
 library(scales)
 library(jsonlite)
+library(egg)
 
 args=commandArgs(trailingOnly=TRUE)
 
@@ -16,18 +17,42 @@ dataset = jsonlite::stream_in(file(input_file)) %>%
 particles = unique(dataset$config.particles)
 
 # We only need the nblocks and time
-df = select(dataset, config.nblocks, config.hw.cpusPerSocket, time) %>%
+df = select(dataset,
+  config.nblocks,
+  config.hw.cpusPerSocket,
+  config.nodes,
+  config.blocksize,
+  config.particles,
+  config.gitBranch,
+  time) %>%
 	rename(nblocks=config.nblocks,
+    nodes=config.nodes,
+    blocksize=config.blocksize,
+    particles=config.particles,
+    gitBranch=config.gitBranch,
 		cpusPerSocket=config.hw.cpusPerSocket)
 
 df = df %>% mutate(blocksPerCpu = nblocks / cpusPerSocket)
 df$nblocks = as.factor(df$nblocks)
+df$nodesFactor = as.factor(df$nodes)
 df$blocksPerCpuFactor = as.factor(df$blocksPerCpu)
+df$blocksizeFactor = as.factor(df$blocksize)
+df$particlesFactor = as.factor(df$particles)
+df$gitBranch = as.factor(df$gitBranch)
 
 # Normalize the time by the median
-D=group_by(df, nblocks) %>%
+D=group_by(df, nblocks, nodesFactor, gitBranch) %>%
+	mutate(tmedian = median(time)) %>%
 	mutate(tnorm = time / median(time) - 1) %>%
-	mutate(bad = max(ifelse(abs(tnorm) >= 0.01, 1, 0)))
+	mutate(bad = max(ifelse(abs(tnorm) >= 0.01, 1, 0))) %>%
+  ungroup() %>%
+  group_by(nodesFactor, gitBranch) %>%
+	mutate(tmedian_min = min(tmedian)) %>%
+  ungroup() %>%
+  group_by(gitBranch) %>%
+	mutate(tmin_max = max(tmedian_min)) %>%
+	mutate(tideal = tmin_max / nodes) %>%
+  ungroup()
 
 D$bad = as.factor(D$bad)
 
@@ -67,44 +92,108 @@ p = ggplot(data=D, aes(x=blocksPerCpuFactor, y=tnorm, color=bad)) +
 		linetype="dashed", color="gray") +
 
 	# Draw boxplots
-	geom_boxplot() +
+	geom_boxplot(aes(fill=nodesFactor)) +
 	scale_color_manual(values=c("black", "brown")) +
+  facet_grid(gitBranch ~ .) +
 
 	#scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
 
-	theme_bw() +
 
-	theme(plot.subtitle=element_text(size=8)) +
-	theme(legend.position = "none")
+	#theme(legend.position = "none")
 	#theme(legend.position = c(0.85, 0.85))
+	theme_bw()+
+	theme(plot.subtitle=element_text(size=8))
 
 
 
 
 # Render the plot
 print(p)
-
-## Save the png image
 dev.off()
-#
-png("scatter.png", width=w*ppi, height=h*ppi, res=ppi)
-#
-## Create the plot with the normalized time vs nblocks
-p = ggplot(D, aes(x=blocksPerCpuFactor, y=time)) +
+
+
+p1 = ggplot(D, aes(x=blocksizeFactor, y=tmedian)) +
+
+	labs(x="Blocksize", y="Time (s)",
+              title=sprintf("Nbody granularity. Particles=%d", particles), 
+              subtitle=input_file) +
+	theme_bw() +
+	theme(plot.subtitle=element_text(size=8)) +
+	#theme(legend.position = c(0.5, 0.8)) +
+
+	geom_line(aes(y=tmedian,
+    group=interaction(gitBranch, nodesFactor),
+    color=nodesFactor)) +
+	geom_point(aes(color=nodesFactor), size=3) +
+  facet_grid(gitBranch ~ .) +
+	scale_shape_manual(values=c(21, 22)) +
+	scale_y_continuous(trans=log2_trans())
+
+png("time-blocksize.png", width=1.5*w*ppi, height=1.5*h*ppi, res=ppi)
+print(p1)
+dev.off()
+
+p2 = ggplot(D, aes(x=blocksPerCpuFactor, y=tmedian)) +
 
 	labs(x="Blocks/CPU", y="Time (s)",
               title=sprintf("Nbody granularity. Particles=%d", particles), 
               subtitle=input_file) +
 	theme_bw() +
 	theme(plot.subtitle=element_text(size=8)) +
-	theme(legend.position = c(0.5, 0.88)) +
 
-	geom_point(shape=21, size=3) +
-	#scale_x_continuous(trans=log2_trans()) +
+	geom_line(aes(y=tmedian,
+    group=interaction(gitBranch, nodesFactor),
+    color=nodesFactor)) +
+	geom_point(aes(color=nodesFactor), size=3) +
+  facet_grid(gitBranch ~ .) +
+
+	scale_shape_manual(values=c(21, 22)) +
 	scale_y_continuous(trans=log2_trans())
 
-# Render the plot
-print(p)
+png("time-blocks-per-cpu.png", width=1.5*w*ppi, height=1.5*h*ppi, res=ppi)
+print(p2)
+dev.off()
 
-# Save the png image
+#p = ggarrange(p1, p2, ncol=2)
+#png("time-gra.png", width=2*w*ppi, height=h*ppi, res=ppi)
+#print(p)
+#dev.off()
+
+
+
+png("exp-space.png", width=w*ppi, height=h*ppi, res=ppi)
+p = ggplot(data=df, aes(x=nodesFactor, y=particlesFactor)) +
+	labs(x="Nodes", y="Particles", title="Nbody: Experiment space") +
+	geom_line(aes(group=particles)) +
+	geom_point(aes(color=nodesFactor), size=3) +
+  facet_grid(gitBranch ~ .) +
+	theme_bw()
+print(p)
+dev.off()
+
+
+png("gra-space.png", width=w*ppi, height=h*ppi, res=ppi)
+p = ggplot(data=D, aes(x=nodesFactor, y=blocksPerCpuFactor)) +
+	labs(x="Nodes", y="Blocks/CPU", title="Nbody: Granularity space") +
+	geom_line(aes(group=nodesFactor)) +
+	geom_point(aes(color=nodesFactor), size=3) +
+  facet_grid(gitBranch ~ .) +
+	theme_bw()
+print(p)
+dev.off()
+
+
+png("performance.png", width=1.5*w*ppi, height=1.5*h*ppi, res=ppi)
+p = ggplot(D, aes(x=nodesFactor)) +
+	labs(x="Nodes", y="Time (s)", title="Nbody strong scaling") +
+	theme_bw() +
+	geom_line(aes(y=tmedian,
+    linetype=blocksPerCpuFactor,
+    group=interaction(gitBranch, blocksPerCpuFactor))) +
+	geom_line(aes(y=tideal, group=gitBranch), color="red") +
+	geom_point(aes(y=tmedian, color=nodesFactor), size=3) +
+  facet_grid(gitBranch ~ .) +
+	scale_shape_manual(values=c(21, 22)) +
+	scale_y_continuous(trans=log2_trans())
+print(p)
 dev.off()

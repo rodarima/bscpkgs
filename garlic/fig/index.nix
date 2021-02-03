@@ -34,6 +34,7 @@ in
     small     = stdPlot ./nbody/baseline.R [ small ];
     jemalloc  = stdPlot ./nbody/jemalloc.R [ baseline jemalloc ];
     ctf       = stdPlot ./nbody/baseline.R [ ctf ];
+    scaling   = stdPlot ./nbody/baseline.R [ scaling ];
   };
 
   hpcg = with exp.hpcg; {
