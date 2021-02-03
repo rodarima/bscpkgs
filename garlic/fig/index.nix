@@ -9,17 +9,20 @@
 let
   rPlot = garlic.pp.rPlot;
   ds = garlic.ds;
+  exp = garlic.exp;
+  pp = garlic.pp;
+
+  rPlotExp = rScript: exp: rPlot { script = rScript; dataset = exp; };
 in
 {
-  nbody = {
+  nbody = with exp.nbody; {
     baseline = rPlot {
       script = ./nbody/baseline.R;
       dataset = ds.nbody.baseline;
     };
-    small = rPlot {
-      script = ./nbody/baseline.R;
-      dataset = ds.nbody.small;
-    };
+
+    small = rPlotExp ./nbody/baseline.R small.timetable;
+
     jemalloc = rPlot {
       script = ./nbody/jemalloc.R;
       dataset = ds.nbody.jemalloc;
