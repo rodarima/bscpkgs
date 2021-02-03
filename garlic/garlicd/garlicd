@@ -1,0 +1,33 @@
+#!/bin/bash
+
+if [ -z "$1" -o -z "$2" ]; then
+	>&2 echo "usage: garlicd <bscpkgs directory> <mountpoint directory>"
+fi
+
+bscpkgsdir=$(readlink -f "$1")
+mountdir=$(readlink -f "$2")
+run="$mountdir/run"
+completed="$mountdir/completed"
+
+[ -p "$run" ] || mkfifo "$run"
+[ -p "$completed" ] || mkfifo "$completed"
+
+cd "$bscpkgsdir"
+
+echo "Waiting for experiments..."
+
+while read -r line < "$run"; do
+	echo Attempting to run: $line
+
+	echo Copying files to MN4...
+	nix copy --to ssh://mn1 $line
+	results=$(garlic -RFv $line)
+	echo "The results are: $results"
+	drv=$(nix-store -q --deriver $results)
+	echo "drv = $drv"
+	if [ -z "$drv" ]; then
+		echo "Something failed, drv is empty. Check the logs."
+	else
+		echo -n "$drv" >> "$completed"
+	fi
+done
