@@ -65,8 +65,8 @@ nbs=length(bs_unique)
 print(D)
 
 ppi=300
-h=5
-w=5
+h=7.5
+w=7.5
 
 png("box.png", width=w*ppi, height=h*ppi, res=ppi)
 #
@@ -112,7 +112,7 @@ print(p)
 dev.off()
 
 
-p1 = ggplot(D, aes(x=blocksizeFactor, y=tmedian)) +
+p1 = ggplot(D, aes(x=blocksizeFactor, y=time)) +
 
 	labs(x="Blocksize", y="Time (s)",
               title=sprintf("Nbody granularity. Particles=%d", particles), 
@@ -124,16 +124,16 @@ p1 = ggplot(D, aes(x=blocksizeFactor, y=tmedian)) +
 	geom_line(aes(y=tmedian,
     group=interaction(gitBranch, nodesFactor),
     color=nodesFactor)) +
-	geom_point(aes(color=nodesFactor), size=3) +
+	geom_point(aes(color=nodesFactor), size=3, shape=21) +
   facet_grid(gitBranch ~ .) +
 	scale_shape_manual(values=c(21, 22)) +
 	scale_y_continuous(trans=log2_trans())
 
-png("time-blocksize.png", width=1.5*w*ppi, height=1.5*h*ppi, res=ppi)
+png("time-blocksize.png", width=w*ppi, height=h*ppi, res=ppi)
 print(p1)
 dev.off()
 
-p2 = ggplot(D, aes(x=blocksPerCpuFactor, y=tmedian)) +
+p2 = ggplot(D, aes(x=blocksPerCpuFactor, y=time)) +
 
 	labs(x="Blocks/CPU", y="Time (s)",
               title=sprintf("Nbody granularity. Particles=%d", particles), 
@@ -144,13 +144,13 @@ p2 = ggplot(D, aes(x=blocksPerCpuFactor, y=tmedian)) +
 	geom_line(aes(y=tmedian,
     group=interaction(gitBranch, nodesFactor),
     color=nodesFactor)) +
-	geom_point(aes(color=nodesFactor), size=3) +
+	geom_point(aes(color=nodesFactor), size=3, shape=21) +
   facet_grid(gitBranch ~ .) +
 
 	scale_shape_manual(values=c(21, 22)) +
 	scale_y_continuous(trans=log2_trans())
 
-png("time-blocks-per-cpu.png", width=1.5*w*ppi, height=1.5*h*ppi, res=ppi)
+png("time-blocks-per-cpu.png", width=w*ppi, height=h*ppi, res=ppi)
 print(p2)
 dev.off()
 
@@ -183,7 +183,7 @@ print(p)
 dev.off()
 
 
-png("performance.png", width=1.5*w*ppi, height=1.5*h*ppi, res=ppi)
+png("performance.png", width=w*ppi, height=h*ppi, res=ppi)
 p = ggplot(D, aes(x=nodesFactor)) +
 	labs(x="Nodes", y="Time (s)", title="Nbody strong scaling") +
 	theme_bw() +
