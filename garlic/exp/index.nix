@@ -32,6 +32,10 @@
         enableJemalloc = true;
       };
     };
+
+    scaling = callPackage ./nbody/scaling.nix {
+      particles = 12 * 4096;
+    };
   };
 
   saiph = {
