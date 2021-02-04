@@ -1,4 +1,4 @@
-all: ug.pdf ug.html doc.tar.gz
+all: ug.pdf ug.html
 
 TTYOPT=-rPO=4m -rLL=72m
 PDFOPT=-dpaper=a4 -rPO=4c -rLL=13c
@@ -9,7 +9,7 @@ REGISTERS=-dcurdate="`date '+%Y-%m-%d'`"
 REGISTERS+=-dgitcommit="`git rev-parse HEAD`"
 
 PREPROC+=$(REGISTERS)
-HTML_OPT=$(PREPROC) -P-y -P-V -P-Dimg -P-i120 -Thtml
+HTML_OPT=$(PREPROC) -P-Dimg -P-i120 -Thtml
 # Embed fonts?
 #POSTPROC+=-P -e
 

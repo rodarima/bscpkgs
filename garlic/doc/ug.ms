@@ -74,28 +74,22 @@ linewid=1.4;
 arcrad=1;
 right
 S: box "Source" "code"
-arrow "Development" invis
-#move "Development" above
+line "Development" invis
 P: box "Program"
-arrow "Experimentation" invis
+line "Experimentation" invis
 R:box "Results"
-arrow "Data" "exploration" invis
+line "Data" "exploration" invis
 F:box "Figures"
-
-arc cw from 1/2 of the way between S.n and S.ne \
-  to 1/2 of the way between P.nw and P.n ->;
-arc cw from 1/2 of the way between P.s and P.sw \
-  to 1/2 of the way between S.se and S.s ->;
-
-arc cw from 1/2 of the way between P.n and P.ne \
-  to 1/2 of the way between R.nw and R.n ->;
-arc cw from 1/2 of the way between R.s and R.sw \
-  to 1/2 of the way between P.se and P.s ->;
-
-arc cw from 1/2 of the way between R.n and R.ne \
-  to 1/2 of the way between F.nw and F.n ->;
-arc cw from 1/2 of the way between F.s and F.sw \
-  to 1/2 of the way between R.se and R.s ->;
+# Creates a "cycle" around two boxes
+define cycle {
+  arc cw from 1/2 of the way between $1.n and $1.ne \
+    to 1/2 of the way between $2.nw and $2.n ->;
+  arc cw from 1/2 of the way between $2.s and $2.sw \
+    to 1/2 of the way between $1.se and $1.s ->;
+}
+cycle(S, P)
+cycle(P, R)
+cycle(R, F)
 .PE
 .DE
 In the development phase the experimenter changes the source code in
@@ -251,8 +245,8 @@ xeon07 provided by the environment variables \fIhttp_proxy\fP and
 \fIhttps_proxy\fP. Try to fetch a webpage with curl, to ensure the proxy
 is working:
 .CS
-  xeon07$ curl x.com
-  x
+xeon07$ curl x.com
+x
 .CE
 .\" ===================================================================
 .NH 3
@@ -614,7 +608,6 @@ The branch name is formed by adding keywords separated by the "+"
 character. The keywords must follow the given order and can only 
 appear zero or once each. At least one keyword must be included. The 
 following keywords are available:
-.DS L
 .IP \f(CWmpi\fP 5m
 A significant fraction of the communications uses only the standard MPI
 (without extensions like TAMPI).
@@ -658,7 +651,6 @@ communications).
 .IP \f(CWsimd\fP
 A significant part of the computation has been optimized to use SIMD
 instructions.
-.DE
 .LP
 In the
 .URL #appendixA "Appendix A"
@@ -899,7 +891,8 @@ program    	target	yes	yes	no	no
 _
 .TE
 .DE
-.LP
+.QS
+.SM
 .B "Table 1" :
 The stages of a complete execution pipeline. The
 .I where
@@ -912,6 +905,7 @@ if it can be executed directly by the user,
 if there are several instances running in parallel and
 .I std
 if is part of the standard execution pipeline.
+.QE
 .\" ###################################################################
 .NH 2
 Writing the experiment
@@ -1087,7 +1081,8 @@ exec	post     	no	no	Code after the execution
 _
 .TE
 .DE
-.QP
+.QS
+.SM
 .B "Table 2" :
 The attributes recognized by the stages in the execution pipeline. The
 column
@@ -1300,7 +1295,231 @@ lastly the number of units. The rationale is that each unit that is
 shared among experiments gets assigned the same hash. Therefore, you can
 iteratively add more units to an experiment, and if they are already
 executed (and the results were generated) is reused.
-.SK
+.\" ###################################################################
+.bp
+.NH 1
+Post-processing
+.LP
+After the correct execution of an experiment the results are stored for
+further investigation. Typically the time of the execution or other
+quantities are measured and presented later in a figure (generally a
+plot or a table). The
+.I "postprocess pipeline"
+consists of all the steps required to create a set of figures from the
+results. Similarly to the execution pipeline where several stages run
+sequentially,
+.[
+garlic execution
+.]
+the postprocess pipeline is also formed by multiple stages executed
+in order.
+.PP
+The rationale behind dividing execution and postprocess is
+that usually the experiments are costly to run (they take a long time to
+complete) while generating a figure require less time. Refining the
+figures multiple times reusing the same experimental results doesn't
+require the execution of the complete experiment, so the experimenter
+can try multiple ways to present the data without waiting a large delay.
+.NH 2
+Results
+.LP
+The results are generated in the same
+.I "target"
+machine where the experiment is executed and are stored in the garlic
+\fCout\fP
+directory, organized into a tree structure following the experiment
+name, the unit name and the run number (governed by the
+.I control
+stage):
+.DS L
+\fC
+|-- 6lp88vlj7m8hvvhpfz25p5mvvg7ycflb-experiment
+|   |-- 8lpmmfix52a8v7kfzkzih655awchl9f1-unit 
+|   |   |-- 1 
+|   |   |   |-- stderr.log
+|   |   |   |-- stdout.log
+|   |   |   |-- ...
+|   |   |-- 2 
+\&...
+\fP
+.DE
+In order to provide an easier access to the results, an index is also
+created by taking the
+.I expName
+and
+.I unitName
+attributes (defined in the experiment configuration) and linking them to
+the appropriate experiment and unit directories. These links are
+overwritten by the last experiment with the same names so they are only
+valid for the last execution. The out and index directories are
+placed into a per-user directory, as we cannot guarantee the complete
+execution of each unit when multiple users share units.
+.PP
+The messages printed to 
+.I stdout
+and
+.I stderr
+are stored in the log files with the same name inside each run
+directory. Additional data is sometimes generated by the experiments,
+and is found in each run directory. As the generated data can be very
+large, is ignored by default when fetching the results.
+.NH 2
+Fetching the results
+.LP
+Consider a program of interest for which an experiment has been designed to
+measure some properties that the experimenter wants to present in a
+visual plot. When the experiment is launched, the execution
+pipeline (EP) is completely executed and it will generate some
+results. In this escenario, the execution pipeline depends on the
+program\[em]any changes in the program will cause nix to build the
+pipeline again
+using the updated program. The results will also depend on the
+execution pipeline as well as the postprocess pipeline (PP) and the plot
+on the results. This chain of dependencies can be shown in the
+following dependency graph:
+.PS
+circlerad=0.22;
+linewid=0.3;
+right
+circle "Prog"
+arrow
+circle "EP"
+arrow
+circle "Result"
+arrow
+circle "PP"
+arrow
+circle "Plot"
+.PE
+Ideally, the dependencies should be handled by nix, so it can detect any
+change and rebuild the necessary parts automatically. Unfortunately, nix
+is not able to build the result as a derivation directly, as it requires
+access to the
+.I "target"
+machine with several user accounts. In order to let several users reuse
+the same results from a shared cache, we would like to use the
+.I "nix store" .
+.PP
+To generate the results from the
+experiment, we add some extra steps that must be executed manually:
+.PS
+circle "Prog"
+arrow
+diag=linewid + circlerad;
+far=circlerad*3 + linewid*4
+E: circle "EP"
+R: circle "Result" at E + (far,0)
+RUN: circle "Run" at E + (diag,-diag) dashed
+FETCH: circle "Fetch" at R + (-diag,-diag) dashed
+move to R.e
+arrow
+P: circle "PP"
+arrow
+circle "Plot"
+arrow dashed from E to RUN chop
+arrow dashed from RUN to FETCH chop
+arrow dashed from FETCH to R chop
+arrow from E to R chop
+.PE
+The run and fetch steps are provided by the helper tool
+.I "garlic(1)" ,
+which launches the experiment using the user credentials at the
+.I "target"
+machine and then fetches the results, placing them in a directory known
+by nix.  When the result derivation needs to be built, nix will look in
+this directory for the results of the execution. If the directory is not
+found, a message is printed to suggest the user to launch the experiment
+and the build process is stopped. When the result is successfully built
+by any user, is stored in the
+.I "nix store"
+and it won't need to be rebuilt again until the experiment changes, as
+the hash only depends on the experiment and not on the contents of the
+results.
+.PP
+Notice that this mechanism violates the deterministic nature of the nix
+store, as from a given input (the experiment) we can generate different
+outputs (each result from different executions). We knowingly relaxed
+this restriction by providing a guarantee that the results are
+equivalent and there is no need to execute an experiment more than once.
+.PP
+To force the execution of an experiment you can use the
+.I rev
+attribute which is a number assigned to each experiment
+and can be incremented to create copies that only differs on that
+number. The experiment hash will change but the experiment will be the
+same, as long as the revision number is ignored along the execution
+stages.
+.NH 2
+Postprocess stages
+.LP
+Once the results are completely generated in the
+.I "target"
+machine there are several stages required to build a set of figures:
+.PP
+.I fetch \[em]
+waits until all the experiment units are completed and then executes the
+next stage. This stage is performed by the
+.I garlic(1)
+tool using the
+.I -F
+option and also reports the current state of the execution.
+.PP
+.I store \[em]
+copies from the
+.I target
+machine into the nix store all log files generated by the experiment, 
+keeping the same directory structure. It tracks the execution state of
+each unit and only copies the results once the experiment is complete.
+Other files are ignored as they are often very large and not required
+for the subsequent stages.
+.PP
+.I timetable \[em]
+converts the results of the experiment into a NDJSON file with one
+line per run for each unit. Each line is a valid JSON object, containing
+the
+.I exp ,
+.I unit
+and
+.I run
+keys and the unit configuration (as a JSON object) in the
+.I config
+key. The execution time is captured from the standard output and is
+added in the
+.I time
+key.
+.PP
+.I merge \[em]
+one or more timetable datasets are joined, by simply concatenating them.
+This step allows building one dataset to compare multiple experiments in
+the same figure.
+.PP
+.I rPlot \[em]
+one ot more figures are generated by a single R script
+.[
+r cookbook
+.]
+which takes as input the previously generated dataset.
+The path of the dataset is recorded in the figure as well, which
+contains enough information to determine all the stages in the execution
+and postprocess pipelines.
+.NH 2
+Current setup
+.LP
+As of this moment, the
+.I build
+machine which contains the nix store is
+.I xeon07
+and the
+.I "target"
+machine used to run the experiments is Mare Nostrum 4 with the
+.I output
+directory placed at
+.CW /gpfs/projects/bsc15/garlic .
+By default, the experiment results are never deleted from the
+.I target
+so you may want to remove the ones already stored in the nix store to
+free space.
+.\" ###################################################################
 .bp
 .SH 1
 Appendix A: Branch name diagram
