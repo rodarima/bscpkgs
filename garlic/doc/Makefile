@@ -1,5 +1,4 @@
-all: execution.pdf execution.utf8 execution.ascii pp.pdf pp.utf8 pp.ascii\
-	branch.pdf blackbox.pdf ug.pdf ug.html
+all: ug.pdf ug.html doc.tar.gz
 
 TTYOPT=-rPO=4m -rLL=72m
 PDFOPT=-dpaper=a4 -rPO=4c -rLL=13c
@@ -18,6 +17,7 @@ blackbox.pdf: blackbox.ms Makefile
 	REFER=ref.i groff -ms $(PREPROC) -dpaper=a4 -rPO=2c -rLL=17c -Tpdf $< > $@
 
 %.html: %.ms Makefile
+	mkdir -p img
 	REFER=ref.i groff -ms -mwww $(HTML_OPT) $< > $@
 	echo $(HTML_OPT)
 	sed -i '/<\/head>/i<link rel="stylesheet" href="s.css">' $@
@@ -34,3 +34,9 @@ blackbox.pdf: blackbox.ms Makefile
 
 %.ascii: %.ms
 	REFER=ref.i groff -ms -mwww -c $(PREPROC) $(TTYOPT) -Tascii $^ > $@
+
+doc.tar.gz: ug.pdf ug.html s.css
+	tar czf $@ $^ img s.css
+
+clean:
+	rm -rf img ug.pdf ug.html doc.tar.gz
