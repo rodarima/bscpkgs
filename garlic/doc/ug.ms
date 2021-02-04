@@ -1,398 +1,102 @@
-.ds HP "21 16 13 12 0 0 0 0 0 0 0 0 0 0"
-.nr Ej 1
-.nr Hb 3
-.nr Hs 3
-.S 11p 1.3m
-.PH "''''"
-.PF "''''"
-.PGFORM 14c 29c 3.5c
-.\".COVER
-.\".de cov@print-date
-.\".DS C
-.\"\\*[cov*new-date]
-.\".DE
-.\"..
-.\".TL
-.\".ps 20
-.\"Garlic: User guide
-.\".AF "Barcelona Supercomputing Center"
-.\".AU "Rodrigo Arias Mallo"
-.\".COVEND
-\&
-.SP 3c
-.DS C
-.S 25 1
-Garlic: User guide
-.S P P
-.SP 1v
-.S 12 1.5m
-Rodrigo Arias Mallo
-.I "Barcelona Supercomputing Center"
-\*[curdate]
-.S P P
-.SP 15c
-.S 9 1.5m
-Git commit hash
-\f(CW\*[gitcommit]\fP
-.S P P
+.\" Point size fails when rending html in the code blocks
+.\".nr PS 11p
+.nr GROWPS 3
+.nr PSINCR 2p
+.fam P
+.\" ===================================================================
+.\" Some useful macros
+.\" ===================================================================
+.\"
+.\" Code start (CS) and end (CE) blocks
+.de CS
+.DS L
+\fC
+..
+.de CE
+\fP
 .DE
-.bp
-.PF "''%''"
+..
+.\" Code inline:
+.\" .CI "inline code"
+.de CI
+\fC\\$1\fP\\$2
+..
+.\" ===================================================================
+.\" \&
+.\" .sp 3c
+.\" .LG
+.\" .LG
+.\" .LG
+.\" .LG
+.\" Garlic: User guide
+.\" .br
+.\" .NL
+.\" Rodrigo Arias Mallo
+.\" .br
+.\" .I "Barcelona Supercomputing Center"
+.\" .br
+.\" \*[curdate]
+.\" .sp 17c
+.\" .DE
+.\" .CI \*[gitcommit]
+.TL
+Garlic: User Guide
+.AU
+Rodrigo Arias Mallo
+.AI
+Barcelona Supercomputing Center
+.AB
+.LP
+This document contains all the information to configure and use the
+garlic benchmark. All stages from the development to the publication
+are covered, as well as the introductory steps required to setup the
+machines.
+.DS L
+.SM
+\fC
+Generated on \*[curdate]
+Git commit: \*[gitcommit]
+\fP
+.DE
+.AE
 .\" ===================================================================
 .NH 1
 Introduction
-.PP
-The garlic framework provides all the tools to experiment with HPC
-programs and produce publication articles.
-.\" ===================================================================
-.NH 2
-Machines and clusters
-.PP
-Our current setup employs multiple machines to build and execute the
-experiments. Each cluster and node has it's own name and will be
-different in other clusters. Therefore, instead of using the names of
-the machines we use machine classes to generalize our setup. Those
-machine clases currently correspond to a physical machine each:
-.BL
-.LI
-.B Builder
-(xeon07): runs the nix-daemon and performs the builds in /nix. Requires
-root access to setup de nix-daemon.
-.LI 
-.B Target
-(MareNostrum 4 compute nodes): the nodes where the experiments 
-are executed. It doesn't need to have /nix installed or root access.
-.LI 
-.B Login
-(MareNostrum 4 login nodes): used to allocate resources and run jobs. It
-doesn't need to have /nix installed or root access.
-.LI 
-.B Laptop
-(where the keyboard is attached): used to connect to the other machines.
-No root access is required or /nix, but needs to be able to connect to
-the builder.
-.LE
-.\".P
-.\"The specific details of each machine class can be summarized in the
-.\"following table:
-.\".TS
-.\"center;
-.\"lB cB cB cB cB lB lB lB
-.\"lB  c  c  c  c  l  l  l.
-.\"_
-.\"Class	daemon	store	root	dl	cpus	space	cluster	node
-.\"_
-.\"laptop	no	no	no	yes	low	1GB	-	-
-.\"build	yes	yes	yes	yes	high	50GB	Cobi	xeon07
-.\"login	no	yes	no	no	low	MN4	mn1
-.\"target	no	yes	no	no	high	MN4	compute nodes
-.\"_
-.\".TE
-.PP
-The machines don't need to be different of each others, as one machine
-can implement several classes. For example the laptop can act as the
-builder too but is not recommended. Or the login machine can also
-perform the builds, but is not possible yet in our setup.
-.\" ===================================================================
-.H 2 "Properties"
-.PP
-We can define the following three properties:
-.BL 1m
-.LI
-R0: \fBSame\fP people on the \fBsame\fP machine obtain the same result
-.LI
-R1: \fBDifferent\fP people on the \fBsame\fP machine obtain the same result
-.LI
-R2: \fBDifferent\fP people on a \fBdifferent\fP machine obtain the same result
-.LE
-.PP
-The garlic framework distinguishes two classes of results: the result of
-building a derivation, which are usually binary programs, and the
-results of the execution of an experiment.
-.PP
-Building a derivation is usually R2, the result is bit-by-bit identical
-excepting some rare cases. One example is that during the build process,
-a directory is listed by the order of the inodes, giving a random order
-which is different between builds. These problems are tracked by the
-.I https://r13y.com/
-project. In the minimal installation, less than 1% of the derivations
-don't achieve the R2 property.
-.PP
-On the other hand, the results of the experiments are not yet R2, as
-they are tied to the target machine.
-.\" ===================================================================
-.H 1 "Preliminary steps"
-The peculiarities of our setup require that users perform some actions
-to use the garlic framework. The content of this section is only
-intended for the users of our machines, but can serve as reference in
-other machines.
-.PP
-The names of the machine classes are used in the command line prompt
-instead of the actual name of the machine, to indicate that the command
-needs to be executed in the stated machine class, for example:
-.DS I
-.VERBON
-builder% echo hi
-hi
-.VERBOFF
-.DE
-When the machine class is not important, it is ignored and only the
-"\f(CW%\fP" prompt appears.
-.\" ===================================================================
-.H 2 "Configure your laptop"
-.PP
-To easily connect to the builder (xeon07) in one step, configure the SSH
-client to perform a jump over the Cobi login node. The
-.I ProxyJump
-directive is only available in version 7.3 and upwards. Add the
-following lines in the \f(CW\(ti/.ssh/config\fP file of your laptop:
-.DS L
-\fC
-Host cobi
-      HostName ssflogin.bsc.es
-      User your-username-here
- 
-Host xeon07
-      ProxyJump cobi
-      HostName xeon07
-      User your-username-here
-\fP
-.DE
-You should be able to connect to the builder typing:
-.DS I
-.VERBON
-laptop$ ssh xeon07
-.VERBOFF
-.DE
-To spot any problems try with the \f(CW-v\fP option to enable verbose
-output.
-.\" ===================================================================
-.H 2 "Configure the builder (xeon07)"
-.PP
-In order to use nix you would need to be able to download the sources 
-from Internet. Usually the download requires the ports 22, 80 and 443 
-to be open for outgoing traffic.
-.PP
-Check that you have network access in
-xeon07 provided by the environment variables \fIhttp_proxy\fP and
-\fIhttps_proxy\fP. Try to fetch a webpage with curl, to ensure the proxy
-is working:
-.DS I
-.VERBON
-  xeon07$ curl x.com
-  x
-.VERBOFF
-.DE
-.\" ===================================================================
-.H 3 "Create a new SSH key"
-.PP
-There is one DSA key in your current home called "cluster" that is no
-longer supported in recent SSH versions and should not be used. Before
-removing it, create a new one without password protection leaving the
-passphrase empty (in case that you don't have one already created) by
-running:
-.DS I
-.VERBON
-xeon07$ ssh-keygen
-Generating public/private rsa key pair.
-Enter file in which to save the key (\(ti/.ssh/id_rsa):
-Enter passphrase (empty for no passphrase):
-Enter same passphrase again:
-Your identification has been saved in \(ti/.ssh/id_rsa.
-Your public key has been saved in \(ti/.ssh/id_rsa.pub.
-\&...
-.VERBOFF
-.DE
-By default it will create the public key at \f(CW\(ti/.ssh/id_rsa.pub\fP.
-Then add the newly created key to the authorized keys, so you can
-connect to other nodes of the Cobi cluster:
-.DS I
-.VERBON
-xeon07$ cat \(ti/.ssh/id_rsa.pub >> \(ti/.ssh/authorized_keys
-.VERBOFF
-.DE
-Finally, delete the old "cluster" key:
-.DS I
-.VERBON
-xeon07$ rm \(ti/.ssh/cluster \(ti/.ssh/cluster.pub
-.VERBOFF
-.DE
-And remove the section in the configuration \f(CW\(ti/.ssh/config\fP
-where the key was assigned to be used in all hosts along with the
-\f(CWStrictHostKeyChecking=no\fP option. Remove the following lines (if
-they exist):
-.DS I
-.VERBON
-Host *
-    IdentityFile \(ti/.ssh/cluster
-    StrictHostKeyChecking=no
-.VERBOFF
-.DE
-By default, the SSH client already searchs for a keypair called
-\f(CW\(ti/.ssh/id_rsa\fP and \f(CW\(ti/.ssh/id_rsa.pub\fP, so there is
-no need to manually specify them.
-.PP
-You should be able to access the login node with your new key by using:
-.DS I
-.VERBON
-xeon07$ ssh ssfhead
-.VERBOFF
-.DE
-.\" ===================================================================
-.H 3 "Authorize access to the repository"
-.PP
-The sources of BSC packages are usually downloaded directly from the PM
-git server, so you must be able to access all repositories without a
-password prompt.
-.PP
-Most repositories are open to read for logged in users, but there are
-some exceptions (for example the nanos6 repository) where you must have
-explicitly granted read access.
-.PP
-Copy the contents of your public SSH key in \f(CW\(ti/.ssh/id_rsa.pub\fP
-and paste it in GitLab at
-.DS I
-.VERBON
-https://pm.bsc.es/gitlab/profile/keys
-.VERBOFF
-.DE
-Finally verify the SSH connection to the server works and you get a 
-greeting from the GitLab server with your username:
-.DS I
-.VERBON
-xeon07$ ssh git@bscpm03.bsc.es
-PTY allocation request failed on channel 0
-Welcome to GitLab, @rarias!
-Connection to bscpm03.bsc.es closed.
-.VERBOFF
-.DE
-Verify that you can access the nanos6 repository (otherwise you 
-first need to ask to be granted read access), at:
-.DS I
-.VERBON
-https://pm.bsc.es/gitlab/nanos6/nanos6
-.VERBOFF
-.DE
-Finally, you should be able to download the nanos6 git 
-repository without any password interaction by running:
-.DS I
-.VERBON
-xeon07$ git clone git@bscpm03.bsc.es:nanos6/nanos6.git
-.VERBOFF
-.DE
-Which will create the nanos6 directory.
-.\" ===================================================================
-.H 3 "Authorize access to MareNostrum 4"
-You will also need to access MareNostrum 4 from the xeon07 machine, in 
-order to run experiments. Add the following lines to the 
-\f(CW\(ti/.ssh/config\fP file and set your user name:
-.DS I
-.VERBON
-Host mn0 mn1 mn2
-    User <your user name in MN4>
-.VERBOFF
-.DE
-Then copy your SSH key to MareNostrum 4 (it will ask you for your login
-password):
-.DS I
-.VERBON
-xeon07$ ssh-copy-id -i \(ti/.ssh/id_rsa.pub mn1
-.VERBOFF
-.DE
-Finally, ensure that you can connect without a password:
-.DS I
-.VERBON
-xeon07$ ssh mn1
-\&...
-login1$
-.VERBOFF
-.DE
-.\" ===================================================================
-.H 3 "Clone the bscpkgs repository"
-.PP
-Once you have Internet and you have granted access to the PM GitLab 
-repositories you can begin building software with nix. First ensure 
-that the nix binaries are available from your shell in xeon07:
-.DS I
-.VERBON
-xeon07$ nix --version
-nix (Nix) 2.3.6
-.VERBOFF
-.DE
-Now you are ready to build and install packages with nix. Clone the 
-bscpkgs repository:
-.DS I
-.VERBON
-xeon07$ git clone git@bscpm03.bsc.es:rarias/bscpkgs.git
-.VERBOFF
-.DE
-Nix looks in the current folder for a file named \f(CWdefault.nix\fP for
-packages, so go to the bscpkgs directory:
-.DS I
-.VERBON
-xeon07$ cd bscpkgs
-.VERBOFF
-.DE
-Now you should be able to build nanos6 (which is probably already
-compiled):
-.DS I
-.VERBON
-xeon07$ nix-build -A bsc.nanos6
-\&...
-/nix/store/...2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
-.VERBOFF
-.DE
-The installation is placed in the nix store (with the path stated in 
-the last line of the build process), with the \f(CWresult\fP symbolic
-link pointing to the same location:
-.DS I
-.VERBON
-xeon07$ readlink result
-/nix/store/...2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
-.VERBOFF
-.DE
-.\" ===================================================================
-.H 2 "Configure the login and target (MareNostrum 4)"
-.PP
-In order to execute the programs in MareNostrum 4, you first need load
-some utilities in the PATH. Add to the end of the file
-\f(CW\(ti/.bashrc\fP in MareNostrum 4 the following line:
-.DS I
-.VERBON
-export PATH=/gpfs/projects/bsc15/nix/bin:$PATH
-.VERBOFF
-.DE
-Then logout and login again (our source the \f(CW\(ti/.bashrc\fP file)
-and check that now you have the \f(CWnix-develop\fP command available:
-.DS I
-.VERBON
-login1$ which nix-develop
-/gpfs/projects/bsc15/nix/bin/nix-develop
-.VERBOFF
-.DE
-The new utilities are available both in the login nodes and in the
-compute (target) nodes, as they share the file system over the network.
-.\" ===================================================================
-.H 1 "Overview"
-.PP
+.LP
 The garlic framework is designed to fulfill all the requirements of an
 experimenter in all the steps up to publication. The experience gained
 while using it suggests that we move along three stages despicted in the
 following diagram:
-.DS CB
-.S 9p 10p
+.DS L
+.SM
 .PS 5
-linewid=1;
+linewid=1.4;
+arcrad=1;
 right
-box "Source" "code"
-arrow "Development" above
-box "Program"
-arrow "Experiment" above
-box "Results"
-arrow "Data" "exploration"
-box "Figures"
+S: box "Source" "code"
+arrow "Development" invis
+#move "Development" above
+P: box "Program"
+arrow "Experimentation" invis
+R:box "Results"
+arrow "Data" "exploration" invis
+F:box "Figures"
+
+arc cw from 1/2 of the way between S.n and S.ne \
+  to 1/2 of the way between P.nw and P.n ->;
+arc cw from 1/2 of the way between P.s and P.sw \
+  to 1/2 of the way between S.se and S.s ->;
+
+arc cw from 1/2 of the way between P.n and P.ne \
+  to 1/2 of the way between R.nw and R.n ->;
+arc cw from 1/2 of the way between R.s and R.sw \
+  to 1/2 of the way between P.se and P.s ->;
+
+arc cw from 1/2 of the way between R.n and R.ne \
+  to 1/2 of the way between F.nw and F.n ->;
+arc cw from 1/2 of the way between F.s and F.sw \
+  to 1/2 of the way between R.se and R.s ->;
 .PE
-.S P P
 .DE
 In the development phase the experimenter changes the source code in
 order to introduce new features or fix bugs. Once the program is
@@ -413,8 +117,305 @@ need to be introduced (or even in the source code of the program).
 Therefore, the experimenter may move forward and backwards along three
 phases several times. The garlic framework provides support for all the
 three stages (with different degrees of madurity).
-.H 1 "Development (work in progress)"
+.\" ===================================================================
+.NH 2
+Machines and clusters
+.LP
+Our current setup employs multiple machines to build and execute the
+experiments. Each cluster and node has it's own name and will be
+different in other clusters. Therefore, instead of using the names of
+the machines we use machine classes to generalize our setup. Those
+machine clases currently correspond to a physical machine each:
+.IP \(bu 12p
+.B Builder
+(xeon07): runs the nix-daemon and performs the builds in /nix. Requires
+root access to setup the
+.I nix-daemon
+with multiple users.
+.IP \(bu
+.B Target
+(MareNostrum 4 compute nodes): the nodes where the experiments 
+are executed. It doesn't need to have /nix installed or root access.
+.IP \(bu
+.B Login
+(MareNostrum 4 login nodes): used to allocate resources and run jobs. It
+doesn't need to have /nix installed or root access.
+.IP \(bu
+.B Laptop
+(where the keyboard is attached, can be anything): used to connect to the other machines.
+No root access is required or /nix, but needs to be able to connect to
+the builder.
+.LP
+The machines don't need to be different of each others, as one machine
+can implement several classes. For example the laptop can act as the
+builder too but is not recommended. Or the login machine can also
+perform the builds, but is not possible yet in our setup.
+.\" ===================================================================
+.NH 2
+Reproducibility
+.LP
+An effort to facilitate the reproducibility of the experiments has been
+done, with varying degrees of success. The names of the different levels
+of reproducibility have not been yet standarized, so we define our own
+to avoid any confusion. We define three levels of reproducibility based
+on the people and the machine involved:
+.IP \(bu 12p
+R0: The \fIsame\fP people on the \fIsame\fP machine obtain the same result
+.IP \(bu
+R1: \fIDifferent\fP people on the \fIsame\fP machine obtain the same result
+.IP \(bu
+R2: \fIDifferent\fP people on a \fIdifferent\fP machine obtain the same result
+.LP
+The garlic framework distinguishes two types of results: the result of
+\fIbuilding a derivation\fP (usually building a binary or a library from the
+sources) and the results of the \fIexecution of an experiment\fP (typically
+those are the measurements performed during the execution of the program
+of study).
 .PP
+For those two types, the meaning of
+.I "same result"
+is different. In the case of building a binary, we define the same
+result if it is bit-by-bit identical. In the packages provided by nixos
+is usually the case except some rare cases. One example is that during the build process,
+a directory is listed by the order of the inodes, giving a random order
+which is different between builds. These problems are tracked by the
+.URL https://r13y.com/ r13y
+project. About 99% of the derivations of the minimal package set achieve
+the R2 property.
+.PP
+On the other hand, the results of the experiments are always bit-by-bit
+different. So we change the definition to state that they are the same
+if the conclusions that can be obtained are the same. In particular, we
+assume that the results are within the confidence interval. With this
+definition, all experiments are currently R1. The reproducibility level
+R2 is not posible yet as the software is compiled to support only the
+target machine, with an specific interconnection.
+.\" ===================================================================
+.bp
+.NH 1
+Preliminary steps
+.LP
+The peculiarities of our setup require that users perform some actions
+to use the garlic framework. The content of this section is only
+intended for the users of our machines, but can serve as reference in
+other machines.
+.PP
+The names of the machine classes are used in the command line prompt
+instead of the actual name of the machine, to indicate that the command
+needs to be executed in the stated machine class, for example:
+.CS
+builder% echo hi
+hi
+.CE
+When the machine class is not important, it is ignored and only the
+.CI "%"
+prompt appears.
+.\" ===================================================================
+.NH 2
+Configure your laptop
+.LP
+To easily connect to the builder (xeon07) in one step, configure the SSH
+client to perform a jump over the Cobi login node. The
+.I ProxyJump
+directive is only available in version 7.3 and upwards. Add the
+following lines in the
+.CI \(ti/.ssh/config
+file of your laptop:
+.CS
+Host cobi
+      HostName ssflogin.bsc.es
+      User your-username-here
+ 
+Host xeon07
+      ProxyJump cobi
+      HostName xeon07
+      User your-username-here
+.CE
+You should be able to connect to the builder typing:
+.CS
+laptop$ ssh xeon07
+.CE
+To spot any problems try with the
+.CI -v
+option to enable verbose output.
+.\" ===================================================================
+.NH 2
+Configure the builder (xeon07)
+.LP
+In order to use nix you would need to be able to download the sources 
+from Internet. Usually the download requires the ports 22, 80 and 443 
+to be open for outgoing traffic.
+.PP
+Check that you have network access in
+xeon07 provided by the environment variables \fIhttp_proxy\fP and
+\fIhttps_proxy\fP. Try to fetch a webpage with curl, to ensure the proxy
+is working:
+.CS
+  xeon07$ curl x.com
+  x
+.CE
+.\" ===================================================================
+.NH 3
+Create a new SSH key
+.LP
+There is one DSA key in your current home called "cluster" that is no
+longer supported in recent SSH versions and should not be used. Before
+removing it, create a new one without password protection leaving the
+passphrase empty (in case that you don't have one already created) by
+running:
+.CS
+xeon07$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (\(ti/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in \(ti/.ssh/id_rsa.
+Your public key has been saved in \(ti/.ssh/id_rsa.pub.
+\&...
+.CE
+By default it will create the public key at \f(CW\(ti/.ssh/id_rsa.pub\fP.
+Then add the newly created key to the authorized keys, so you can
+connect to other nodes of the Cobi cluster:
+.CS
+xeon07$ cat \(ti/.ssh/id_rsa.pub >> \(ti/.ssh/authorized_keys
+.CE
+Finally, delete the old "cluster" key:
+.CS
+xeon07$ rm \(ti/.ssh/cluster \(ti/.ssh/cluster.pub
+.CE
+And remove the section in the configuration \f(CW\(ti/.ssh/config\fP
+where the key was assigned to be used in all hosts along with the
+\f(CWStrictHostKeyChecking=no\fP option. Remove the following lines (if
+they exist):
+.CS
+Host *
+    IdentityFile \(ti/.ssh/cluster
+    StrictHostKeyChecking=no
+.CE
+By default, the SSH client already searchs for a keypair called
+\f(CW\(ti/.ssh/id_rsa\fP and \f(CW\(ti/.ssh/id_rsa.pub\fP, so there is
+no need to manually specify them.
+.PP
+You should be able to access the login node with your new key by using:
+.CS
+xeon07$ ssh ssfhead
+.CE
+.\" ===================================================================
+.NH 3
+Authorize access to the repository
+.LP
+The sources of BSC packages are usually downloaded directly from the PM
+git server, so you must be able to access all repositories without a
+password prompt.
+.PP
+Most repositories are open to read for logged in users, but there are
+some exceptions (for example the nanos6 repository) where you must have
+explicitly granted read access.
+.PP
+Copy the contents of your public SSH key in \f(CW\(ti/.ssh/id_rsa.pub\fP
+and paste it in GitLab at
+.CS
+https://pm.bsc.es/gitlab/profile/keys
+.CE
+Finally verify the SSH connection to the server works and you get a 
+greeting from the GitLab server with your username:
+.CS
+xeon07$ ssh git@bscpm03.bsc.es
+PTY allocation request failed on channel 0
+Welcome to GitLab, @rarias!
+Connection to bscpm03.bsc.es closed.
+.CE
+Verify that you can access the nanos6 repository (otherwise you 
+first need to ask to be granted read access), at:
+.CS
+https://pm.bsc.es/gitlab/nanos6/nanos6
+.CE
+Finally, you should be able to download the nanos6 git 
+repository without any password interaction by running:
+.CS
+xeon07$ git clone git@bscpm03.bsc.es:nanos6/nanos6.git
+.CE
+Which will create the nanos6 directory.
+.\" ===================================================================
+.NH 3
+Authorize access to MareNostrum 4
+.LP
+You will also need to access MareNostrum 4 from the xeon07 machine, in 
+order to run experiments. Add the following lines to the 
+\f(CW\(ti/.ssh/config\fP file and set your user name:
+.CS
+Host mn0 mn1 mn2
+    User <your user name in MN4>
+.CE
+Then copy your SSH key to MareNostrum 4 (it will ask you for your login
+password):
+.CS
+xeon07$ ssh-copy-id -i \(ti/.ssh/id_rsa.pub mn1
+.CE
+Finally, ensure that you can connect without a password:
+.CS
+xeon07$ ssh mn1
+\&...
+login1$
+.CE
+.\" ===================================================================
+.NH 3
+Clone the bscpkgs repository
+.LP
+Once you have Internet and you have granted access to the PM GitLab 
+repositories you can begin building software with nix. First ensure 
+that the nix binaries are available from your shell in xeon07:
+.CS
+xeon07$ nix --version
+nix (Nix) 2.3.6
+.CE
+Now you are ready to build and install packages with nix. Clone the 
+bscpkgs repository:
+.CS
+xeon07$ git clone git@bscpm03.bsc.es:rarias/bscpkgs.git
+.CE
+Nix looks in the current folder for a file named \f(CWdefault.nix\fP for
+packages, so go to the bscpkgs directory:
+.CS
+xeon07$ cd bscpkgs
+.CE
+Now you should be able to build nanos6 (which is probably already
+compiled):
+.CS
+xeon07$ nix-build -A bsc.nanos6
+\&...
+/nix/store/...2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
+.CE
+The installation is placed in the nix store (with the path stated in 
+the last line of the build process), with the \f(CWresult\fP symbolic
+link pointing to the same location:
+.CS
+xeon07$ readlink result
+/nix/store/...2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
+.CE
+.\" ===================================================================
+.NH 2
+Configure the login and target (MareNostrum 4)
+.LP
+In order to execute the programs in MareNostrum 4, you first need load
+some utilities in the PATH. Add to the end of the file
+\f(CW\(ti/.bashrc\fP in MareNostrum 4 the following line:
+.CS
+export PATH=/gpfs/projects/bsc15/nix/bin:$PATH
+.CE
+Then logout and login again (our source the \f(CW\(ti/.bashrc\fP file)
+and check that now you have the \f(CWnix-develop\fP command available:
+.CS
+login1$ which nix-develop
+/gpfs/projects/bsc15/nix/bin/nix-develop
+.CE
+The new utilities are available both in the login nodes and in the
+compute (target) nodes, as they share the file system over the network.
+.\" ===================================================================
+.bp
+.NH 1
+Development
+.LP
 During the development phase, a functional program is produced by
 modifying its source code. This process is generally cyclic: the
 developer needs to compile, debug and correct mistakes. We want to
@@ -435,8 +436,9 @@ cannot accidentally link with the wrong library or modify the build
 process with a forgotten environment variable in the \f(CW\(ti/.bashrc\fP
 file.
 .\" ===================================================================
-.H 2 "Getting the development tools"
-.PP
+.NH 2
+Getting the development tools
+.LP
 To create a development
 environment, first copy or download the sources of your program (not the
 dependencies) in a new directory placed in the target machine
@@ -446,8 +448,7 @@ The default environment contains packages commonly used to develop
 programs, listed in the \fIgarlic/index.nix\fP file:
 .\" FIXME: Unify garlic.unsafeDevelop in garlic.develop, so we can
 .\" specify the packages directly
-.DS I
-.VERBON
+.CS
 develop = let 
   commonPackages = with self; [
     coreutils htop procps-ng vim which strace
@@ -460,8 +461,7 @@ develop = let
     # Add more bsc packages here...
   ];
   ...
-.VERBOFF
-.DE
+.CE
 If you need additional packages, add them to the list, so that they
 become available in the environment. Those may include any dependency
 required to build your program.
@@ -469,14 +469,12 @@ required to build your program.
 Then use the build machine (xeon07) to build the
 .I garlic.develop
 derivation:
-.DS I
-.VERBON
+.CS
 build% nix-build -A garlic.develop
 \&...
 build% grep ln result
 ln -fs /gpfs/projects/.../bin/stage1 .nix-develop
-.VERBOFF
-.DE
+.CE
 Copy the \fIln\fP command and run it in the target machine
 (MareNostrum\~4), inside the new directory used for your program
 development, to create the link \fI.nix-develop\fP (which is used to
@@ -493,76 +491,68 @@ environment link is created, there is no need to repeat these steps again.
 Before entering the environment, you will need to access the required
 resources for your program, which may include several compute nodes.
 .\" ===================================================================
-.H 2 "Allocating resources for development"
-.PP
+.NH 2
+Allocating resources for development
+.LP
 Our target machine (MareNostrum 4) provides an interactive shell, that
 can be requested with the number of computational resources required for
 development. To do so, connect to the login node and allocate an
 interactive session:
-.DS I
-.VERBON
+.CS
 % ssh mn1
 login% salloc ...
 target%
-.VERBOFF
-.DE
+.CE
 This operation may take some minutes to complete depending on the load
 of the cluster. But once the session is ready, any subsequent execution
 of programs will be immediate.
 .\" ===================================================================
-.H 2 "Accessing the developement environment"
+.NH 2
+Accessing the developement environment
 .PP
 The utility program \fInix-develop\fP has been designed to access the
 development environment of the current directory, by looking for the
 \fI.nix-develop\fP file. It creates a namespace where the required
 packages are installed and ready to be used. Now you can access the
 newly created environment by running:
-.DS I
-.VERBON
+.CS
 target% nix-develop
 develop%
-.VERBOFF
-.DE
+.CE
 The spawned shell contains all the packages pre-defined in the
 \fIgarlic.develop\fP derivation, and can now be accessed by typing the
 name of the commands.
-.DS I
-.VERBON
+.CS
 develop% which gcc
 /nix/store/azayfhqyg9...s8aqfmy-gcc-wrapper-9.3.0/bin/gcc
 develop% which gdb
 /nix/store/1c833b2y8j...pnjn2nv9d46zv44dk-gdb-9.2/bin/gdb
-.VERBOFF
-.DE
+.CE
 If you need additional packages, you can add them in the
 \fIgarlic/index.nix\fP file as mentioned previously. To keep the
 same current resources, so you don't need to wait again for the
 resources to be allocated, exit only from the development shell:
-.DS I
-.VERBON
+.CS
 develop% exit
 target%
-.VERBOFF
-.DE
+.CE
 Then update the
 .I .nix-develop
 link and enter into the new develop environment:
-.DS I
-.VERBON
+.CS
 target% nix-develop
 develop%
-.VERBOFF
-.DE
+.CE
 .\" ===================================================================
-.H 2 "Execution"
+.NH 2
+Execution
+.LP
 The allocated shell can only execute tasks in the current node, which
 may be enough for some tests. To do so, you can directly run your
 program as:
-.DS I
-.VERBON
+.CS
 develop$ ./program
-.VERBOFF
-.DE
+.CE
 If you need to run a multi-node program, typically using MPI
 communications, then you can do so by using srun. Notice that you need
 to allocate several nodes when calling salloc previously. The srun
@@ -570,49 +560,45 @@ command will execute the given program \fBoutside\fP the development
 environment if executed as-is. So we re-enter the develop environment by
 calling nix-develop as a wrapper of the program:
 .\" FIXME: wrap srun to reenter the develop environment by its own
-.DS I
-.VERBON
+.CS
 develop$ srun nix-develop ./program
-.VERBOFF
-.DE
+.CE
 .\" ===================================================================
-.H 2 "Debugging"
+.NH 2
+Debugging
+.LP
 The debugger can be used to directly execute the program if is executed
 in only one node by using:
-.DS I
-.VERBON
+.CS
 develop$ gdb ./program
-.VERBOFF
-.DE
+.CE
 Or it can be attached to an already running program by using its PID.
 You will need to first connect to the node running it (say target2), and
 run gdb inside the nix-develop environment. Use
 .I squeue
 to see the compute nodes running your program: 
-.DS I
-.VERBON
+.CS
 login$ ssh target2
 target2$ cd project-develop
 target2$ nix-develop
 develop$ gdb -p $pid
-.VERBOFF
-.DE
+.CE
 You can repeat this step to control the execution of programs running in
 different nodes simultaneously.
 .PP
 In those cases where the program crashes before being able to attach the
 debugger, enable the generation of core dumps:
-.DS I
-.VERBON
+.CS
 develop$ ulimit -c unlimited
-.VERBOFF
-.DE
+.CE
 And rerun the program, which will generate a core file that can be
 opened by gdb and contains the state of the memory when the crash
 happened. Beware that the core dump file can be very large, depending on
 the memory used by your program at the crash.
-.H 2 "Git branch name convention"
-.PP
+.\" ===================================================================
+.NH 2
+Git branch name convention
+.LP
 The garlic benchmark imposes a set of requirements to be meet for each 
 application in order to coordinate the execution of the benchmark and 
 the gathering process of the results.
@@ -628,143 +614,404 @@ The branch name is formed by adding keywords separated by the "+"
 character. The keywords must follow the given order and can only 
 appear zero or once each. At least one keyword must be included. The 
 following keywords are available:
-.LB 12 2 0 0
-.LI \f(CWmpi\fP
+.DS L
+.IP \f(CWmpi\fP 5m
 A significant fraction of the communications uses only the standard MPI
 (without extensions like TAMPI).
-.LI \f(CWtampi\fP
+.IP \f(CWtampi\fP
 A significant fraction of the communications uses TAMPI.
-.LI \f(CWsend\fP
+.IP \f(CWsend\fP
 A significant part of the MPI communication uses the blocking family of
-methods (MPI_Send, MPI_Recv, MPI_Gather...).
-.LI \f(CWisend\fP
+methods
+.I MPI_Send , (
+.I MPI_Recv ,
+.I MPI_Gather "...)."
+.IP \f(CWisend\fP
 A significant part of the MPI communication uses the non-blocking family
-of methods (MPI_Isend, MPI_Irecv, MPI_Igather...).
-.LI \f(CWrma\fP
+of methods
+.I MPI_Isend , (
+.I MPI_Irecv ,
+.I MPI_Igather "...)."
+.IP \f(CWrma\fP
 A significant part of the MPI communication uses remote memory access
-(one-sided) methods (MPI_Get, MPI_Put...).
-.LI \f(CWseq\fP
+(one-sided) methods
+.I MPI_Get , (
+.I MPI_Put "...)."
+.IP \f(CWseq\fP
 The complete execution is sequential in each process (one thread per
 process).
-.LI \f(CWomp\fP
+.IP \f(CWomp\fP
 A significant fraction of the execution uses the OpenMP programming
 model.
-.LI \f(CWoss\fP
+.IP \f(CWoss\fP
 A significant fraction of the execution uses the OmpSs-2 programming
 model.
-.LI \f(CWtask\fP
+.IP \f(CWtask\fP
 A significant part of the execution involves the use of the tasking
 model.
-.LI \f(CWtaskfor\fP
+.IP \f(CWtaskfor\fP
 A significant part of the execution uses the taskfor construct.
-.LI \f(CWfork\fP
+.IP \f(CWfork\fP
 A significant part of the execution uses the fork-join model (including
 hybrid programming techniques with  parallel computations and sequential
 communications).
-.LI \f(CWsimd\fP
+.IP \f(CWsimd\fP
 A significant part of the computation has been optimized to use SIMD
 instructions.
-.LE
-.PP
-In the \fBAppendix A\fP there is a flowchart to help the decision
-process of the branch name.
-.PP
-Additional user defined keywords may be added at the end using the 
-separator "+" as well. User keywords must consist of capital 
-alphanumeric characters only and be kept short. These additional 
-keywords must be different (case insensitive) to the already defined 
-above. Some examples:
-.DS I
-.VERBON
+.DE
+.LP
+In the
+.URL #appendixA "Appendix A"
+there is a flowchart to help the decision
+process of the branch name. Additional user defined keywords may be
+added at the end using the separator "+" as well. User keywords must
+consist of capital alphanumeric characters only and be kept short. These
+additional keywords must be different (case insensitive) to the already
+defined above. Some examples:
+.CS
 garlic/mpi+send+seq
 garlic/mpi+send+omp+fork
 garlic/mpi+isend+oss+task
 garlic/tampi+isend+oss+task
 garlic/tampi+isend+oss+task+COLOR
 garlic/tampi+isend+oss+task+COLOR+BTREE
-.VERBOFF
-.DE
+.CE
 .\" ===================================================================
-.H 1 "Experimentation"
-The experimentation phase begins with a functional program which is the
-object of study. The experimenter then designs an experiment aimed at
-measuring some properties of the program. The experiment is then
-executed and the results are stored for further analysis.
-.H 2 "Writing the experiment configuration"
+.bp
+.NH 1
+Experimentation
+.LP
+During the experimentation, a program is studied by running it and
+measuring some properties. The experimenter is in charge of the
+experiment design, which is typically controlled by a single
+.I nix
+file placed in the
+.CI garlic/exp
+subdirectory.
+Experiments are formed by several
+.I "experimental units"
+or simply
+.I units .
+A unit is the result of each unique configuration of the experiment 
+(typically involves the cartesian product of all factors) and
+consists of several shell scripts executed sequentially to setup the
+.I "execution environment" ,
+which finally launch the actual program being analyzed.
+The scripts that prepare the environment and the program itself are
+called the
+.I stages
+of the execution and altogether form the
+.I "execution pipeline"
+or simply the
+.I pipeline .
+The experimenter must know with very good details all the stages
+involved in the pipeline, as they have a large impact on the execution.
 .PP
-The term experiment is quite overloaded in this document. We are going
-to see how to write the recipe that describes the execution pipeline of
-an experiment.
+Additionally, the execution time is impacted by the target machine in
+which the experiments run. The software used for the benchmark is
+carefully configured and tuned for the hardware used in the execution;
+in particular, the experiments are designed to run in MareNostrum 4
+cluster with the SLURM workload manager and the Omni-Path
+interconnection network. In the future we plan to add
+support for other clusters in order to execute the experiments in other
+machines.
+.\"#####################################################################
+.NH 2
+Isolation
+.LP
+The benchmark is designed so that both the compilation of every software
+package and the execution of the experiment is performed under strict
+conditions. We can ensure that two executions of the same experiment are
+actually running the same program in the same software environment.
 .PP
-Within the garlic benchmark, experiments are typically sorted by a
-hierarchy depending on which application they belong. Take a look at the
-\fCgarlic/exp\fP directory and you will find some folders and .nix
-files.
+All the software used by an experiment is included in the
+.I "nix store"
+which is, by convention, located at the
+.CI /nix
+directory. Unfortunately, it is common for libraries to try to load
+software from other paths like
+.CI /usr
+or
+.CI /lib .
+It is also common that configuration files are loaded from
+.CW /etc
+and from the home directory of the user that runs the experiment.
+Additionally, some environment variables are recognized by the libraries
+used in the experiment, which change their behavior. As we cannot
+control the software and configuration files in those directories, we
+couldn't guarantee that the execution behaves as intended.
 .PP
-Each of those recipes files describe a function that returns a
-derivation, which, once built will result in the first stage script of
-the execution pipeline.
+In order to avoid this problem, we create a
+.I sandbox
+where only the files in the nix store are available (with some other
+exceptions). Therefore, even if the libraries try to access any path
+outside the nix store, they will find that the files are not there
+anymore. Additionally, the environment variables are cleared before
+entering the environment (with some exceptions as well).
+.\"#####################################################################
+.NH 2
+Execution pipeline
+.LP
+Several predefined stages form the
+.I standard
+execution pipeline and are defined in the
+.I stdPipeline
+array. The standard pipeline prepares the resources and the environment
+to run a program (usually in parallel) in the compute nodes. It is
+divided in two main parts:
+connecting to the target machine to submit a job and executing the job.
+Finally, the complete execution pipeline ends by running the actual
+program, which is not part of the standard pipeline, as should be
+defined differently for each program.
+.\"#####################################################################
+.NH 3
+Job submission
+.LP
+Some stages are involved in the job submission: the
+.I trebuchet
+stage connects via
+.I ssh
+to the target machine and executes the next stage there. Once in the
+target machine, the
+.I runexp
+stage computes the output path to store the experiment results, using
+the user in the target machine and changes the working directory there.
+In MareNostrum 4 the output path is at
+.CI /gpfs/projects/bsc15/garlic/$user/out .
+Then the
+.I isolate
+stage is executed to enter the sandbox and the
+.I experiment
+stage begins, which creates a directory to store the experiment output,
+and launches several
+.I unit
+stages.
 .PP
-The first part of states the name of the attributes required as the
-input of the function. Typically some packages, common tools and options:
-.DS I
-.VERBON
-{
-  stdenv
-, stdexp
-, bsc
-, targetMachine
-, stages
-, garlicTools
-}:
-.VERBOFF
+Each unit executes a
+.I sbatch
+stage which runs the
+.I sbatch(1)
+program with a job script that simply calls the next stage. The
+sbatch program internally reads the
+.CW /etc/slurm/slurm.conf
+file from outside the sandbox, so we must explicitly allow this file to
+be available, as well as the
+.I munge
+socket used for authentication by the SLURM daemon. Once the jobs are
+submitted to SLURM, the experiment stage ends and the trebuchet finishes
+the execution. The jobs will be queued for execution without any other
+intervention from the user.
+.PP
+The rationale behind running sbatch from the sandbox is because the
+options provided in environment variables override the options from the
+job script. Therefore, we avoid this problem by running sbatch from the
+sandbox, where the interfering environment variables are removed. The
+sbatch program is also provided in the
+.I "nix store" ,
+with a version compatible with the SLURM daemon running in the target
+machine.
+.\"#####################################################################
+.NH 3
+Job execution
+.LP
+Once an unit job has been selected for execution, SLURM
+allocates the resources (usually several nodes) and then selects one of
+the nodes to run the job script: it is not executed in parallel yet.
+The job script runs from a child process forked from on of the SLURM
+daemon processes, which are outside the sandbox. Therefore, we first run the
+.I isolate
+stage
+to enter the sandbox again.
+.PP
+The next stage is called
+.I control
+and determines if enough data has been generated by the experiment unit
+or if it should continue repeating the execution. At the current time,
+it is only implemented as a simple loop that runs the next stage a fixed
+amount of times (by default, it is repeated 30 times).
+.PP
+The following stage is
+.I srun
+which launches several copies of the next stage to run in
+parallel (when using more than one task). Runs one copy per task,
+effectively creating one process per task. The CPUs affinity is
+configured by the parameter
+.I --cpu-bind
+and is important to set it correctly (see more details in the
+.I srun(1)
+manual). Appending the
+.I verbose
+value to the cpu bind option causes srun to print the assigned affinity
+of each task, which is very valuable when examining the execution log.
+.PP
+The mechanism by which srun executes multiple processes is the same used
+by sbatch, it forks from a SLURM daemon running in the computing nodes.
+Therefore, the execution begins outside the sandbox. The next stage is
+.I isolate
+which enters again the sandbox in every task. All remaining stages are
+running now in parallel.
+.\" ###################################################################
+.NH 3
+The program
+.LP
+At this point in the execution, the standard pipeline has been
+completely executed, and we are ready to run the actual program that is
+the matter of the experiment. Usually, programs require some arguments
+to be passed in the command line. The
+.I exec
+stage sets the arguments (and optionally some environment variables) and
+executes the last stage, the
+.I program .
+.PP
+The experimenters are required to define these last stages, as they
+define the specific way in which the program must be executed.
+Additional stages may be included before or after the program run, so
+they can perform additional steps.
+.\" ###################################################################
+.NH 3
+Stage overview
+.LP
+The complete execution pipeline using the standard pipeline is shown in
+the Table 1. Some properties are also reflected about the execution
+stages.
+.DS L
+.TS
+center;
+lB cB cB cB cB cB
+l  c  c  c  c  c.
+_
+Stage     	Where	Safe	Copies	User	Std
+_
+trebuchet	*	no	no	yes	yes
+runexp  	login	no	no	no	yes
+isolate 	login	no	no	no	yes
+experiment	login	yes	no	no	yes
+unit    	login	yes	no	no	yes
+sbatch  	login	yes	no	no	yes
+_
+isolate 	target	no	no	no	yes
+control 	target	yes	no	no	yes
+srun    	target	yes	no	no	yes
+isolate    	target	no	yes	no	yes
+_
+exec    	target	yes	yes	no	no
+program    	target	yes	yes	no	no
+_
+.TE
 .DE
-.PP
-Notice the \fCtargetMachine\fP argument, which provides information
-about the machine in which the experiment will run. You should write
-your experiment in such a way that runs in multiple clusters.
-.DS I
-.VERBON
+.LP
+.B "Table 1" :
+The stages of a complete execution pipeline. The
+.I where
+column determines where the stage is running,
+.I safe
+states if the stage begins the execution inside the sandbox,
+.I user
+if it can be executed directly by the user,
+.I copies
+if there are several instances running in parallel and
+.I std
+if is part of the standard execution pipeline.
+.\" ###################################################################
+.NH 2
+Writing the experiment
+.LP
+The experiments are generally written in the
+.I nix
+language as it provides very easy management for the packages an their
+customization. An experiment file is formed by several parts, which
+produce the execution pipeline when built. The experiment file describes
+a function (which is typical in nix) and takes as argument an
+attribute set with some common packages, tools and options:
+.CS
+{ stdenv, bsc, stdexp, targetMachine, stages, garlicTools }:
+.CE
+The
+.I bsc
+attribute contains all the BSC and nixpkgs packages, as defined in the
+overlay. The
+.I stdexp
+contains some useful tools and functions to build the experiments, like
+the standard execution pipeline, so you don't need to redefine the
+stages in every experiment. The configuration of the target machine is
+specified in the
+.I targetMachine
+attribute which includes information like the number of CPUs per node or
+the cache line length. It is used to define the experiments in such a
+way that they are not tailored to an specific machine hardware
+(sometimes this is not posible). All the execution stages are available
+in the
+.I stages
+attribute which are used when some extra stage is required. And finally,
+the
+.I garlicTools
+attribute provide some functions to aid common tasks when defining the
+experiment configuration
+.\" ###################################################################
+.NH 3
+Experiment configuration
+.LP
+The next step is to define some variables in a
+.CI let
+\&...
+.CI in
+\&...
+.CI ;
+construct, to be used later. The first one, is the variable
+configuration of the experiment called
+.I varConf ,
+which include all
+the factors that will be changed. All the attributes of this set
+.I must
+be arrays, even if they only contain one element:
+.CS
 varConf = {
   blocks = [ 1 2 4 ];
   nodes = [ 1 ];
 };
-.VERBOFF
-.DE
-.PP
-The \fCvarConf\fP is the attribute set that allows you to vary some
-factors in the experiment.
-.DS I
-.VERBON
+.CE
+In this example, the variable
+.I blocks
+will be set to the values 1, 2 and 4; while
+.I nodes
+will remain set to 1 always. These variables are used later to build the
+experiment configuration. The
+.I varConf
+is later converted to a list of attribute sets, where every attribute
+contains only one value, covering all the combinations (the Cartesian
+product is computed):
+.CS
+[ { blocks = 1; nodes = 1; }
+  { blocks = 2; nodes = 1; }
+  { blocks = 4; nodes = 1; } ]
+.CE
+These configurations are then passed to the
+.I genConf
+function one at a time, which is the central part of the description of
+the experiment:
+.CS
 genConf = var: fix (self: targetMachine.config // {
   expName = "example";
   unitName = self.expName + "-b" + toString self.blocks;
   blocks = var.blocks;
-  nodes = var.nodes;
   cpusPerTask = 1;
   tasksPerNode = self.hw.socketsPerNode;
+  nodes = var.nodes;
 });
-.VERBOFF
-.DE
-.PP
-The \fCgenConf\fP function is the central part of the description of the
-experiment. Takes as input \fBone\fP configuration from the cartesian
-product of
-.I varConfig
-and returns the complete configuration. In our case, it will be
-called 3 times, with the following inputs at each time:
-.DS I
-.VERBON
-{ blocks = 1; nodes = 1; }
+.CE
+It takes as input
+.I one
+configuration from the Cartesian product, for example:
+.CS
 { blocks = 2; nodes = 1; }
-{ blocks = 4; nodes = 1; }
-.VERBOFF
-.DE
-.PP
-The return value can be inspected by calling the function in the
-interactive nix repl:
-.DS I
-.VERBON
+.CE
+And returns the complete configuration for that input, which usually
+expand the input configuration with some derived variables along with
+other constant parameters. The return value can be inspected by calling
+the function in the interactive
+.I "nix repl"
+session:
+.CS
 nix-repl> genConf { blocks = 2; nodes = 1; }
 {
   blocks = 2;
@@ -780,9 +1027,7 @@ nix-repl> genConf { blocks = 2; nodes = 1; }
   tasksPerNode = 2;
   unitName = "example-b2";
 }
-.VERBOFF
-.DE
-.PP
+.CE
 Some configuration parameters were added by
 .I targetMachine.config ,
 such as the
@@ -801,7 +1046,228 @@ By following this rule, the experiments can easily be ported to machines
 with other hardware characteristics, and we only need to define the
 hardware details once. Then all the experiments will be updated based on
 those details.
-.H 2 "First steps"
+.\" ###################################################################
+.NH 3
+Adding the stages
+.LP
+Once the configuration is ready, it will be passed to each stage of the
+execution pipeline which will take the parameters it needs. The
+connection between the parameters and how they are passed to each stage
+is done either by convention or manually. There is a list of parameters that
+are recognized by the standard pipeline stages. For example the
+attribute
+.I nodes ,
+it is recognized as the number of nodes in the standard
+.I sbatch
+stage when allocating resources:
+.DS L
+.TS
+center;
+lB lB cB cB lB
+l  l  c  c  l.
+_
+Stage	Attribute     	Std	Req	Description
+_
+*	nixPrefix	yes	yes	Path to the nix store in the target
+unit	expName     	yes	yes	Name of the experiment
+unit	unitName     	yes	yes	Name of the unit
+control	loops   	yes	yes	Number of runs of each unit
+sbatch	cpusPerTask 	yes	yes	Number of CPUs per task (process)
+sbatch	jobName   	yes	yes	Name of the job
+sbatch	nodes   	yes	yes	Number of nodes allocated
+sbatch	ntasksPerNode	yes	yes	Number of tasks (processes) per node
+sbatch	qos     	yes	no	Name of the QoS queue
+sbatch	reservation	yes	no	Name of the reservation
+sbatch	time    	yes	no	Maximum allocated time (string)
+_
+exec	argv    	no	no	Array of arguments to execve
+exec	env     	no	no	Environment variable settings
+exec	pre     	no	no	Code before the execution
+exec	post     	no	no	Code after the execution
+_
+.TE
+.DE
+.QP
+.B "Table 2" :
+The attributes recognized by the stages in the execution pipeline. The
+column
+.I std
+indicates if they are part of the standard execution pipeline. Some
+attributes are required as indicated by the
+.I req
+column.
+.QE
+.LP
+Other attribute names can be used to specify custom information used in
+additional stages. The two most common stages required to complete the
+pipeline are the
+.I exec
+and the
+.I program .
+Let see an example of
+.I exec :
+.CS
+exec = {nextStage, conf, ...}: stages.exec {
+  inherit nextStage;
+  argv = [ "--blocks" conf.blocks ];
+};
+.CE
+The
+.I exec
+stage is defined as a function that uses the predefined
+.I stages.exec
+stage, which accepts the
+.I argv
+array, and sets the argv of the program. In our case, we fill the
+.I argv
+array by setting the
+.I --blocks
+parameter to the number of blocks, specified in the configuration in the
+attribute
+.I blocks .
+The name of this attribute can be freely choosen, as long as the
+.I exec
+stage refers to it properly. The
+.I nextStage
+attribute is mandatory in all stages, and is automatically set when
+building the pipeline.
+.PP
+The last step is to configure the actual program to be executed,
+which can be specified as another stage:
+.CS
+program = {nextStage, conf, ...}: bsc.apps.example;
+.CE
+Notice that this function only returns the
+.I bsc.apps.example
+derivation, which will be translated to the path where the example
+program is installed. If the program is located inside a directory
+(typically
+.I bin ),
+it must define the attribute
+.I programPath
+in the
+.I bsc.apps.example
+derivation, which points to the executable program. An example:
+.CS
+stdenv.mkDerivation {
+\&  ...
+  programPath = "/bin/example";
+\&  ...
+};
+.CE
+.\" ###################################################################
+.NH 3
+Building the pipeline
+.LP
+With the
+.I exec
+and
+.I program
+stages defined and the ones provided by the standard pipeline, the
+complete execution pipeline can be formed. To do so, the stages are
+placed in an array, in the order they will be executed:
+.CS
+pipeline = stdexp.stdPipeline ++ [ exec program ];
+.CE
+The attribute
+.I stdexp.stdPipeline
+contains the standard pipeline stages, and we only append our two
+defined stages
+.I exec
+and
+.I program .
+The
+.I pipeline
+is an array of functions, and must be transformed in something that can
+be executed in the target machine. For that purpose, the
+.I stdexp
+provides the
+.I genExperiment
+function, which takes the
+.I pipeline
+array and the list of configurations and builds the execution pipeline:
+.CS
+stdexp.genExperiment { inherit configs pipeline; }
+.CE
+The complete example experiment can be shown here:
+.CS
+{ stdenv, stdexp, bsc, targetMachine, stages }:
+with stdenv.lib;
+let
+  # Initial variable configuration
+  varConf = {
+    blocks = [ 1 2 4 ];
+    nodes = [ 1 ];
+  };
+  # Generate the complete configuration for each unit
+  genConf = c: targetMachine.config // rec {
+    expName = "example";
+    unitName = "${expName}-b${toString blocks}";
+    inherit (targetMachine.config) hw;
+    inherit (c) blocks nodes;
+    loops = 30;
+    ntasksPerNode = hw.socketPerNode;
+    cpusPerTask = hw.cpusPerSocket;
+    jobName = unitName;
+  };
+  # Compute the array of configurations
+  configs = stdexp.buildConfigs {
+    inherit varConf genConf;
+  };
+  exec = {nextStage, conf, ...}: stages.exec {
+    inherit nextStage;
+    argv = [ "--blocks" conf.blocks ];
+  };
+  program = {nextStage, conf, ...}: bsc.garlic.apps.example;
+  pipeline = stdexp.stdPipeline ++ [ exec program ];
+in
+  stdexp.genExperiment { inherit configs pipeline; }
+.CE
+.\" ###################################################################
+.NH 3
+Adding the experiment to the index
+.LP
+The experiment file must be located in a named directory inside the
+.I garlic/exp
+directory. The name is usually the program name. Once the experiment is
+placed in a nix file, it must be added to the index of experiments, so
+it can be build. The index is hyerarchically organized as attribute
+sets, with
+.I exp
+containing all the experiments;
+.I exp.example
+the experiments of the
+.I example
+program; and
+.I exp.example.test1
+referring to the
+.I test1
+experiment of the
+.I example
+program. Additional attributes can be added, like
+.I exp.example.test1.variantA
+to handle more details.
+.PP
+For this example we are going to use the attribute path
+.I exp.example.test
+and add it to the index, in the
+.I garlic/exp/index.nix
+file. We append to the end of the attribute set, the following
+definition:
+.CS
+\&...
+  example = {
+    test = callPackage ./example/test.nix { };
+  };
+}
+.CE
+The experiment can now be built with:
+.CS
+builder% nix-build -A exp.example.test
+.CE
+.\" ###################################################################
+.NH 2
+Recommendations
 .PP
 The complete results generally take a long time to be finished, so it is
 advisable to design the experiments iteratively, in order to quickly
@@ -835,12 +1301,14 @@ shared among experiments gets assigned the same hash. Therefore, you can
 iteratively add more units to an experiment, and if they are already
 executed (and the results were generated) is reused.
 .SK
-.APP "" "Branch name diagram"
-.DS CB
-.S -3 10
+.bp
+.SH 1
+Appendix A: Branch name diagram
+.LP
+.TAG appendixA
+.DS B
+.SM
 .PS 4.4/25.4
 copy "gitbranch.pic"
 .PE
-.S P P
 .DE
-.TC
