@@ -693,6 +693,75 @@ another experiment (the results of the initialization). The
 initialization results will be cached if the derivation is kept
 invariant, when modifying the computation phase parameters.
 .\" ===================================================================
+.NH 2
+Measurement of the execution time
+.LP
+The programs must measure the wall time of the computation phase following a
+set of rules. The way in which the wall time is measured is very important to
+get accurate results. The measured time must be implemented by using a
+monotonic clock which is able to correct the drift of the oscillator of
+the internal clock due to changes in temperature. This clock must be
+measured in C and C++ with:
+.CS
+clock_gettime(CLOCK_MONOTONIC, &ts);
+.CE
+A helper function can be used the approximate value of the clock in a
+double precision float, in seconds:
+.CS
+double get_time()
+{
+    struct timespec tv;
+    if(clock_gettime(CLOCK_MONOTONIC, &tv) != 0)
+    {
+        perror("clock_gettime failed");
+        exit(EXIT_FAILURE);
+    }
+    return (double)(ts.tv_sec) +
+        (double)ts.tv_nsec * 1.0e-9;
+}
+.CE
+The start and end points must be measured after the synchronization of
+all the processes and threads, so the complete computation work can be
+bounded to fit inside the measured interval. An example for a MPI
+program:
+.CS
+double start, end, delta_time;
+MPI_Barrier();
+start = get_time();
+run_simulation();
+MPI_Barrier();
+end = get_time();
+delta_time = end - start;
+.CE
+.\" ===================================================================
+.NH 2
+Format of the execution time
+.LP
+The measured execution time must be printed to the standard output
+(stdout) in scientific notation with at least 7 significative digits.
+The following the printf format (or the strict equivalent in other languages)
+must be used:
+.CS
+printf("time %e\\n", delta_time);
+.CE
+The line must be printed alone and only once: for MPI programs,
+only one process shall print the time:
+.CS
+if(rank == 0) printf("time %e\\n", delta_time);
+.CE
+Other lines can be printed in the stdout, but without the
+.I time
+prefix, so that the following pipe can be used to capture the line:
+.CS
+% ./app | grep "^time"
+1.234567e-01
+.CE
+Ensure that your program follows this convention by testing it with the
+above
+.I grep
+filter; otherwise the results will fail to be parsed when building
+the dataset with the execution time.
+.\" ===================================================================
 .bp
 .NH 1
 Experimentation
