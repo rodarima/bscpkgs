@@ -49,7 +49,6 @@ let
     env = ''
       export OMP_NUM_THREADS=${toString hw.cpusPerSocket}
       export NANOS6_REPORT_PREFIX="#"
-      export I_MPI_THREAD_SPLIT=1
       export ASAN_SYMBOLIZER_PATH=${bsc.clangOmpss2Unwrapped}/bin/llvm-symbolizer
     '';
   };
