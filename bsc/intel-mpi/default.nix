@@ -29,13 +29,12 @@ in
 
 stdenv.mkDerivation rec {
   name = "intel-mpi-${version}";
-  version = "2019.9.304";
-  dir_nr = "17263";
-  internal-ver = "2020.4.304";
+  version = "2019.10.317";
+  dir_nr = "17534";
 
   src = builtins.fetchTarball {
     url = "http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/${dir_nr}/l_mpi_${version}.tgz";
-    sha256 = "0nmp6np4s7nx2p94x40bpqkp5nasgif3gmbfl4lajzgj2rkh871v";
+    sha256 = "00nimgqywr20dv1ns5kg4r8539gvharn0xfj48i7mhbg8kwf8s08";
   };
 
   buildInputs = [
@@ -53,7 +52,10 @@ stdenv.mkDerivation rec {
   postUnpack = ''
     pushd $sourceRoot
       rpmextract rpm/intel-mpi-*.rpm
+      # Predictable name
+      mv opt/intel/compilers_and_libraries_* opt/intel/compilers_and_libraries
     popd
+    sourceRoot="$sourceRoot/opt/intel/compilers_and_libraries/linux/mpi/intel64"
   '';
 
   patches = [
@@ -62,19 +64,15 @@ stdenv.mkDerivation rec {
   ];
 
   postPatch = ''
-    ls -l opt/intel/
-    pushd opt/intel/compilers_and_libraries_${internal-ver}/linux/mpi/intel64/bin
-      for i in mpi* ; do
-        echo "Fixing paths in $i"
-        sed -i "s:I_MPI_SUBSTITUTE_INSTALLDIR:$out:g" "$i"
-      done     
-    popd
+    for i in bin/mpi* ; do
+      echo "Fixing paths in $i"
+      sed -i "s:I_MPI_SUBSTITUTE_INSTALLDIR:$out:g" "$i"
+    done     
   '';
 
   dontBuild = true;
 
   installPhase = ''
-    cd opt/intel/compilers_and_libraries_${internal-ver}/linux/mpi/intel64
     mkdir -p $out
     mv etc $out
     mv bin $out 
