@@ -28,7 +28,7 @@ let
     gitBranch = "garlic/tampi+isend+oss+task+simd";
 
     # Repeat the execution of each unit 50 times
-    loops = 50;
+    loops = 10;
 
     # Resources
     qos = "debug";
