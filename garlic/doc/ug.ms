@@ -669,6 +669,30 @@ garlic/tampi+isend+oss+task+COLOR
 garlic/tampi+isend+oss+task+COLOR+BTREE
 .CE
 .\" ===================================================================
+.NH 2
+Initialization time
+.LP
+It is common for programs to have an initialization phase prior to the
+execution of the main computation task which is the objective of the study.
+The initialization phase is usually not considered when taking
+measurements, but the time it takes to complete can limit seriously the
+amount of information that can be extracted from the computation phase.
+As an example, if the computation phase is in the order of seconds, but
+the initialization phase takes several minutes, the number of runs would
+need to be set low, as the units could exceed the time limits. Also, the
+experimenter may be reluctant to modify the experiments to test other
+parameters, as the waiting time for the results is unavoidably large. 
+.PP
+To prevent this problem the programs must reduce the time of the
+initialization phase to be no larger than the computation time. To do
+so, the initialization phase can be optimized either with
+parallelization, or it can be modified to store the result of the
+initialization to the disk to be later at the computation phase. In the
+garlic framework an experiment can have a dependency over the results of
+another experiment (the results of the initialization). The
+initialization results will be cached if the derivation is kept
+invariant, when modifying the computation phase parameters.
+.\" ===================================================================
 .bp
 .NH 1
 Experimentation
