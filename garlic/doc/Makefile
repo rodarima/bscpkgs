@@ -18,8 +18,9 @@ ug.pdf: ug.mm Makefile
 	groff -mm $(PREPROC) $(POSTPROC) $(REGISTERS) -dpaper=a4 -Tpdf $< > $@
 	-killall -HUP mupdf
 
-ug.xhtml: ug.mm Makefile
-	groff -mm $(PREPROC) $(POSTPROC) -Txhtml $< > $@
+%.html: %.ms Makefile
+	REFER=ref.i groff -ms $(PREPROC) $(POSTPROC) $(REGISTERS) -Thtml $< > $@
+	sed -i '/<\/head>/i<link rel="stylesheet" href="s.css">' $@
 
 %.pdf: %.ms Makefile
 	REFER=ref.i groff -ms $(PREPROC) $(PDFOPT) -Tpdf $< > $@
