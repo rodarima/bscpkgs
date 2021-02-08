@@ -52,22 +52,23 @@ Results
 The results are generated in the same
 .I "target"
 machine where the experiment is executed and are stored in the garlic
-.I out
+\fCout\fP
 directory, organized into a tree structure following the experiment
 name, the unit name and the run number (governed by the
 .I control
 stage):
-.QS
-.CW
- |-- 6lp88vlj7m8hvvhpfz25p5mvvg7ycflb-experiment
- |   |-- 8lpmmfix52a8v7kfzkzih655awchl9f1-unit 
- |   |   |-- 1 
- |   |   |   |-- stderr.log
- |   |   |   |-- stdout.log
- |   |   |   |-- ...
- |   |   |-- 2 
- ...
-.QE
+.DS L
+\fC
+|-- 6lp88vlj7m8hvvhpfz25p5mvvg7ycflb-experiment
+|   |-- 8lpmmfix52a8v7kfzkzih655awchl9f1-unit 
+|   |   |-- 1 
+|   |   |   |-- stderr.log
+|   |   |   |-- stdout.log
+|   |   |   |-- ...
+|   |   |-- 2 
+\&...
+\fP
+.DE
 In order to provide an easier access to the results, an index is also
 created by taking the
 .I expName
