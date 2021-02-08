@@ -25,7 +25,10 @@ stdenv.mkDerivation {
             echo "check stdout log file: ${inputResult}/$exp/$unit/$run/stdout.log"
             exit 1
           fi
-          jq -cn "{ exp:\"$exp\", unit:\"$unit\", config:inputs, time:$time, run:$run }" $conf >> $out
+          start_time=$(cat $run/.garlic/total_time_start)
+          end_time=$(cat $run/.garlic/total_time_end)
+          total_time=$(($end_time - $start_time))
+          jq -cn "{ exp:\"$exp\", unit:\"$unit\", config:inputs, time:$time, run:$run, total_time:$total_time }" $conf >> $out
         done
       done
     done

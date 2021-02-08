@@ -16,14 +16,17 @@ stdenv.mkDerivation {
   phases = [ "installPhase" ];
   dontPatchShebangs = true;
   installPhase = ''
-    cat > $out <<EOF
+    cat > $out <<"EOF"
     #!/bin/sh -e
-    for n in \$(seq 1 ${toString loops}); do
-      export GARLIC_RUN="\$n"
-      echo "running \$n of ${toString loops}" > status
-      mkdir "\$n"
-      cd "\$n"
+    for n in $(seq 1 ${toString loops}); do
+      export GARLIC_RUN="$n"
+      echo "running $n of ${toString loops}" > status
+      mkdir "$n"
+      cd "$n"
+      mkdir .garlic
+      date +%s > .garlic/total_time_start
       ${stageProgram nextStage}
+      date +%s > .garlic/total_time_end
       cd ..
     done
     echo "completed" > status

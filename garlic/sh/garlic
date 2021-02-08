@@ -136,6 +136,8 @@ do_fetch() {
     --include='*/*/garlic_config.json' \
     --include='*/*/std*.log' \
     --include='*/*/*/std*.log' \
+    --include='*/*/*/.garlic' \
+    --include='*/*/*/.garlic/*' \
     --exclude='*/*/*/*' \
     $exp $garlicTemp
 
