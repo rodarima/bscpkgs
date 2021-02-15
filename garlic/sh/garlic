@@ -76,6 +76,14 @@ checkExperiment() {
   return 0
 }
 
+checkMountpoint() {
+  if [ ! -e "$garlicPrefix/garlic.control" ]; then
+    >&2 echo "error: missing $garlicPrefix/garlic.control"
+    >&2 echo "Is the mountpoint enabled?"
+    exit 1
+  fi
+}
+
 do_fetch() {
   expName=$(basename $experiment)
   user=$(ssh -G "$sshHost" | awk '/^user /{print $2}')
@@ -183,6 +191,8 @@ if [ -z "$trebuchet" ]; then
   >&2 echo "missing experiment"
   usage
 fi
+
+checkMountpoint
 
 checkTrebuchet $trebuchet
 
