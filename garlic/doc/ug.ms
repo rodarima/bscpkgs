@@ -387,6 +387,39 @@ link pointing to the same location:
 xeon07$ readlink result
 /nix/store/...2cm1ldx9smb552sf6r1-nanos6-2.4-6f10a32
 .CE
+.\" ###################################################################
+.NH 3
+Configure the garlic daemon (experimental)
+.LP
+The garlic benchmark has a experimental daemon which can be used to
+automatically launch the experiments in the
+.I target
+machine. In order to configure it, a folder must be accesible in the
+build process. To enable it, add the following configuration line in the
+.CI \(ti/.config/nix/nix.config
+file at xeon07:
+.CS
+extra-sandbox-paths = /garlic=\fI<bscpkgs dir>\fP/garlic/garlicd
+.CE
+The
+.I "<bscpkgs dir>"
+component must be replaced to the
+.I full
+path of the bscpkgs directory. Then, go to the
+.I garlic/garlid
+directory and run the daemon:
+.CS
+\&./garlicd \fI<bscpkgs dir>\fP .
+.CE
+Again, put the path to the bscpkgs directory as the first argument. The
+second directoty is where the daemon will create the two FIFO files:
+.I run
+and
+.I completed ,
+to comunicate with the build process. Notice that the daemon stays
+running in the foreground, waiting for submission jobs. At this moment,
+it can only process one experiment at a time, and it it fails to run,
+you should restart the daemon.
 .\" ===================================================================
 .NH 2
 Configure the login and target (MareNostrum 4)
