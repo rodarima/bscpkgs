@@ -1,11 +1,32 @@
 #!/bin/bash
 
-if [ -z "$1" -o -z "$2" ]; then
-	>&2 echo "usage: garlicd <bscpkgs directory> <mountpoint directory>"
+set -e
+
+msg() {
+  >&2 echo "garlicd: $@"
+} 
+
+if [ -z "$1" ]; then
+  >&2 echo "usage: garlicd <bscpkgs directory>"
+  exit 1
 fi
 
+export PATH="@extraPath@:$PATH"
+
 bscpkgsdir=$(readlink -f "$1")
-mountdir=$(readlink -f "$2")
+
+garlic_sandbox=$(nix show-config |\
+  grep extra-sandbox-paths |\
+  grep -o '/garlic=[^ ]*')
+
+if [ -z "$garlic_sandbox" ]; then
+  msg "Missing extra-sandbox-paths /garlic mountpoint"
+  msg "Check the ~/.config/nix/nix.conf file"
+  exit 1
+fi
+
+mountdir_rel=$(echo "$garlic_sandbox" | sed 's@^/garlic=@@g')
+mountdir=$(readlink -f "$mountdir_rel")
 run="$mountdir/run"
 completed="$mountdir/completed"
 
@@ -14,20 +35,34 @@ completed="$mountdir/completed"
 
 cd "$bscpkgsdir"
 
-echo "Waiting for experiments..."
 
-while read -r line < "$run"; do
-	echo Attempting to run: $line
+while true; do
+  msg "Waiting for experiments ..."
+  read -r tre < "$run"
 
-	echo Copying files to MN4...
-	nix copy --to ssh://mn1 $line
-	results=$(garlic -RFv $line)
-	echo "The results are: $results"
-	drv=$(nix-store -q --deriver $results)
-	echo "drv = $drv"
-	if [ -z "$drv" ]; then
-		echo "Something failed, drv is empty. Check the logs."
-	else
-		echo -n "$drv" >> "$completed"
-	fi
+  msg "Attempting to run: $tre"
+  msg "Copying files to MN4..."
+  # It fails if the user doesn't have nix-store, but is already copied
+  # with the post build hook
+  nix copy --to ssh://mn1 $tre || true
+
+  msg "Launching the experiment..."
+  garlic -R "$tre"
+
+  msg "Fetching results..."
+  results=$(garlic -Fv "$tre")
+
+  msg "results=\"$results\""
+  
+  msg "Searching drv..."
+  drv=$(nix-store -q --deriver $results)
+
+  msg "drv = \"$drv\""
+  if [ -z "$drv" ]; then
+    msg "Something failed, drv is empty. Check the logs."
+    exit 1
+  fi
+
+  echo -n "$drv" >> "$completed"
+  msg "execution completed :-)"
 done

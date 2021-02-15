@@ -124,6 +124,10 @@
     resultFromLauncher = l: import (builtins.readFile l);
   };
 
+  garlicd = callPackage ./garlicd/default.nix {
+    garlicTool = bsc.garlic.tool;
+  };
+
   # Apps for Garlic
   apps = callPackage ./apps/index.nix { };
 
