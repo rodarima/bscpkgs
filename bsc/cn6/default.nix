@@ -6,7 +6,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  pname = "ctfast";
+  pname = "cn6";
   version = "${src.shortRev}";
 
   buildInputs = [
@@ -16,18 +16,18 @@ stdenv.mkDerivation rec {
   ];
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/rarias/ctfast.git";
+    url = "ssh://git@bscpm03.bsc.es/rarias/cn6.git";
     ref = "master";
   };
 
   # Fix the search path
   configurePhase = ''
-    sed -i "s@^CTFPLUGINS=.*@CTFPLUGINS=$out/lib/nanos6@" ctfast2prv
+    sed -i "s@^PRV_LIB_PATH=.*@PRV_LIB_PATH=$out/lib/nanos6@" Makefile
   '';
 
   installPhase = ''
     mkdir -p $out/bin
-    cp ctfast2prv $out/bin
+    cp cn6 $out/bin
 
     mkdir -p $out/lib/nanos6
     cp prv.so $out/lib/nanos6/
