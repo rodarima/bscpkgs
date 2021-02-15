@@ -394,10 +394,15 @@ Configure the garlic daemon (experimental)
 The garlic benchmark has a experimental daemon which can be used to
 automatically launch the experiments in the
 .I target
-machine. In order to configure it, a folder must be accesible in the
-build process. To enable it, add the following configuration line in the
+machine. The daemon creates to FIFO pipes to communicate with the
+experiment in the build environment:
+.I run
+and
+.I completed .
+In order to use it, an existing directory must be specified, where those
+two files can be created. In the configuration file
 .CI \(ti/.config/nix/nix.config
-file at xeon07:
+in xeon07, append the following line:
 .CS
 extra-sandbox-paths = /garlic=\fI<bscpkgs dir>\fP/garlic/garlicd
 .CE
@@ -405,21 +410,18 @@ The
 .I "<bscpkgs dir>"
 component must be replaced to the
 .I full
-path of the bscpkgs directory. Then, go to the
-.I garlic/garlid
-directory and run the daemon:
+path of the bscpkgs directory. Then, go to the 
+.I garlic
+directory and run
+.CI nix-shell
+to enter the shell. Finally, execute the daemon inside the nix shell:
 .CS
-\&./garlicd \fI<bscpkgs dir>\fP .
+garlicd \fI<bscpkgs dir>\fP
 .CE
-Again, put the path to the bscpkgs directory as the first argument. The
-second directoty is where the daemon will create the two FIFO files:
-.I run
-and
-.I completed ,
-to comunicate with the build process. Notice that the daemon stays
-running in the foreground, waiting for submission jobs. At this moment,
-it can only process one experiment at a time, and it it fails to run,
-you should restart the daemon.
+Again, put the path to the bscpkgs directory as the first argument.
+Notice that the daemon stays running in the foreground, waiting for
+submission jobs. At this moment, it can only process one experiment at a
+time.
 .\" ===================================================================
 .NH 2
 Configure the login and target (MareNostrum 4)
