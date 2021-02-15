@@ -17,7 +17,7 @@ bscpkgsdir=$(readlink -f "$1")
 
 garlic_sandbox=$(nix show-config |\
   grep extra-sandbox-paths |\
-  grep -o '/garlic=[^ ]*')
+  grep -o '/garlic=[^ ]*' || true)
 
 if [ -z "$garlic_sandbox" ]; then
   msg "Missing extra-sandbox-paths /garlic mountpoint"
