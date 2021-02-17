@@ -30,11 +30,15 @@ mountdir=$(readlink -f "$mountdir_rel")
 run="$mountdir/run"
 completed="$mountdir/completed"
 
-[ -p "$run" ] || mkfifo "$run"
-[ -p "$completed" ] || mkfifo "$completed"
+for fifo in "$run" "$completed"; do
+  if [ ! -e "$fifo" ]; then
+    mkfifo "$fifo"
+    # FIXME: Use more resctrictive permissions
+    chmod 666 "$fifo"
+  fi
+done
 
 cd "$bscpkgsdir"
-
 
 while true; do
   msg "Waiting for experiments ..."
