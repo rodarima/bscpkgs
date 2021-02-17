@@ -22,6 +22,7 @@ mkShell {
     alias ..="cd .."
 
     export LANG=C
+    export SHELL=${bash}/bin/bash
 
     echo Welcome to the garlic shell
   '';
