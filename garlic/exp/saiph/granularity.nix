@@ -25,16 +25,18 @@ let
     nby = c.nb;
     nbz = c.nb;
     mpi = impi;
-    gitBranch = "garlic/tampi+isend+oss+task+simd";
+    gitBranch = "garlic/tampi+isend+omp+task+simd";
 
-    # Repeat the execution of each unit 50 times
-    loops = 10;
+    # Repeat the execution of each unit 30 times
+    loops = 30;
 
     # Resources
+    cachelineBytes = hw.cachelineBytes;
     qos = "debug";
     time = "02:00:00";
     ntasksPerNode = 1;
     nodes = 1;
+    ntasksPerNode = hw.socketsPerNode;
     cpusPerTask = hw.cpusPerSocket;
     jobName = "${unitName}-${gitBranch}";
   };
@@ -57,7 +59,7 @@ let
     customPkgs = stdexp.replaceMpi conf.mpi;
   in
     customPkgs.apps.saiph.override {
-      inherit nbx nby nbz mpi gitBranch;
+      inherit nbx nby nbz mpi gitBranch cachelineBytes;
     };
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];

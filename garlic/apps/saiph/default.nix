@@ -13,7 +13,7 @@
 , nby ? null
 , nbz ? null
 , vectFlags ? null
-#, breakpointHook
+, cachelineBytes ? 64
 }:
 
 with stdenv.lib;
@@ -59,6 +59,7 @@ stdenv.mkDerivation rec {
     "-f" "Makefile.${cc.CC}"
     "apps"
     "APP=Heat3D_vect"
+    "ROW_ALIGNMENT=${toString cachelineBytes}"
   ] ++ optional (nbx != null) "NB_X=${toString nbx}"
     ++ optional (nby != null) "NB_Y=${toString nby}"
     ++ optional (nbz != null) "NB_Z=${toString nbz}"
