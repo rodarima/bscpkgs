@@ -17,12 +17,13 @@ let
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
     expName = "saiph.blocking";
-    unitName = "${expName}.1-nby-nbz-${toString nby}-${toString nbz}";
+    unitName = "${expName}.1-nby-nbz-${toString nby}-${toString nbz}.nsteps-${toString nsteps}";
     inherit (targetMachine.config) hw;
 
     # saiph options
     nby = c.nb;
     nbz = c.nb;
+    nsteps = 500;
     mpi = impi;
     gitBranch = "garlic/tampi+isend+oss+task+simd";
 
@@ -56,7 +57,7 @@ let
     customPkgs = stdexp.replaceMpi conf.mpi;
   in
     customPkgs.apps.saiph.override {
-      inherit nby nbz mpi gitBranch cachelineBytes;
+      inherit nby nbz nsteps mpi gitBranch cachelineBytes;
     };
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];
