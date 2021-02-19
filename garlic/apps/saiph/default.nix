@@ -12,6 +12,7 @@
 , nbx ? null
 , nby ? null
 , nbz ? null
+, nsteps ? null
 , vectFlags ? null
 , cachelineBytes ? 64
 }:
@@ -63,6 +64,7 @@ stdenv.mkDerivation rec {
   ] ++ optional (nbx != null) "NB_X=${toString nbx}"
     ++ optional (nby != null) "NB_Y=${toString nby}"
     ++ optional (nbz != null) "NB_Z=${toString nbz}"
+    ++ optional (nsteps != null) "NSTEPS=${toString nsteps}"
     ++ optional (numComm != null) "NUM_COMM=${toString numComm}"
     ++ optional (vectFlags != null) "VECT_FLAGS=${toString vectFlags}"
     ;
