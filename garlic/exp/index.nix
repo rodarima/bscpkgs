@@ -41,6 +41,10 @@
       pure = callPackage ./creams/ss+pure.nix { };
       hybrid = callPackage ./creams/ss+hybrid.nix { };
     };
+    gran = {
+      pure = callPackage ./creams/gran+node1.nix { };
+      hybrid = callPackage ./creams/gran+node16.nix { };
+    };
   };
 
   hpcg = rec {
