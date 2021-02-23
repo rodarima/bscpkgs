@@ -7,6 +7,7 @@
 , vtk
 , boost
 , gitBranch ? "master"
+, gitCommit ? null
 , numComm ? null
 , nbx ? null
 , nby ? null
@@ -20,10 +21,13 @@ with stdenv.lib;
 stdenv.mkDerivation rec {
   name = "saiph";
 
-  src = builtins.fetchGit {
+  inherit gitBranch gitCommit;
+  src = builtins.fetchGit ({
     url = "ssh://git@bscpm03.bsc.es/DSLs/saiph.git";
     ref = "${gitBranch}";
-  };
+  } // (if (gitCommit != null) then {
+    rev = gitCommit;
+  } else {}));
 
   programPath = "/bin/Heat3D_vect";
 
