@@ -15,13 +15,13 @@ dataset = jsonlite::stream_in(file(input_file)) %>%
 
 
 # We only need the nblocks and time
-df = select(dataset, config.nbx, time) %>%
-	rename(nbx=config.nbx)
+df = select(dataset, config.nby, time) %>%
+	rename(nby=config.nby)
 
-df$nbx = as.factor(df$nbx)
+df$nby = as.factor(df$nby)
 
 # Normalize the time by the median
-D=group_by(df, nbx) %>%
+D=group_by(df, nby) %>%
 	mutate(tnorm = time / median(time) - 1) %>%
 	mutate(bad = max(ifelse(abs(tnorm) >= 0.01, 1, 0)))
 
@@ -39,10 +39,10 @@ png("box.png", width=w*ppi, height=h*ppi, res=ppi)
 #
 #
 # Create the plot with the normalized time vs nblocks
-p = ggplot(data=D, aes(x=nbx, y=tnorm, color=bad)) +
+p = ggplot(data=D, aes(x=nby, y=tnorm, color=bad)) +
 
 	# Labels
-	labs(x="nbx", y="Normalized time",
+	labs(x="nby", y="Normalized time",
               title=sprintf("Saiph-Heat3D normalized time"), 
               subtitle=input_file) +
 
@@ -80,9 +80,9 @@ dev.off()
 png("scatter.png", width=w*ppi, height=h*ppi, res=ppi)
 #
 ## Create the plot with the normalized time vs nblocks
-p = ggplot(D, aes(x=nbx, y=time)) +
+p = ggplot(D, aes(x=nby, y=time)) +
 
-	labs(x="nbx", y="Time (s)",
+	labs(x="nby", y="Time (s)",
               title=sprintf("Saiph-Heat3D granularity"), 
               subtitle=input_file) +
 	theme_bw() +
