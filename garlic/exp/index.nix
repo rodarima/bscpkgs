@@ -34,6 +34,7 @@
   saiph = {
     numcomm = callPackage ./saiph/numcomm.nix { };
     granularity = callPackage ./saiph/granularity.nix { };
+    scaling = callPackage ./saiph/scaling.nix { };
   };
 
   creams = rec {

@@ -42,7 +42,8 @@ in
   };
 
   saiph = with exp.saiph; {
-    granularity = stdPlot ./saiph/granularity.R [ granularity ];
+    granularity = rPlotExp ./saiph/granularity.R [ granularity ];
+    scaling = rPlotExp ./saiph/scaling.R [ scaling ];
   };
 
   heat = with exp.heat; {
