@@ -1,13 +1,13 @@
 {
   stdenv
 , cc
-, nanos6 ? null
-, mcxx ? null
-, mpi ? null
+, nanos6
+, mcxx
+, mpi
+, tampi
 , gitBranch
 }:
 
-with stdenv.lib;
 stdenv.mkDerivation rec {
   name = "hpcg";
 
@@ -16,16 +16,13 @@ stdenv.mkDerivation rec {
     ref = "${gitBranch}";
   };
 
-  prePatch = ''
-    #export NIX_DEBUG=6
-  '';
+  # prePatch = ''
+  #   #export NIX_DEBUG=6
+  # '';
 
   buildInputs = [
-    cc
-  ]
-  ++ optional (mcxx != null) mcxx
-  ++ optional (nanos6 != null) nanos6
-  ++ optional (mpi != null) mpi;
+    cc nanos6 mcxx mpi tampi
+  ];
 
   makeFlags = [
     "CC=${cc.CC}"

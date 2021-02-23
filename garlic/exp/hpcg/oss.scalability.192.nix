@@ -40,7 +40,7 @@ let
     gitBranch = "garlic/tampi+isend+oss+task";
 
     # Repeat the execution of each unit 30 times
-    loops = 3;
+    loops = 10;
 
     disableAspectRatio = false;
 

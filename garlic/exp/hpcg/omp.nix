@@ -22,7 +22,7 @@ let
     nblocks = c.nblocks;
     cc = bsc.icc;
     mpi = null; # TODO: Remove this for omp
-    gitBranch = "garlic/omp";
+    gitBranch = "garlic/omp+fork";
 
     # Repeat the execution of each unit 30 times
     loops = 30;

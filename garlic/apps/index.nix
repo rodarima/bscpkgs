@@ -28,7 +28,7 @@
   };
 
   hpcg = callPackage ./hpcg/default.nix {
-    gitBranch = "garlic/oss";
+    gitBranch = "garlic/tampi+isend+oss+task";
   };
 
   bigsort = {

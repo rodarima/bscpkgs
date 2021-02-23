@@ -55,12 +55,23 @@
     #  inherit (bsc.garlic.pp) resultFromTrebuchet;
     #};
     genInput = callPackage ./hpcg/gen.nix {
-      inherit (bsc.garlic.pp) resultFromTrebuchet;
     };
 
     oss = callPackage ./hpcg/oss.nix {
       inherit genInput;
     };
+
+    ossGranularity = callPackage ./hpcg/oss.granularity.192.nix {
+      inherit genInput;
+    };
+
+    ossScalability = callPackage ./hpcg/oss.scalability.192.nix {
+      inherit genInput;
+    };
+
+    # slices = callPackage ./hpcg/slices.nix {
+    #   inherit genInput;
+    # };
   };
 
   heat = rec {

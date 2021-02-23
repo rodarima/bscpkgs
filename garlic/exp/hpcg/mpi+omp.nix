@@ -21,7 +21,7 @@ let
     n = c.n;
     cc = bsc.icc;
     mpi = bsc.impi;
-    gitBranch = "garlic/mpi+omp";
+    gitBranch = "garlic/mpi+send+omp+fork";
 
     # Repeat the execution of each unit 30 times
     loops = 30;

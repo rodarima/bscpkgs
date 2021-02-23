@@ -5,7 +5,6 @@
 , targetMachine
 , stages
 , garlicTools
-, resultFromTrebuchet
 }:
 
 with stdenv.lib;
@@ -14,28 +13,23 @@ with garlicTools;
 
 let
   # Generate the complete configuration for each unit
-  genConf = with bsc; c: targetMachine.config // rec {
+  genConf = c: targetMachine.config // rec {
     expName = "${c.expName}.gen";
     unitName = "${expName}.n${toString n.x}";
 
     inherit (targetMachine.config) hw;
-    # hpcg options
-    cc = bsc.icc;
-    mcxx = bsc.mcxx;
-    nanos6 = bsc.nanos6;
-    mpi = null; # TODO: Remove this for oss
 
     # Only the n and gitBranch options are inherited
-    inherit (c) n gitBranch;
+    inherit (c) n nprocs disableAspectRatio nodes ntasksPerNode gitBranch;
 
     # Repeat the execution of each unit 30 times
     loops = 1;
 
     # Resources
     qos = "debug";
-    ntasksPerNode = 1;
-    nodes = 1;
-    time = "02:00:00";
+    # ntasksPerNode = hw.socketsPerNode;
+    # nodes = 2;
+    time = "00:30:00";
     # task in one socket
     cpusPerTask = hw.cpusPerSocket;
     jobName = unitName;
@@ -43,25 +37,24 @@ let
 
   exec = {nextStage, conf, ...}: with conf; stages.exec {
     inherit nextStage;
-    env = "NANOS6_DEPENDENCIES=discrete";
     argv = [
-      "--nx=${toString n.x}"
-      "--ny=${toString n.y}"
-      "--nz=${toString n.z}"
-      # The nblocks is ignored
-      #"--nblocks=${toString nblocks}"
+      "--nx=${toString conf.n.x}"
+      "--ny=${toString conf.n.y}"
+      "--nz=${toString conf.n.z}"
+      "--npx=${toString conf.nprocs.x}"
+      "--npy=${toString conf.nprocs.y}"
+      "--npz=${toString conf.nprocs.z}"
+      # nblocks and ncomms are ignored
+      "--nblocks=1"
+      "--ncomms=1"
       # Store the results in the same directory
       "--store=."
-    ];
+    ] ++ optional (conf.disableAspectRatio) "--no-ar=1";
   };
 
-  program = {nextStage, conf, ...}: with conf;
-  let
-    customPkgs = stdexp.replaceMpi conf.mpi;
-  in
-    customPkgs.apps.hpcg.override {
-      inherit cc nanos6 mcxx gitBranch;
-    };
+  program = {nextStage, conf, ...}: bsc.apps.hpcg.override {
+    inherit (conf) gitBranch;
+  };
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];
 
@@ -78,7 +71,7 @@ let
     inputExp = getExperimentStage inputTre;
     # Then load the result. This is only used to ensure that we have the
     # results, so it has been executed.
-    inputRes = resultFromTrebuchet inputTre;
+    inputRes = inputTre.result;
     # We also need the unit, to compute the path.
     inputUnit = stages.unit {
       conf = genConf conf;
@@ -95,7 +88,9 @@ let
       # ${inputRes}
 
       # Then we simply link the input result directory in "input"
-      ln -s ${relPath} input
+      # We use || true because all ranks will execute this and
+      # the execution will fail
+      ln -sf ${relPath} input || true
     '';
   };
 

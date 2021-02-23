@@ -38,7 +38,9 @@ in
   };
 
   hpcg = with exp.hpcg; {
-    oss = stdPlot ./hpcg/oss.R [ oss ];
+    ossGranularity = stdPlot ./hpcg/oss.granularity.R [ ossGranularity ];
+    ossScalability = stdPlot ./hpcg/oss.scalability.R [ ossScalability ];
+    # slices = stdPlot ./hpcg/oss.R [ slices ];
   };
 
   saiph = with exp.saiph; {

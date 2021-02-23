@@ -37,17 +37,19 @@ df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
   # Now the dataframe contains all the configuration of the units inside the
   # columns named `config.*`, for example `config.cbs`. We first select only
   # the columns that we need:
-  select(config.nblocks, config.ncommblocks, config.hw.cpusPerSocket, unit, time) %>%
+  select(config.nblocks, config.ncommblocks, config.hw.cpusPerSocket, config.nodes, unit, time) %>%
 
   # And then we rename those columns to something shorter:
   rename(nblocks=config.nblocks,
          ncommblocks=config.ncommblocks,
-         cpusPerSocket=config.hw.cpusPerSocket) %>%
+         cpusPerSocket=config.hw.cpusPerSocket,
+         nodes=config.nodes) %>%
 
   mutate(blocksPerCpu = nblocks / cpusPerSocket) %>%
 
   mutate(nblocks = as.factor(nblocks)) %>%
   mutate(blocksPerCpu = as.factor(blocksPerCpu)) %>%
+  mutate(nodes = as.factor(nodes)) %>%
   mutate(unit = as.factor(unit)) %>%
 
   group_by(unit) %>%
@@ -66,7 +68,7 @@ dpi=300
 h=5
 w=5
 
-p = ggplot(df, aes(x=blocksPerCpu, y=normalized.time)) +
+p = ggplot(df, aes(x=nodes, y=normalized.time, color=blocksPerCpu)) +
 
   # The boxplots are useful to identify outliers and problems with the
   # distribution of time
@@ -79,7 +81,8 @@ p = ggplot(df, aes(x=blocksPerCpu, y=normalized.time)) +
   theme_bw() +
 
   # Here we add the title and the labels of the axes
-  labs(x="Blocks per CPU", y="Normalized time", title="HPCG granularity: normalized time",
+  labs(x="Nodes", y="Normalized time", title="HPCG weak scalability: normalized time",
+    color="Blocks per CPU",
     subtitle=input_file) +
 
   # And set the subtitle font size a bit smaller, so it fits nicely
@@ -90,7 +93,7 @@ ggsave("normalized.time.png", plot=p, width=w, height=h, dpi=dpi)
 ggsave("normalized.time.pdf", plot=p, width=w, height=h, dpi=dpi)
 
 # We plot the time of each run as we vary the block size
-p = ggplot(df, aes(x=blocksPerCpu, y=time)) +
+p = ggplot(df, aes(x=nodes, y=time, color=blocksPerCpu)) +
 
   # We add a points (scatter plot) using circles (shape=21) a bit larger
   # than the default (size=3)
@@ -100,7 +103,8 @@ p = ggplot(df, aes(x=blocksPerCpu, y=time)) +
   theme_bw() +
 
   # Here we add the title and the labels of the axes
-  labs(x="Blocks Per CPU", y="Time (s)", title="HPCG granularity: time",
+  labs(x="Nodes", y="Time (s)", title="HPCG weak scalability: time",
+    color="Blocks per CPU",
     subtitle=input_file) +
 
   # And set the subtitle font size a bit smaller, so it fits nicely
