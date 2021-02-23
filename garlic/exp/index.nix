@@ -35,6 +35,10 @@
     numcomm = callPackage ./saiph/numcomm.nix { };
     granularity = callPackage ./saiph/granularity.nix { };
     scaling = callPackage ./saiph/scaling.nix { };
+    blockingY = callPackage ./saiph/blocking_Y.nix { };
+    blockingZ = callPackage ./saiph/blocking_Z.nix { };
+    blockingYZ = callPackage ./saiph/blocking_YZ.nix { };
+    blockingZY = callPackage ./saiph/blocking_ZY.nix { };
   };
 
   creams = rec {

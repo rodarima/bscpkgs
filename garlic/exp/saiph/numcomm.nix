@@ -46,7 +46,6 @@ let
     inherit nextStage;
     env = ''
       export OMP_NUM_THREADS=24
-      export NANOS6_REPORT_PREFIX="#"
       export ASAN_SYMBOLIZER_PATH=${bsc.clangOmpss2Unwrapped}/bin/llvm-symbolizer
     '';
   };

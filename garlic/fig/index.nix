@@ -44,6 +44,10 @@ in
   saiph = with exp.saiph; {
     granularity = rPlotExp ./saiph/granularity.R [ granularity ];
     scaling = rPlotExp ./saiph/scaling.R [ scaling ];
+    blockingY = rPlotExp ./saiph/granularityY.R [ blockingY ];
+    blockingZ = rPlotExp ./saiph/granularityZ.R [ blockingZ ];
+    blockingYZ = rPlotExp ./saiph/granularityYZ.R [ blockingYZ ];
+    blockingZY = rPlotExp ./saiph/granularityZY.R [ blockingZY ];
   };
 
   heat = with exp.heat; {

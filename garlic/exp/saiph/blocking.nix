@@ -47,8 +47,6 @@ let
   exec = {nextStage, conf, ...}: with conf; stages.exec {
     inherit nextStage;
     env = ''
-      export NANOS6_REPORT_PREFIX="#"
-      export I_MPI_THREAD_SPLIT=1
       export ASAN_SYMBOLIZER_PATH=${bsc.clangOmpss2Unwrapped}/bin/llvm-symbolizer
     '';
   };
