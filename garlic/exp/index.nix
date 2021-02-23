@@ -94,4 +94,8 @@
   lulesh = {
     test = callPackage ./lulesh/test.nix { };
   };
+
+  osu = {
+    latency = callPackage ./osu/latency.nix { };
+  };
 }

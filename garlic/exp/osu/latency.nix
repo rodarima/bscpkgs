@@ -1,86 +1,52 @@
 {
-  bsc
-, genApp
-, genConfigs
-
-# Wrappers
-, launchWrapper
-, sbatchWrapper
-, srunWrapper
-, argvWrapper
-, controlWrapper
-, nixsetupWrapper
+  stdenv
+, stdexp
+, bsc
+, targetMachine
+, stages
 
 # Should we test the network (true) or the shared memory (false)?
 , interNode ? true
-
-# Enable multiple threads?
-, multiThread ? false
 }:
 
 let
-  # Set the configuration for the experiment
-  config = {
-    mpi = [ bsc.impi bsc.openmpi bsc.mpich ];
+  # Initial variable configuration
+  varConf = with bsc; {
+    mpi = [ impi bsc.openmpi mpich ];
   };
 
-  extraConfig = {
+  # Generate the complete configuration for each unit
+  genConf = with bsc; c: targetMachine.config // rec {
     nodes = if interNode then 2 else 1;
     ntasksPerNode = if interNode then 1 else 2;
+    cpusPerTask = 1;
     time = "00:10:00";
     qos = "debug";
+    loops = 30;
+    expName = "osu-latency-${mpi.name}";
+    unitName = expName;
+    jobName = expName;
+    inherit (c) mpi;
   };
 
-  # Compute the cartesian product of all configurations
-  configs = map (conf: conf // extraConfig) (genConfigs config);
-
-  sbatch = conf: app: sbatchWrapper {
-    app = app;
-    nixPrefix = "/gpfs/projects/bsc15/nix";
-    exclusive = true;
-    ntasksPerNode = "${toString conf.ntasksPerNode}";
-    nodes = "${toString conf.nodes}";
-    time = conf.time;
-    qos = conf.qos;
-    chdirPrefix = "/home/bsc15/bsc15557/bsc-nixpkgs/out";
+  # Compute the array of configurations
+  configs = stdexp.buildConfigs {
+    inherit varConf genConf;
   };
 
-  srun = app: srunWrapper {
-    app = app;
-    nixPrefix = "/gpfs/projects/bsc15/nix";
+  exec = {nextStage, conf, ...}: with conf; stages.exec {
+    inherit nextStage;
+    # We simply run the osu_latency test
+    program = "${nextStage}/bin/osu_latency";
   };
 
-  argv = app:
-    argvWrapper {
-      app = app;
-      program = "bin/osu_latency";
-      argv = "()";
-      env = ''
-        export I_MPI_THREAD_SPLIT=1
-      '';
-    };
+  program = {nextStage, conf, ...}: bsc.osumb.override {
+    # Use the specified MPI implementation
+    inherit (conf) mpi;
+  };
 
-  osumbFn = conf:
-    with conf;
-    bsc.osumb.override { inherit mpi; };
-
-
-  pipeline = conf:
-    sbatch conf (
-      nixsetupWrapper (
-        controlWrapper (
-          srun (
-            nixsetupWrapper (
-              argv (
-                osumbFn conf))))));
-
-  #pipeline = conf: sbatch conf (srun (nixsetupWrapper (argv (osumbFn conf))));
-  #pipeline = conf: sbatch conf (srun (nixsetupWrapper (argv bsc.osumb)));
-
-  # Ideally it should look like this:
-  #pipeline = sbatch nixsetup control argv nbodyFn;
-
-  jobs = map pipeline configs;
+  pipeline = stdexp.stdPipeline ++ [ exec program ];
 
 in
-  launchWrapper jobs
+
+  stdexp.genExperiment { inherit configs pipeline; }
