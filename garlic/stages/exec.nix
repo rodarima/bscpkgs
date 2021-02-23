@@ -10,6 +10,7 @@
 , argv ? []
 , post ? ""
 , nixPrefix ? ""
+, program ? null
 }:
 
 with builtins;
@@ -18,6 +19,7 @@ with garlicTools;
 let
   argvString = concatStringsSep " " (map (e: toString e) argv);
   execMethod = if (post == "") then "exec " else "";
+  programPath = if (program != null) then program else (stageProgram nextStage);
 in
 stdenv.mkDerivation {
   name = "exec";
@@ -30,7 +32,7 @@ stdenv.mkDerivation {
 
     ${pre}
 
-    ${execMethod}${nixPrefix}${stageProgram nextStage} ${argvString}
+    ${execMethod}${nixPrefix}${programPath} ${argvString}
 
     ${post}
 
