@@ -40,4 +40,16 @@ in
   creams = with exp.creams; {
     ss = rPlotExp ./creams/ss.R [ ss.hybrid ss.pure ];
   };
+
+  osu = with exp.osu; {
+    #latency = pp.osu-latency latency.result;
+    latency =
+    let
+      resultJson = pp.osu-latency latency.result;
+    in
+      rPlot {
+        script = ./osu/latency.R;
+        dataset = resultJson;
+      };
+  };
 }

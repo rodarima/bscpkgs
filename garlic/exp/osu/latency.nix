@@ -12,7 +12,7 @@
 let
   # Initial variable configuration
   varConf = with bsc; {
-    mpi = [ impi bsc.openmpi mpich ];
+    mpi = [ impi bsc.openmpi mpich ]; #psmpi ];
   };
 
   # Generate the complete configuration for each unit

@@ -111,6 +111,7 @@
       inherit trebuchetStage;
     });
     timetable = callPackage ./pp/timetable.nix { };
+    osu-latency = callPackage ./pp/osu-latency.nix { };
     rPlot = callPackage ./pp/rplot.nix { };
     timetableFromTrebuchet = tre: timetable (resultFromTrebuchet tre);
     mergeDatasets = callPackage ./pp/merge.nix { };
