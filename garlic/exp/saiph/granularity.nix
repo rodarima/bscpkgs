@@ -11,7 +11,7 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    nb = [ 1 2 4 8 ];
+    nb = [ 1 2 4 8 16 32 64 ];
   };
 
   # Generate the complete configuration for each unit
@@ -21,7 +21,7 @@ let
     inherit (targetMachine.config) hw;
 
     # saiph options
-    nbx = c.nb;
+    nbx = 1;
     nby = c.nb;
     nbz = c.nb;
     mpi = impi;
@@ -32,7 +32,7 @@ let
 
     # Resources
     qos = "debug";
-    time = "00:30:00";
+    time = "02:00:00";
     ntasksPerNode = 1;
     nodes = 1;
     cpusPerTask = hw.cpusPerSocket;
@@ -48,7 +48,6 @@ let
     inherit nextStage;
     env = ''
       export OMP_NUM_THREADS=${toString hw.cpusPerSocket}
-      export NANOS6_REPORT_PREFIX="#"
       export ASAN_SYMBOLIZER_PATH=${bsc.clangOmpss2Unwrapped}/bin/llvm-symbolizer
     '';
   };
