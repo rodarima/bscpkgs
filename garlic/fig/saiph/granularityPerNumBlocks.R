@@ -6,7 +6,7 @@ library(jsonlite)
 args=commandArgs(trailingOnly=TRUE)
 
 # Read the timetable from args[1]
-input_file = "input.json"
+input_file = "nov24Gran.json"
 if (length(args)>0) { input_file = args[1] }
 
 # Load the dataset in NDJSON format
@@ -83,15 +83,15 @@ png("scatter.png", width=w*ppi, height=h*ppi, res=ppi)
 p = ggplot(D, aes(x=nby, y=time)) +
 
 	labs(x="nb{y-z}", y="Time (s)",
-               title=sprintf("Saiph-Heat3D granularity"), 
-               subtitle=input_file) +
+              title=sprintf("Saiph-Heat3D granularity"), 
+              subtitle=input_file) +
 	theme_bw() +
 	theme(plot.subtitle=element_text(size=8)) +
 	theme(legend.position = c(0.5, 0.88)) +
 
-	geom_point(shape=21, size=3)
-	#+ scale_x_continuous(trans=log2_trans())
-	#+ scale_y_continuous(trans=log2_trans())
+	geom_point(shape=21, size=3) +
+	#scale_x_continuous(trans=log2_trans()) +
+	scale_y_continuous(trans=log2_trans())
 
 # Render the plot
 print(p)
