@@ -25,7 +25,9 @@ let
 
     gitBranch = [
       "garlic/mpi+send+omp+fork"
+      "garlic/mpi+send+omp+task"
       "garlic/mpi+send+oss+task"
+      "garlic/mpi+isend+omp+task"
       "garlic/mpi+isend+oss+task"
       "garlic/tampi+isend+oss+task"
     ];
