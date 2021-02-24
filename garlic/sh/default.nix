@@ -11,7 +11,6 @@ with garlicTools;
 
 let
   garlicPrefix = "/mnt/garlic";
-  garlicTemp = "/tmp/garlic";
 in
   stdenv.mkDerivation {
     name = "garlic-tool";
@@ -22,7 +21,7 @@ in
 
     src = ./.;
 
-    inherit garlicPrefix garlicTemp sshHost;
+    inherit garlicPrefix sshHost;
 
     installPhase = ''
       substituteAllInPlace garlic

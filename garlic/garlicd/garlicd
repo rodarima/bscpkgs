@@ -29,8 +29,17 @@ mountdir_rel=$(echo "$garlic_sandbox" | sed 's@^/garlic=@@g')
 mountdir=$(readlink -f "$mountdir_rel")
 run="$mountdir/run"
 completed="$mountdir/completed"
+wipe="$mountdir/wipe"
 
-for fifo in "$run" "$completed"; do
+handle_bad_signal() {
+  msg "cleaning FIFO pipes"
+  rm -f "$run" "$completed" "$wipe"
+  exit 1
+}
+
+trap handle_bad_signal SIGINT
+
+for fifo in "$run" "$completed" "$wipe"; do
   if [ ! -e "$fifo" ]; then
     mkfifo "$fifo"
     # FIXME: Use more resctrictive permissions
@@ -54,19 +63,22 @@ while true; do
   garlic -R "$tre"
 
   msg "Fetching results..."
-  results=$(garlic -Fv "$tre")
+  garlic -FKv "$tre"
 
-  msg "results=\"$results\""
-  
-  msg "Searching drv..."
-  drv=$(nix-store -q --deriver $results)
+  echo -n "$tre" >> "$completed"
 
-  msg "drv = \"$drv\""
-  if [ -z "$drv" ]; then
-    msg "Something failed, drv is empty. Check the logs."
+  msg "Waiting for nix to finish the build..."
+
+  read -r tre2 < "$wipe"
+  if [ "$tre" != "$tre2" ]; then
+    msg "error: trebuchet mismatch"
     exit 1
   fi
 
-  echo -n "$drv" >> "$completed"
-  msg "execution completed :-)"
+  msg "Removing temporal files..."
+  garlic -D "$tre"
+
+  echo -n "$tre" >> "$completed"
+
+  msg "Execution completed :-)"
 done

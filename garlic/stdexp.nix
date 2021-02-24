@@ -35,7 +35,10 @@ rec {
       };
     };
   in trebuchet // rec {
-    result = pp.resultFromLauncher (pp.launcher trebuchet);
+    result = pp.store {
+      trebuchet=trebuchet;
+      experiment=trebuchet.experiment;
+    };
     timetable = pp.timetable result;
   };
 

@@ -3,52 +3,77 @@
 }:
 
 {
-  experimentStage
-, trebuchetStage
+  trebuchet,
+  experiment
 }:
 
 with builtins;
 
-#assert typeOf experimentStage == "string";
-#assert typeOf trebuchetStage == "string";
-
 let
-  # We cannot keep the context of the string when called from a derivation, as
-  # they will produce a different resultTree derivation vs called from the
-  # garlic script tool.
-  #_experimentStage = unsafeDiscardStringContext experimentStage;
-  #_trebuchetStage = unsafeDiscardStringContext trebuchetStage;
-
-  experimentName = baseNameOf (experimentStage);
-  trebuchetName = baseNameOf (trebuchetStage);
-  garlicTemp = "/tmp/garlic";
+  experimentName = baseNameOf (experiment);
+  trebuchetName = baseNameOf (trebuchet);
 in
-  #assert hasContext _trebuchetStage == false;
-  #assert hasContext _experimentStage == false;
   stdenv.mkDerivation {
     name = "resultTree";
     preferLocalBuild = true;
-    __noChroot = true;
 
     phases = [ "installPhase" ];
 
     installPhase = ''
-      exp=${garlicTemp}/${experimentName}
+      echo "resultTree: searching for garlicd daemon..."
+      if [ -e /garlic/run ]; then
+        echo "resultTree: asking the daemon to run and fetch the experiment"
+
+        echo ${trebuchet} >> /garlic/run
+        echo "resultTree: waiting for experiment results..."
+        res=$(cat /garlic/completed)
+
+        if [ "$res" != "${trebuchet}" ]; then
+          echo "resultTree: unknown trebuchet received"
+          exit 1
+        fi
+      else
+        echo "resultTree: garlicd not detected: /garlic/run not found"
+        echo "resultTree: assuming results are already in /garlic"
+      fi
+
+      echo "resultTree: attempting to copy the results from /garlic ..."
+
+      exp=/garlic/cache/${experimentName}
 
       if [ ! -e "$exp" ]; then
-        echo "$exp: not found"
-        echo "Run the experiment and fetch the results with:"
+        echo "resultTree: $exp: not found"
+        echo "resultTree: run the experiment and fetch the results with:"
         echo
-        echo -e "\e[30;48;5;2mgarlic -RFv ${trebuchetStage}\e[0m"
+        echo -e "\e[30;48;5;2mgarlic -RFv ${trebuchet}\e[0m"
         echo
-        echo "See garlic(1) for more details."
-        echo "cannot continue building $out, aborting"
+        echo "resultTree: see garlic(1) for more details."
+        echo "resultTree: cannot continue building $out, aborting"
         exit 1
       fi
 
+      echo "resultTree: copying results from /garlic into the nix store..."
+
       mkdir -p $out
       cp -aL $exp $out/
-      ln -s ${trebuchetStage} $out/trebuchet
-      ln -s ${experimentStage} $out/experiment
+      ln -s ${trebuchet} $out/trebuchet
+      ln -s ${experiment} $out/experiment
+
+
+      if [ -e /garlic/run ]; then
+        echo "resultTree: removing temp files..."
+        echo ${trebuchet} >> /garlic/wipe
+        echo "resultTree: waiting confimation from daemon..."
+        cat /garlic/completed > /dev/null
+      else
+        echo "resultTree: garlicd not detected: /garlic/run not found"
+        echo "resultTree: ignoring temp files"
+      fi
+
+      echo "resultTree: successfully copied into the nix store"
+
+      echo "  experiment: ${experiment}"
+      echo "   trebuchet: ${trebuchet}"
+      echo "  resultTree: $out"
     '';
   }
