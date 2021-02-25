@@ -19,6 +19,7 @@ stdenv.mkDerivation {
         cd ${inputResult}/$exp/$unit
         conf=garlic_config.json
         for run in $(ls -d [0-9]* | sort -n); do
+          echo "processing unit=$unit run=$run"
           awk '/^[0-9]+ +[0-9\.]+$/{print $1, $2}' $run/stdout.log | (
             while read -r size latency; do
               jq -cn "{ exp:\"$exp\", unit:\"$unit\", config:inputs, run:$run, \
