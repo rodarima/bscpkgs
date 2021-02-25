@@ -9,9 +9,13 @@
 , gitBranch ? "master"
 , gitCommit ? null
 , numComm ? null
-, nbx ? null
-, nby ? null
-, nbz ? null
+, manualDist ? 0
+, nbgx ? null
+, nbgy ? null
+, nbgz ? null
+, nblx ? null
+, nbly ? null
+, nblz ? null
 , nsteps ? null
 , vectFlags ? null
 , cachelineBytes ? 64
@@ -61,9 +65,13 @@ stdenv.mkDerivation rec {
     "apps"
     "APP=Heat3D_vect"
     "ROW_ALIGNMENT=${toString cachelineBytes}"
-  ] ++ optional (nbx != null) "NB_X=${toString nbx}"
-    ++ optional (nby != null) "NB_Y=${toString nby}"
-    ++ optional (nbz != null) "NB_Z=${toString nbz}"
+  ] ++ optional (manualDist != 0) "DIST_SET=${toString manualDist}"
+    ++ optional (manualDist != 0) "NBG_X=${toString nbgx}"
+    ++ optional (manualDist != 0) "NBG_Y=${toString nbgy}"
+    ++ optional (manualDist != 0) "NBG_Z=${toString nbgz}"
+    ++ optional (nblx != null) "NBL_X=${toString nblx}"
+    ++ optional (nbly != null) "NBL_Y=${toString nbly}"
+    ++ optional (nblz != null) "NBL_Z=${toString nblz}"
     ++ optional (nsteps != null) "NSTEPS=${toString nsteps}"
     ++ optional (numComm != null) "NUM_COMM=${toString numComm}"
     ++ optional (vectFlags != null) "VECT_FLAGS=${toString vectFlags}"
