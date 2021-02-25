@@ -6,14 +6,12 @@ msg() {
   >&2 echo "garlicd: $@"
 } 
 
-if [ -z "$1" ]; then
-  >&2 echo "usage: garlicd <bscpkgs directory>"
+if [ ! -z "$1" ]; then
+  >&2 echo "usage: garlicd"
   exit 1
 fi
 
 export PATH="@extraPath@:$PATH"
-
-bscpkgsdir=$(readlink -f "$1")
 
 garlic_sandbox=$(nix show-config |\
   grep extra-sandbox-paths |\
@@ -46,8 +44,6 @@ for fifo in "$run" "$completed" "$wipe"; do
     chmod 666 "$fifo"
   fi
 done
-
-cd "$bscpkgsdir"
 
 while true; do
   msg "Waiting for experiments ..."
