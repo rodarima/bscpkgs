@@ -43,7 +43,8 @@ in
 
       if [ ! -e "$exp" ]; then
         echo "resultTree: $exp: not found"
-        echo "resultTree: run the experiment and fetch the results with:"
+        echo "resultTree: run the experiment and fetch the results running"
+        echo "resultTree: the following command from the nix-shell"
         echo
         echo -e "\e[30;48;5;2mgarlic -RFv ${trebuchet}\e[0m"
         echo
