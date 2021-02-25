@@ -12,6 +12,13 @@
       march = "skylake-avx512";
       mtune = "skylake-avx512";
       hw = {
+        # The rev attribute attemps to capture the hardware configuration of the
+        # machine, and will rebuild all experiments if it changed. It only holds
+        # the timestamp at the current time, representing the HW configuration at
+        # that moment.
+        rev = 1614253003;
+
+        # Node and socket details
         cpusPerNode = 48;
         cpusPerSocket = 24;
         socketsPerNode = 2;
