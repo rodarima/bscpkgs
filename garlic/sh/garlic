@@ -151,7 +151,7 @@ do_fetch() {
 
   mkdir -p "$outputDir"
 
-  rsync -rt --copy-links \
+  rsync -vrt --copy-links \
     --include='*/*/garlic_config.json' \
     --include='*/*/std*.log' \
     --include='*/*/*/std*.log' \
