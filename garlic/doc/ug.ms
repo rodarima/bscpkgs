@@ -389,38 +389,68 @@ xeon07$ readlink result
 .CE
 .\" ###################################################################
 .NH 3
-Configure the garlic daemon (experimental)
+Configure garlic
 .LP
-The garlic benchmark has a experimental daemon which can be used to
+In order to launch experiments in the
+.I target
+machine, it is required to configure nix to allow a directory to be
+available during the build process, where the results will be stored 
+before being copied in the nix store. Create a new
+.CI garlic
+directory in your
+personal cache directory and copy the full path:
+.CS
+xeon07$ mkdir -p \(ti/.cache/garlic
+xeon07$ readlink -f \(ti/.cache/garlic
+/home/Computational/rarias/.cache/garlic
+.CE
+Then create the nix configuration directory (if it has not already been
+created):
+.CS
+xeon07$ mkdir -p \(ti/.config/nix
+.CE
+And add the following line in the
+.CI \(ti/.config/nix/nix.conf
+file, replacing it with the path you copied before:
+.CS
+.SM
+extra-sandbox-paths = /garlic=/home/Computational/rarias/.cache/garlic
+.CE
+This option creates a virtual directory called
+.CI /garlic
+inside the build environment, whose contents are the ones you specify at
+the right hand side of the equal sign (in this case the
+.CI \(ti/.cache/garlic
+directory). It will be used to allow the results of the experiments to
+be passed to nix from the
+.I target
+machine.
+.\" ###################################################################
+.NH 3
+Run the garlic daemon (optional)
+.LP
+The garlic benchmark has a daemon which can be used to
 automatically launch the experiments in the
 .I target
-machine. The daemon creates to FIFO pipes to communicate with the
-experiment in the build environment:
-.I run
-and
-.I completed .
-In order to use it, an existing directory must be specified, where those
-two files can be created. In the configuration file
-.CI \(ti/.config/nix/nix.config
-in xeon07, append the following line:
-.CS
-extra-sandbox-paths = /garlic=\fI<bscpkgs dir>\fP/garlic/garlicd
-.CE
-The
-.I "<bscpkgs dir>"
-component must be replaced to the
-.I full
-path of the bscpkgs directory. Then, go to the 
-.I garlic
+machine on demand, when they are required to build other derivations, so
+they can be launched without user interaction. The daemon creates some
+FIFO pipes to communicate with the build environment, and must be
+running to be able to run the experiments. To execute it, go to the 
+.CI bscpkgs/garlic
 directory and run
-.CI nix-shell
-to enter the shell. Finally, execute the daemon inside the nix shell:
 .CS
-garlicd \fI<bscpkgs dir>\fP
+xeon07$ nix-shell
+nix-shell$
 .CE
-Again, put the path to the bscpkgs directory as the first argument.
+to enter the nix shell (or specify the path to the
+.CI garlic/shell.nix
+file as argument). Then, run the daemon inside the nix shell:
+.CS
+nix-shell$ garlicd
+garlicd: Waiting for experiments ...
+.CE
 Notice that the daemon stays running in the foreground, waiting for
-submission jobs. At this moment, it can only process one experiment at a
+experiments. At this moment, it can only process one experiment at a
 time.
 .\" ===================================================================
 .NH 2
