@@ -7,6 +7,7 @@
   nextStage
 , cpuBind
 , nixPrefix
+, preSrun ? ""
 , srunOptions ? ""
 , output ? "stdout.log"
 , error ? "stderr.log"
@@ -22,6 +23,9 @@ stdenv.mkDerivation rec {
   installPhase = ''
     cat > $out <<'EOF'
     #!/bin/sh -e
+
+    ${preSrun}
+
     exec ${slurm}/bin/srun \
       --mpi=pmi2 \
       --cpu-bind=${cpuBind} \
