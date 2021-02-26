@@ -483,7 +483,7 @@ needed, but under a controlled environment so that the same behavior
 occurs during the experimentation phase.
 .PP
 In particular, we want that several developers can reproduce the
-the same development environment so they can debug each other programs
+same development environment so they can debug each other programs
 when reporting bugs. Therefore, the environment must be carefully
 controlled to avoid non-reproducible scenarios.
 .PP
