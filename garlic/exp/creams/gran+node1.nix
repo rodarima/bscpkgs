@@ -81,8 +81,11 @@ let
       stages.exec {
         inherit nextStage;
         env = ''
-          cp -r ${input}/SodTubeBenchmark/* .
-          chmod +w -R .
+          # Only the MPI rank 0 will copy the files
+          if [ $SLURM_PROCID == 0 ]; then
+            cp -fr ${input}/SodTubeBenchmark/* .
+            chmod +w -R .
+          fi
         '';
       };
 
