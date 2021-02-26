@@ -20,7 +20,7 @@ stdenv.mkDerivation rec {
   preferLocalBuild = true;
   dontPatchShebangs = true;
   installPhase = ''
-    cat > $out <<EOF
+    cat > $out <<'EOF'
     #!/bin/sh -e
     exec ${slurm}/bin/srun \
       --mpi=pmi2 \
