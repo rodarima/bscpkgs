@@ -100,5 +100,7 @@
     latencyShm = latency.override { interNode = false; };
     latencyMt = latency.override { enableMultithread = true; };
     latencyMtShm = latency.override { enableMultithread = true; interNode = true; };
+    bw = callPackage ./osu/bw.nix { };
+    bwShm = bw.override { interNode = false; };
   };
 }
