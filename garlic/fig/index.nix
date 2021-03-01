@@ -10,35 +10,35 @@ let
   rPlot = garlic.pp.rPlot;
   exp = garlic.exp;
   pp = garlic.pp;
+  ds = garlic.ds;
 
-  exptt = exlist: map (e: e.timetable) exlist;
-  rPlotExp = rScript: exp: rPlot {
+  stdPlot = rScript: expList: rPlot {
     script = rScript;
-    dataset = pp.mergeDatasets (exptt exp);
+    dataset = pp.mergeDatasets (map (e: ds.std.timetable e.result) expList);
   };
 in
 {
   nbody = with exp.nbody; {
-    baseline  = rPlotExp ./nbody/baseline.R [ baseline ];
-    small     = rPlotExp ./nbody/baseline.R [ small ];
-    jemalloc  = rPlotExp ./nbody/jemalloc.R [ baseline jemalloc ];
-    ctf       = rPlotExp ./nbody/baseline.R [ ctf ];
+    baseline  = stdPlot ./nbody/baseline.R [ baseline ];
+    small     = stdPlot ./nbody/baseline.R [ small ];
+    jemalloc  = stdPlot ./nbody/jemalloc.R [ baseline jemalloc ];
+    ctf       = stdPlot ./nbody/baseline.R [ ctf ];
   };
 
   hpcg = with exp.hpcg; {
-    oss = rPlotExp ./hpcg/oss.R [ oss ];
+    oss = stdPlot ./hpcg/oss.R [ oss ];
   };
 
   saiph = with exp.saiph; {
-    granularity = rPlotExp ./saiph/granularity.R [ granularity ];
+    granularity = stdPlot ./saiph/granularity.R [ granularity ];
   };
 
   heat = with exp.heat; {
-    test = rPlotExp ./heat/test.R [ test ];
+    test = stdPlot ./heat/test.R [ test ];
   };
 
   creams = with exp.creams; {
-    ss = rPlotExp ./creams/ss.R [ ss.hybrid ss.pure ];
+    ss = stdPlot ./creams/ss.R [ ss.hybrid ss.pure ];
   };
 
   osu = with exp.osu; {
