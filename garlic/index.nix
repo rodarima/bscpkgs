@@ -103,22 +103,12 @@
     sshHost = "mn1";
   };
 
-  # Post processing tools
-  pp = with bsc.garlicTools; rec {
+  # Post processing
+  pp = {
     store = callPackage ./pp/store.nix { };
-    resultFromTrebuchet = trebuchetStage: (store {
-      experimentStage = getExperimentStage trebuchetStage;
-      inherit trebuchetStage;
-    });
-    timetable = callPackage ./pp/timetable.nix { };
     osu-latency = callPackage ./pp/osu-latency.nix { };
     rPlot = callPackage ./pp/rplot.nix { };
-    timetableFromTrebuchet = tre: timetable (resultFromTrebuchet tre);
     mergeDatasets = callPackage ./pp/merge.nix { };
-
-    # Takes a list of experiments and returns a file that contains
-    # all timetable results from the experiments.
-    merge = exps: mergeDatasets (map timetableFromTrebuchet exps);
   };
 
   garlicd = callPackage ./garlicd/default.nix {
