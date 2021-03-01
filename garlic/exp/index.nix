@@ -95,7 +95,10 @@
     test = callPackage ./lulesh/test.nix { };
   };
 
-  osu = {
+  osu = rec {
     latency = callPackage ./osu/latency.nix { };
+    latencyShm = latency.override { interNode = false; };
+    latencyMt = latency.override { enableMultithread = true; };
+    latencyMtShm = latency.override { enableMultithread = true; interNode = true; };
   };
 }
