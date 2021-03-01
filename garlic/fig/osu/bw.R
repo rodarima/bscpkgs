@@ -14,7 +14,7 @@ dataset = jsonlite::stream_in(file(input_file)) %>%
 	jsonlite::flatten()
 
 # We only need the nblocks and time
-df = select(dataset, config.unitName, config.nodes, config.ntasksPerNode, config.cpusPerTask, size, latency) %>%
+df = select(dataset, config.unitName, config.nodes, config.ntasksPerNode, config.cpusPerTask, size, bw) %>%
 	rename(unitName=config.unitName)
 
 nodes = unique(df$config.nodes)
@@ -27,14 +27,14 @@ ppi=300
 h=8
 w=12
 
-png("latency.png", width=w*ppi, height=h*ppi, res=ppi)
+png("bw.png", width=w*ppi, height=h*ppi, res=ppi)
 
 breaks = 10^(-10:10)
 minor_breaks <- rep(1:9, 21)*(10^rep(-10:10, each=9))
 
-p = ggplot(data=df, aes(x=size, y=latency)) +
-	labs(x="Size (bytes)", y="Latency (us)",
-              title=sprintf("OSU latency benchmark nodes=%d tasksPerNode=%d cpusPerTask=%d",
+p = ggplot(data=df, aes(x=size, y=bw)) +
+	labs(x="Size (bytes)", y="Bandwidth (MB/s)",
+              title=sprintf("OSU bandwidth benchmark: nodes=%d tasksPerNode=%d cpusPerTask=%d",
 			    nodes, tasksPerNode, cpusPerTask), 
               subtitle=input_file) +
 	geom_boxplot(aes(color=unitName, group=interaction(unitName, sizeFactor))) +

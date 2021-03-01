@@ -16,6 +16,11 @@ let
     script = rScript;
     dataset = pp.mergeDatasets (map (e: ds.std.timetable e.result) expList);
   };
+
+  customPlot = rScript: dataset: rPlot {
+    script = rScript;
+    dataset = dataset;
+  };
 in
 {
   nbody = with exp.nbody; {
@@ -42,14 +47,12 @@ in
   };
 
   osu = with exp.osu; {
-    #latency = pp.osu-latency latency.result;
-    latency =
-    let
-      resultJson = pp.osu-latency latency.result;
-    in
-      rPlot {
-        script = ./osu/latency.R;
-        dataset = resultJson;
-      };
+    latency = customPlot ./osu/latency.R (ds.osu.latency latency.result);
+    latencyShm = customPlot ./osu/latency.R (ds.osu.latency latencyShm.result);
+    latencyMt = customPlot ./osu/latency.R (ds.osu.latency latencyMt.result);
+    latencyMtShm = customPlot ./osu/latency.R (ds.osu.latency latencyMtShm.result);
+
+    bw = customPlot ./osu/bw.R (ds.osu.bw bw.result);
+    bwShm = customPlot ./osu/bw.R (ds.osu.bw bwShm.result);
   };
 }

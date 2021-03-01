@@ -106,7 +106,6 @@
   # Post processing
   pp = {
     store = callPackage ./pp/store.nix { };
-    osu-latency = callPackage ./pp/osu-latency.nix { };
     rPlot = callPackage ./pp/rplot.nix { };
     mergeDatasets = callPackage ./pp/merge.nix { };
   };
