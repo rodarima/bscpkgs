@@ -131,7 +131,10 @@
   # Experiments
   exp = callPackage ./exp/index.nix { };
 
-  # Figures generated from the experiments
+  # Dataset generators from resultTree
+  ds = callPackage ./ds/index.nix { };
+
+  # Figures generated from the datasets
   fig = callPackage ./fig/index.nix { };
 
 }
