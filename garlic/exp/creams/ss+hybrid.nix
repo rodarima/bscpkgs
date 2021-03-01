@@ -16,7 +16,7 @@ let
       { nodes=2 ; nprocz=4 ; granul=19; time= "02:00:00"; }
       { nodes=4 ; nprocz=8 ; granul=10; time= "02:00:00"; }
       { nodes=8 ; nprocz=16; granul=9 ; time= "02:00:00"; }
-      { nodes=16; nprocz=32; granul=9 ; time= "02:00:00"; }
+      { nodes=16; nprocz=32; granul=9 ; time= "02:00:00"; }    
     ];
 
     gitBranch = [
@@ -31,25 +31,25 @@ let
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
-    expName = "creams-ss";
-    unitName = "${expName}-${toString nodes}-${gitBranch}";
+    expName = "creams-ss-hybrid";
     inherit (targetMachine.config) hw;
     # Options for creams
     cc = icc;
     mpi = impi;
-    inherit (c.input) granul;
+    inherit (c.input) granul time nodes;
     inherit (c) gitBranch;
-    nprocz = ntasksPerNode * nodes;
+    unitName = "${expName}-${toString nodes}-${gitBranch}";
 
-    # Repeat the execution of each unit 30 times
-    loops = 30;
+    # Repeat the execution of each unit 10 times
+    loops = 10;
 
     # Resources
     qos = "debug";
     ntasksPerNode = hw.socketsPerNode;
     cpusPerTask = hw.cpusPerSocket;
-    inherit (c.input) time nodes;
     jobName = unitName;
+    
+    nprocz = ntasksPerNode * nodes;
   };
 
   # Compute the array of configurations
@@ -57,29 +57,24 @@ let
     inherit varConf genConf;
   };
 
-  # Use nanos6 with regions
-  nanos6Env = {nextStage, conf, ...}: with conf; stages.exec {
-    inherit nextStage;
-    env = ''
-      export NANOS6_CONFIG_OVERRIDE="version.dependencies=regions"
-    '';
-  };
-
-  # Custom stage to copy the creams input dataset
-  copyInput = {nextStage, conf, ...}:
+  # Custom srun stage to copy the creams input dataset
+  customSrun = {nextStage, conf, ...}:
     let
       input = bsc.garlic.apps.creamsInput.override {
         inherit (conf) gitBranch granul nprocz;
       };
     in
-      stages.exec {
+      stages.srun {
+        # These are part of the stdndard srun stage:
+        inherit (conf) nixPrefix;
         inherit nextStage;
-        env = ''
-          # Only the MPI rank 0 will copy the files
-          if [ $SLURM_PROCID == 0 ]; then
-            cp -fr ${input}/SodTubeBenchmark/* .
-            chmod +w -R .
-          fi
+        cpuBind = "cores,verbose";
+
+        # Now we add some commands to execute before calling srun. These will
+        # only run in one rank (the first in the list of allocated nodes)
+        preSrun = ''
+          cp -r ${input}/SodTubeBenchmark/* .
+          chmod +w -R .
         '';
       };
 
@@ -92,7 +87,12 @@ let
         inherit cc mpi gitBranch;
       };
 
-  pipeline = stdexp.stdPipeline ++ [ nanos6Env copyInput creams ];
+  pipeline = stdexp.stdPipelineOverride {
+    overrides = {
+      # Replace the stdandard srun stage with our own
+      srun = customSrun;
+    };
+  } ++ [ creams ];
 
 in
  
