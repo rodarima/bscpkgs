@@ -56,7 +56,6 @@ let
   };
   #configs = filter (el: if el.nbly == 1 && el.nblz == 1 && el.nodes == 1 && el.gitCommit == "3b52a616d44f4b86880663e2d951ad89c1dcab4f" then false else true) configsAll;
 
-
   exec = {nextStage, conf, ...}: with conf; stages.exec {
     inherit nextStage;
     env = ''

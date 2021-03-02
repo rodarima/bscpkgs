@@ -15,14 +15,15 @@ dataset = jsonlite::stream_in(file(input_file)) %>%
 
 
 # We only need the nblocks and time
-df = select(dataset, config.nby, config.nodes, time, total_time) %>%
-	rename(nby=config.nby, nnodes=config.nodes)
+df = select(dataset, config.nby, config.nodes, time, total_time, config.gitCommit) %>%
+	rename(nby=config.nby, nnodes=config.nodes, gitCommit=config.gitCommit)
 
 df$nby = as.factor(df$nby)
 df$nodes = as.factor(df$nnodes)
+df$gitCommit = as.factor(df$gitCommit)
 
 # Normalize the time by the median
-D=group_by(df, nby, nodes) %>%
+D=group_by(df, nby, nodes, gitCommit) %>%
 	mutate(tmedian = median(time)) %>%
 	mutate(ttmedian = median(total_time)) %>%
 	mutate(tnorm = time / tmedian - 1) %>%
@@ -37,7 +38,7 @@ print(D)
 
 ppi=300
 h=5
-w=5
+w=8
 
 png("box.png", width=w*ppi, height=h*ppi, res=ppi)
 #
@@ -94,9 +95,11 @@ p = ggplot(D, aes(x=nby, y=time)) +
 	theme(plot.subtitle=element_text(size=8)) +
 	theme(legend.position = c(0.5, 0.88)) +
 
-	geom_point(shape=21, size=3) +
+	geom_point(aes(color=nodes), shape=21, size=3) +
 	#scale_x_continuous(trans=log2_trans()) +
-	scale_y_continuous(trans=log2_trans())
+	scale_y_continuous(trans=log2_trans()) +
+	facet_wrap( ~ gitCommit)
+
 
 # Render the plot
 print(p)
@@ -120,7 +123,8 @@ p = ggplot(D, aes(x=nby, y=time)) +
   geom_line(aes(y=tmedian, color=nodes, group=nodes)) +
   geom_line(aes(y=ttmedian, color=nodes, group=nodes)) +
 	#scale_x_continuous(trans=log2_trans()) +
-	scale_y_continuous(trans=log2_trans())
+	scale_y_continuous(trans=log2_trans()) +
+	facet_wrap( ~ gitCommit)
 
 # Render the plot
 print(p)
@@ -142,7 +146,8 @@ p = ggplot(D, aes(x=nby, y=tn)) +
 	geom_point(shape=21, size=3) +
   geom_line(aes(color=nodes, group=nodes)) +
 	#scale_x_continuous(trans=log2_trans()) +
-	scale_y_continuous(trans=log2_trans())
+	scale_y_continuous(trans=log2_trans()) +
+	facet_wrap( ~ gitCommit)
 
 # Render the plot
 print(p)
