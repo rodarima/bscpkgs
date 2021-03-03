@@ -60,6 +60,7 @@ in
 
     bw    = customPlot ./osu/bw.R (ds.osu.bw bw.result);
     bwShm = customPlot ./osu/bw.R (ds.osu.bw bwShm.result);
+    impi  = customPlot ./osu/impi.R (ds.osu.bw impi.result);
   };
 
   # The figures used in the article contained in a directory per figure
