@@ -43,8 +43,10 @@ let
 
   # Generate the complete configuration for each unit
   genConf = var: fix (self: var // targetMachine.config // {
-    expName = "nbody-nblocks";
-    unitName = "${self.expName}${toString self.nblocks}";
+    expName = "nbody-scaling";
+    unitName = self.expName +
+      "-nb${toString self.nblocks}"+
+      "-nodes${toString self.nodes}";
 
     inherit (machineConfig) hw;
 
