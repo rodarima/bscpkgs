@@ -115,15 +115,23 @@
   };
 
   # Apps for Garlic
-  apps = callPackage ./apps/index.nix { };
+  apps = callPackage ./apps/index.nix {
+    inherit self super bsc;
+  };
 
   # Experiments
-  exp = callPackage ./exp/index.nix { };
+  exp = callPackage ./exp/index.nix {
+    inherit self super bsc;
+  };
 
   # Dataset generators from resultTree
-  ds = callPackage ./ds/index.nix { };
+  ds = callPackage ./ds/index.nix {
+    inherit self super bsc;
+  };
 
   # Figures generated from the datasets
-  fig = callPackage ./fig/index.nix { };
+  fig = callPackage ./fig/index.nix {
+    inherit self super bsc;
+  };
 
 }
