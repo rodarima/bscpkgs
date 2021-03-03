@@ -158,6 +158,7 @@ let
     # =================================================================
 
     osumb = callPackage ./bsc/osu/default.nix { };
+    lmbench = callPackage ./bsc/lmbench/default.nix { };
     pmix2 = callPackage ./bsc/pmix/pmix2.nix { };
     slurm17 = callPackage ./bsc/slurm/default.nix {
       pmix = bsc.pmix2;
