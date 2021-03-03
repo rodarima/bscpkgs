@@ -11,10 +11,12 @@
 , papi
 , extrae
 , boost
-, enableJemalloc ? false
+, enableJemalloc ? true
 , jemalloc ? null
 , cachelineBytes ? 64
 }:
+
+assert enableJemalloc -> (jemalloc != null);
 
 with stdenv.lib;
 
