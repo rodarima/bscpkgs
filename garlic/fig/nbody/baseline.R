@@ -198,3 +198,14 @@ p = ggplot(D, aes(x=nodesFactor)) +
   scale_y_continuous(trans=log2_trans())
 print(p)
 dev.off()
+
+
+png("time-nodes.png", width=w*ppi, height=h*ppi, res=ppi)
+p = ggplot(D, aes(x=nodesFactor)) +
+  labs(x="Nodes", y="Time * nodes (s)", title="Nbody strong scaling") +
+  theme_bw() +
+  geom_line(aes(y=tn, group=gitBranch)) +
+  facet_grid(gitBranch ~ .) +
+  scale_y_continuous(trans=log2_trans())
+print(p)
+dev.off()
