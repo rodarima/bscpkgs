@@ -11,6 +11,7 @@ let
   exp = garlic.exp;
   pp = garlic.pp;
   ds = garlic.ds;
+  fig = garlic.fig;
 
   stdPlot = rScript: expList: rPlot {
     script = rScript;
@@ -21,6 +22,11 @@ let
     script = rScript;
     dataset = dataset;
   };
+
+  linkTree = name: tree: self.linkFarm name (
+    self.lib.mapAttrsToList (
+      name: value: { name=name; path=value; }
+    ) tree);
 in
 {
   nbody = with exp.nbody; {
@@ -54,5 +60,13 @@ in
 
     bw = customPlot ./osu/bw.R (ds.osu.bw bw.result);
     bwShm = customPlot ./osu/bw.R (ds.osu.bw bwShm.result);
+  };
+
+  # The figures used in the article contained in a directory per figure
+  article = with fig; linkTree "article-fig" {
+    "osu/latency"     = osu.latency;
+    "osu/latencyMt"   = osu.latencyMt;
+    "osu/bw"          = osu.bw;
+    "osu/bwShm"       = osu.bwShm;
   };
 }
