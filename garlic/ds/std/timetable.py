@@ -5,6 +5,13 @@ def eprint(*args, **kwargs):
 	print(*args, file=sys.stderr, flush=True, **kwargs)
 
 def process_run(tree, runPath):
+
+	with open(".garlic/total_time_start", "r") as f:
+		total_time_start = float(f.readline().strip())
+
+	with open(".garlic/total_time_end", "r") as f:
+		total_time_end = float(f.readline().strip())
+
 	with open("stdout.log", "r") as f:
 		lines = [line.strip() for line in f.readlines()]
 
@@ -23,6 +30,8 @@ def process_run(tree, runPath):
 	time_str = time_line.split()[1]
 
 	tree['time'] = float(time_str)
+	tree['total_time'] = total_time_end - total_time_start
+
 	print(json.dumps(tree))
 
 def process_result_tree(resultTree):
