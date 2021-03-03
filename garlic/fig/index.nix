@@ -53,12 +53,12 @@ in
   };
 
   osu = with exp.osu; {
-    latency = customPlot ./osu/latency.R (ds.osu.latency latency.result);
-    latencyShm = customPlot ./osu/latency.R (ds.osu.latency latencyShm.result);
-    latencyMt = customPlot ./osu/latency.R (ds.osu.latency latencyMt.result);
-    latencyMtShm = customPlot ./osu/latency.R (ds.osu.latency latencyMtShm.result);
+    latency       = customPlot ./osu/latency.R (ds.osu.latency latency.result);
+    latencyShm    = customPlot ./osu/latency.R (ds.osu.latency latencyShm.result);
+    latencyMt     = customPlot ./osu/latency.R (ds.osu.latency latencyMt.result);
+    latencyMtShm  = customPlot ./osu/latency.R (ds.osu.latency latencyMtShm.result);
 
-    bw = customPlot ./osu/bw.R (ds.osu.bw bw.result);
+    bw    = customPlot ./osu/bw.R (ds.osu.bw bw.result);
     bwShm = customPlot ./osu/bw.R (ds.osu.bw bwShm.result);
   };
 
