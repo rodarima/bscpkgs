@@ -5,7 +5,7 @@
 with stdenv.lib;
 
 stdenv.mkDerivation rec {
-  name = "fwi-header";
+  name = "fwi-input";
 
   src = builtins.fetchGit {
     url = "https://gitlab.com/srodrb/BSC-FWI.git";
