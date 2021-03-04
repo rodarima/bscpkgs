@@ -53,6 +53,7 @@ in
 
   creams = with exp.creams; {
     ss = stdPlot ./creams/ss.R [ ss.hybrid ss.pure ];
+    gran = stdPlot ./creams/gran.R [ gran.hybrid ];
   };
 
   osu = with exp.osu; {
