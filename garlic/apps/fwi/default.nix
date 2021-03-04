@@ -17,7 +17,7 @@ stdenv.mkDerivation rec {
   name = "fwi";
 
   src = builtins.fetchGit {
-    url = "https://gitlab.com/srodrb/BSC-FWI.git";
+    url = "ssh://git@bscpm03.bsc.es/garlic/apps/fwi.git";
     ref = "${gitBranch}";
   };
 

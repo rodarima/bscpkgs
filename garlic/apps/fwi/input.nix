@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
   name = "fwi-input";
 
   src = builtins.fetchGit {
-    url = "https://gitlab.com/srodrb/BSC-FWI.git";
+    url = "ssh://git@bscpm03.bsc.es/garlic/apps/fwi.git";
     ref = "garlic/seq";
   };
 
