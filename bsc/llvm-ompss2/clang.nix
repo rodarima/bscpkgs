@@ -14,14 +14,14 @@
 }:
 
 stdenv.mkDerivation rec {
-  version = "2020.11";
+  version = "2020.11+d2d451fb";
   pname = "clang-ompss2";
 
   src = fetchFromGitHub {
     owner = "bsc-pm";
     repo = "llvm";
-    rev = "github-release-${version}";
-    sha256 = "00z3xlw36lbiz84a47k95gin9fzsni5jd1f71dpg5l2qjy961qma";
+    rev = "d2d451fb1a886b52d0ff95ec8484df7afa7a8132";
+    sha256 = "1yrfxfp2wz3qpb7j39ra8kkjsqm328j611yrks8bjc86lscmp6yz";
   };
 
   enableParallelBuilding = true;
