@@ -1,8 +1,12 @@
 {
   stdenv
+, nz ? 200
+, nx ? 200
+, ny ? 500
 }:
 
 with stdenv.lib;
+with builtins;
 
 stdenv.mkDerivation rec {
   name = "fwi-input";
@@ -13,6 +17,13 @@ stdenv.mkDerivation rec {
   };
 
   enableParallelBuilding = false;
+
+  # Set the input size with the weird order (nz,nx,ny).
+  postPatch = ''
+    sed -i 1c${toString nz} SetupParams/fwi_params.txt
+    sed -i 2c${toString nx} SetupParams/fwi_params.txt
+    sed -i 3c${toString ny} SetupParams/fwi_params.txt
+  '';
 
   # FIXME: This is an ugly hack.
   # When using _GNU_SOURCE or any other definition used in features.h, we need
