@@ -14,9 +14,6 @@
     small = baseline.override {
       particles = 12 * 4096;
     };
-    # TODO: Update freeCpu using a non-standard pipeline
-    #freeCpu = baseline.override { freeCpu = true; };
-    jemalloc = baseline.override { enableJemalloc = true; };
 
     # Some experiments with traces
     trace = {
@@ -27,10 +24,6 @@
         steps = 1;
       };
 
-      # Same but with jemalloc enabled
-      jemalloc = trace.baseline.override {
-        enableJemalloc = true;
-      };
     };
 
     scaling = callPackage ./nbody/scaling.nix {

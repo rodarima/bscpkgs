@@ -7,7 +7,6 @@
 , garlicTools
 
 # Options for the experiment
-, enableJemalloc ? false
 , enableCTF ? false
 # Number of cases tested
 , steps ? 7
@@ -56,7 +55,7 @@ let
     cc = bsc.icc;
     mpi = bsc.impi;
     cflags = "-g";
-    inherit timesteps gitBranch enableJemalloc enableCTF loops;
+    inherit timesteps gitBranch enableCTF loops;
 
     # Resources
     qos = "debug";
@@ -91,13 +90,7 @@ let
 
   program = {nextStage, conf, ...}: with conf;
     let
-      /* These changes are propagated to all dependencies. For example,
-      when changing nanos6+jemalloc, we will get tampi built with
-      nanos6+jemalloc as well. */
-      customPkgs = bsc.extend (self: super: {
-        mpi = conf.mpi;
-        nanos6 = super.nanos6.override { inherit enableJemalloc; };
-      });
+      customPkgs = stdexp.replaceMpi conf.mpi;
     in
       customPkgs.apps.nbody.override ({
         inherit cc blocksize mpi gitBranch cflags;
