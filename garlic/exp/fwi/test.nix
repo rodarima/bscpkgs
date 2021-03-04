@@ -13,13 +13,15 @@ let
   varConf = {
     gitBranch = [
       "garlic/tampi+send+oss+task"
-      "garlic/mpi+send+omp+task"
-      "garlic/mpi+send+oss+task"
-      "garlic/mpi+send+seq"
-      "garlic/oss+task"
-      "garlic/omp+task"
-      "garlic/seq"
+#      "garlic/mpi+send+omp+task"
+#      "garlic/mpi+send+oss+task"
+#      "garlic/mpi+send+seq"
+#      "garlic/oss+task"
+#      "garlic/omp+task"
+#      "garlic/seq"
     ];
+
+    blocksize = [ 1 2 4 ];
   };
 
   machineConfig = targetMachine.config;
@@ -31,7 +33,11 @@ let
     inherit (machineConfig) hw;
 
     cc = icc;
-    gitBranch = c.gitBranch;
+    inherit (c) gitBranch blocksize;
+    n = 500;
+    nx = n;
+    ny = n;
+    nz = n;
 
     # Repeat the execution of each unit several times
     loops = 10;
@@ -50,22 +56,25 @@ let
     inherit varConf genConf;
   };
 
-  # Custom stage to copy the FWI input
-  #copyInput = {nextStage, conf, ...}:
-  #  let
-  #    input = bsc.garlic.apps.fwi;
-  #  in
-  #    stages.exec {
-  #      inherit nextStage;
-  #      env = ''
-  #        cp -r ${input}/bin/InputModels .
-  #        chmod +w -R .
-  #      '';
-  #      argv = [
-  #        "${input}/etc/fwi/fwi_params.txt"
-  #        "${input}/etc/fwi/fwi_frequencies.txt"
-  #      ];
-  #    };
+  exec = {nextStage, conf, ...}:
+  let
+    input = bsc.apps.fwi.input.override {
+      inherit (conf) nx ny nz;
+    };
+  in stages.exec {
+    inherit nextStage;
+    pre = ''
+      ln -fs ${input}/InputModels InputModels || true
+    '';
+    argv = [
+      "${input}/fwi_params.txt"
+      "${input}/fwi_frequencies.txt"
+      conf.blocksize
+      "-1" # Fordward steps
+      "-1" # Backward steps
+      "-1" # Write/read frequency
+    ];
+  };
 
   apps = bsc.garlic.apps;
 
@@ -74,7 +83,7 @@ let
     inherit (conf) cc gitBranch;
   };
 
-  pipeline = stdexp.stdPipeline ++ [ program ];
+  pipeline = stdexp.stdPipeline ++ [ exec program ];
 
 in
  
