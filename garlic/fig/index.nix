@@ -61,6 +61,10 @@ in
     big.granularity = stdPlot ./creams/granularity.R [ big.granularity ];
   };
 
+  fwi = with exp.fwi; {
+    test = stdPlot ./fwi/test.R [ test ];
+  };
+
   osu = with exp.osu; {
     latency       = customPlot ./osu/latency.R (ds.osu.latency latency.result);
     latencyShm    = customPlot ./osu/latency.R (ds.osu.latency latencyShm.result);
