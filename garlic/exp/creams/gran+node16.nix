@@ -79,8 +79,21 @@ let
         preSrun = ''
           cp -r ${input}/SodTubeBenchmark/* .
           chmod +w -R .
+          rm -f nanos6.toml
         '';
       };
+
+  exec = {nextStage, conf, ...}: with conf; stages.exec {
+    inherit nextStage;
+    env = ''
+      export NANOS6_CONFIG_OVERRIDE="version.dependencies=regions"
+    '';
+
+    # Remove restarts as is not needed and is huge
+    post = ''
+      rm -rf restarts || true
+    '';
+  };
 
   # Creams program
   creams = {nextStage, conf, ...}: with conf;
@@ -96,7 +109,7 @@ let
       # Replace the stdandard srun stage with our own
       srun = customSrun;
     };
-  } ++ [ creams ];
+  } ++ [ exec creams ];
 
 in
  
