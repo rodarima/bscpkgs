@@ -46,6 +46,8 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out/
     cp src/generated_model_params.h $out/
+    cp SetupParams/fwi_params.txt $out/
+    cp SetupParams/fwi_frequencies.txt $out/
     cp -r InputModels $out/
   '';
 }
