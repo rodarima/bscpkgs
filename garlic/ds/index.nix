@@ -15,4 +15,6 @@
     latency = callPackage ./osu/latency.nix {};
     bw = callPackage ./osu/bw.nix {};
   };
+
+  perf.stat = callPackage ./perf/stat.nix {};
 }
