@@ -42,8 +42,11 @@
       hybrid = callPackage ./creams/ss+hybrid.nix { };
     };
     gran = {
-      pure = callPackage ./creams/gran+node1.nix { };
-      hybrid = callPackage ./creams/gran+node16.nix { };
+      node1 = callPackage ./creams/gran+node1.nix { };
+      node2 = callPackage ./creams/gran+node2.nix { };
+      node4 = callPackage ./creams/gran+node4.nix { };
+      node8 = callPackage ./creams/gran+node8.nix { };
+      node16 = callPackage ./creams/gran+node16.nix { };
     };
   };
 

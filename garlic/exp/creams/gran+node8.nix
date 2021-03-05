@@ -12,15 +12,15 @@ let
   # Initial variable configuration
   varConf = {
     input = [
-      { nodes=1 ; nprocz=2 ; granul=256; time= "02:00:00"; }
-      { nodes=1 ; nprocz=2 ; granul=128; time= "02:00:00"; }
-      { nodes=1 ; nprocz=2 ; granul=64;  time= "02:00:00"; }
-      { nodes=1 ; nprocz=2 ; granul=37;  time= "02:00:00"; }
-      { nodes=1 ; nprocz=2 ; granul=32;  time= "02:00:00"; }
-      { nodes=1 ; nprocz=2 ; granul=16;  time= "02:00:00"; }
-      { nodes=1 ; nprocz=2 ; granul= 9;  time= "02:00:00"; }
-      { nodes=1 ; nprocz=2 ; granul= 5;  time= "02:00:00"; }
-      { nodes=1 ; nprocz=2 ; granul= 4;  time= "02:00:00"; }
+      { nodes=8 ; nprocz=16 ; granul=128; time= "02:00:00"; }
+      { nodes=8 ; nprocz=16 ; granul=64;  time= "02:00:00"; }
+      { nodes=8 ; nprocz=16 ; granul=32;  time= "02:00:00"; }
+      { nodes=8 ; nprocz=16 ; granul=16;  time= "02:00:00"; }
+      { nodes=8 ; nprocz=16 ; granul= 9;  time= "02:00:00"; }
+      { nodes=8 ; nprocz=16 ; granul= 5;  time= "02:00:00"; }
+      { nodes=8 ; nprocz=16 ; granul= 4;  time= "02:00:00"; }
+      { nodes=8 ; nprocz=16 ; granul= 2;  time= "02:00:00"; }
+      { nodes=8 ; nprocz=16 ; granul= 1;  time= "02:00:00"; }
     ];
 
     gitBranch = [
@@ -35,7 +35,7 @@ let
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
-    expName = "creams-gran-node1";
+    expName = "creams-gran-node8";
     inherit (targetMachine.config) hw;
     # Options for creams
     cc = icc;
