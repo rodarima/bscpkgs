@@ -2,43 +2,29 @@
   stdenv
 , mpi
 , tampi
-, clangOmpss2
-, bsx ? 1024
-, bsy ? 1024
+, mcxx
+, gitBranch ? "master"
 }:
 
 stdenv.mkDerivation rec {
   name = "heat";
-  extension = if (bsx == bsy)
-    then "${toString bsx}bs.exe"
-    else "${toString bsx}x${toString bsy}bs.exe";
 
-  variant = "heat_ompss";
-  target = "${variant}.${extension}";
-
-  makeFlags = [
-    "BSX=${toString bsx}"
-    "BSY=${toString bsy}"
-    target
-  ];
-
-  src = ~/heat;
-  #src = builtins.fetchGit {
-  #  url = "ssh://git@bscpm03.bsc.es/garlic/apps/heat.git";
-  #  ref = "garlic";
-  #};
+  src = builtins.fetchGit {
+    url = "ssh://git@bscpm03.bsc.es/garlic/apps/heat.git";
+    ref = gitBranch;
+  };
 
   buildInputs = [
     mpi
-    clangOmpss2
+    mcxx
     tampi
   ];
 
-  programPath = "/bin/${target}";
+  programPath = "/bin/${name}";
 
   installPhase = ''
     mkdir -p $out/bin
-    cp ${target} $out/bin/
+    cp ${name} $out/bin/
 
     mkdir -p $out/etc
     cp heat.conf $out/etc/
