@@ -15,16 +15,20 @@ dataset = jsonlite::stream_in(file(input_file)) %>%
 
 
 # We only need the nblocks and time
-df = select(dataset, config.bsx, time) %>%
-	rename(bsx=config.bsx)
+df = select(dataset, config.cbs, config.rbs, time) %>%
+	rename(cbs=config.cbs, rbs=config.rbs)
 
-df$bsx = as.factor(df$bsx)
+df$cbs = as.factor(df$cbs)
+df$rbs = as.factor(df$rbs)
 
 # Normalize the time by the median
-D=group_by(df, bsx) %>%
-	mutate(tnorm = time / median(time) - 1)
-
-print(D)
+df=group_by(df, cbs, rbs) %>%
+	mutate(mtime = median(time)) %>%
+	mutate(tnorm = time / mtime - 1) %>%
+	mutate(logmtime = log(mtime)) %>%
+  ungroup() %>%
+  filter(between(mtime, mean(time) - (1 * sd(time)),
+    mean(time) + (1 * sd(time))))
 
 ppi=300
 h=5
@@ -35,10 +39,10 @@ png("box.png", width=w*ppi, height=h*ppi, res=ppi)
 #
 #
 # Create the plot with the normalized time vs nblocks
-p = ggplot(data=D, aes(x=bsx, y=tnorm)) +
+p = ggplot(data=df, aes(x=cbs, y=tnorm)) +
 
 	# Labels
-	labs(x="bsx", y="Normalized time",
+	labs(x="cbs", y="Normalized time",
               title=sprintf("Heat normalized time"), 
               subtitle=input_file) +
 
@@ -75,9 +79,9 @@ dev.off()
 png("scatter.png", width=w*ppi, height=h*ppi, res=ppi)
 #
 ## Create the plot with the normalized time vs nblocks
-p = ggplot(D, aes(x=bsx, y=time)) +
+p = ggplot(df, aes(x=cbs, y=time, linetype=rbs, group=rbs)) +
 
-	labs(x="bsx", y="Time (s)",
+	labs(x="cbs", y="Time (s)",
               title=sprintf("Heat granularity"), 
               subtitle=input_file) +
 	theme_bw() +
@@ -85,8 +89,29 @@ p = ggplot(D, aes(x=bsx, y=time)) +
 	theme(legend.position = c(0.5, 0.88)) +
 
 	geom_point(shape=21, size=3) +
+	geom_line(aes(y=mtime)) +
 	#scale_x_continuous(trans=log2_trans()) +
 	scale_y_continuous(trans=log2_trans())
+
+# Render the plot
+print(p)
+
+# Save the png image
+dev.off()
+
+
+png("heatmap.png", width=w*ppi, height=h*ppi, res=ppi)
+#
+## Create the plot with the normalized time vs nblocks
+p = ggplot(df, aes(x=cbs, y=rbs, fill=logmtime)) +
+	geom_raster() +
+  scale_fill_gradient(high="black", low="white") +
+  coord_fixed() +
+	theme_bw() +
+	theme(plot.subtitle=element_text(size=8)) +
+	labs(x="cbs", y="rbs",
+    title=sprintf("Heat granularity"), 
+    subtitle=input_file)
 
 # Render the plot
 print(p)
