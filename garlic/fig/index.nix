@@ -46,6 +46,7 @@ in
 
   heat = with exp.heat; {
     granul = stdPlot ./heat/granul.R [ granul ];
+    cache = customPlot ./heat/cache.R (ds.perf.stat cache.result);
   };
 
   creams = with exp.creams; {
