@@ -64,7 +64,7 @@
   };
 
   heat = {
-    test = callPackage ./heat/test.nix { };
+    granul = callPackage ./heat/granul.nix { };
   };
 
   bigsort = rec {

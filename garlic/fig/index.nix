@@ -45,7 +45,7 @@ in
   };
 
   heat = with exp.heat; {
-    test = stdPlot ./heat/test.R [ test ];
+    granul = stdPlot ./heat/granul.R [ granul ];
   };
 
   creams = with exp.creams; {
