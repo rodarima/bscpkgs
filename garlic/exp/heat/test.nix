@@ -4,14 +4,17 @@
 , bsc
 , targetMachine
 , stages
+, garlicTools
 }:
 
 with stdenv.lib;
+with garlicTools;
 
 let
   # Initial variable configuration
   varConf = with bsc; {
-    bsx = [ 1024 2048 4096 ];
+    cbs = range2 8 4096;
+    rbs = range2 32 4096;
   };
 
   machineConfig = targetMachine.config;
@@ -19,12 +22,19 @@ let
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
     expName = "heat";
-    unitName = "${expName}.bsx-${toString bsx}";
+    unitName = expName +
+      ".cbs-${toString cbs}" +
+      ".rbs-${toString rbs}";
+
     inherit (machineConfig) hw;
 
     # heat options
-    inherit (c) bsx;
     timesteps = 10;
+    cols = 1024 * 16; # Columns
+    rows = 1024 * 16; # Rows
+    cbs = c.cbs;
+    rbs = c.rbs;
+    gitBranch = "garlic/tampi+isend+oss+task";
     
     # Repeat the execution of each unit 30 times
     loops = 10;
@@ -44,20 +54,25 @@ let
     inherit varConf genConf;
   };
 
-  exec = {nextStage, conf, ...}: with conf; stages.exec {
+  exec = {nextStage, conf, ...}: stages.exec {
     inherit nextStage;
-    argv = [ "-s" 1024 "-t" timesteps ];
+    argv = [
+      "--rows" conf.rows
+      "--cols" conf.cols
+      "--rbs" conf.rbs
+      "--cbs" conf.cbs
+      "--timesteps" conf.timesteps
+    ];
+
+    # The next stage is the program
     env = ''
-      export LD_DEBUG=libs
-      export NANOS6_LOADER_VERBOSE=1
-      cp ${nextStage}/etc/heat.conf .
+      ln -sf ${nextStage}/etc/heat.conf heat.conf || true
     '';
   };
 
-  program = {nextStage, conf, ...}: with conf;
-    bsc.garlic.apps.heat.override {
-      inherit bsx;
-    };
+  program = {nextStage, conf, ...}: bsc.garlic.apps.heat.override {
+    inherit (conf) gitBranch;
+  };
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];
 
