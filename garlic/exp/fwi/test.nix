@@ -21,8 +21,19 @@ let
 #      "garlic/seq"
     ];
 
-    blocksize = [ 1 2 4 ];
+    blocksize = [ 1 2 ];
+
+    n = [
+    	{nx=500; ny=500; nz=500;}
+    ];
   };
+
+# The c value contains something like:
+# {
+#   n = { nx=500; ny=500; nz=500; }
+#   blocksize = 1;
+#   gitBranch = "garlic/tampi+send+oss+task";
+# }
 
   machineConfig = targetMachine.config;
 
@@ -34,10 +45,18 @@ let
 
     cc = icc;
     inherit (c) gitBranch blocksize;
+
     n = 500;
-    nx = n;
-    ny = n;
-    nz = n;
+    #nx = c.n.nx;
+    #ny = c.n.ny;
+    #nz = c.n.nz;
+
+    # Same but shorter:
+    inherit (c.n) nx ny nz;
+
+    fwiInput = bsc.apps.fwi.input.override {
+      inherit (c.n) nx ny nz;
+    };
 
     # Repeat the execution of each unit several times
     loops = 10;
@@ -56,19 +75,14 @@ let
     inherit varConf genConf;
   };
 
-  exec = {nextStage, conf, ...}:
-  let
-    input = bsc.apps.fwi.input.override {
-      inherit (conf) nx ny nz;
-    };
-  in stages.exec {
+  exec = {nextStage, conf, ...}: stages.exec {
     inherit nextStage;
     pre = ''
-      ln -fs ${input}/InputModels InputModels || true
+      ln -fs ${conf.fwiInput}/InputModels InputModels || true
     '';
     argv = [
-      "${input}/fwi_params.txt"
-      "${input}/fwi_frequencies.txt"
+      "${conf.fwiInput}/fwi_params.txt"
+      "${conf.fwiInput}/fwi_frequencies.txt"
       conf.blocksize
       "-1" # Fordward steps
       "-1" # Backward steps
@@ -80,7 +94,7 @@ let
 
   # FWI program
   program = {nextStage, conf, ...}: apps.fwi.solver.override {
-    inherit (conf) cc gitBranch;
+    inherit (conf) cc gitBranch fwiInput;
   };
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];
