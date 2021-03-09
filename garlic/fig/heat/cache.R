@@ -2,6 +2,7 @@ library(ggplot2)
 library(dplyr)
 library(scales)
 library(jsonlite)
+library(viridis)
 
 args=commandArgs(trailingOnly=TRUE)
 
@@ -14,7 +15,7 @@ dataset = jsonlite::stream_in(file(input_file)) %>%
 	jsonlite::flatten()
 
 # We only need the nblocks and time
-df = select(dataset, config.cbs, config.rbs, perf.cache_misses) %>%
+df = select(dataset, config.cbs, config.rbs, perf.cache_misses, perf.instructions, perf.cycles, time) %>%
 	rename(cbs=config.cbs, rbs=config.rbs)
 
 df$cbs = as.factor(df$cbs)
@@ -22,30 +23,55 @@ df$rbs = as.factor(df$rbs)
 
 # Normalize the time by the median
 df=group_by(df, cbs, rbs) %>%
+	mutate(median.time = median(time)) %>%
+	mutate(log.median.time = log(median.time)) %>%
 	mutate(median.misses = median(perf.cache_misses)) %>%
 	mutate(log.median.misses = log(median.misses)) %>%
-  ungroup()
+	mutate(median.instr= median(perf.instructions)) %>%
+	mutate(log.median.instr= log(median.instr)) %>%
+	mutate(median.cycles = median(perf.cycles)) %>%
+	mutate(median.cpi = median.cycles / median.instr) %>%
+	mutate(median.ipc = median.instr / median.cycles) %>%
+	mutate(median.ips = median.instr / median.time) %>%
+	mutate(median.cps = median.cycles / median.time) %>%
+  ungroup()# %>%
 
-ppi=300
-h=5
-w=5
+heatmap_plot = function(df, colname, title) {
+  p = ggplot(df, aes(x=cbs, y=rbs, fill=!!ensym(colname))) +
+    geom_raster() +
+    #scale_fill_gradient(high="black", low="white") +
+    scale_fill_viridis(option="plasma") +
+    coord_fixed() +
+    theme_bw() +
+    theme(axis.text.x=element_text(angle = -45, hjust = 0)) +
+    theme(plot.subtitle=element_text(size=8)) +
+    #guides(fill = guide_colorbar(barwidth=15, title.position="top")) +
+    guides(fill = guide_colorbar(barwidth=12, title.vjust=0.8)) +
+    labs(x="cbs", y="rbs",
+      title=sprintf("Heat granularity: %s", title), 
+      subtitle=input_file) +
+    theme(legend.position="bottom")
 
+  k=1
+  ggsave(sprintf("%s.png", colname), plot=p, width=4.8*k, height=5*k, dpi=300)
+  ggsave(sprintf("%s.pdf", colname), plot=p, width=4.8*k, height=5*k, dpi=300)
+}
 
-png("heatmap.png", width=1.5*w*ppi, height=h*ppi, res=ppi)
-#
-## Create the plot with the normalized time vs nblocks
-p = ggplot(df, aes(x=cbs, y=rbs, fill=log.median.misses)) +
-	geom_raster() +
-  scale_fill_gradient(high="black", low="white") +
-  coord_fixed() +
-	theme_bw() +
-	theme(plot.subtitle=element_text(size=8)) +
-	labs(x="cbs", y="rbs",
-    title=sprintf("Heat granularity: cache misses"), 
-    subtitle=input_file)
+heatmap_plot(df, "median.misses", "cache misses")
+heatmap_plot(df, "log.median.misses", "cache misses")
+heatmap_plot(df, "median.instr", "instructions")
+heatmap_plot(df, "log.median.instr", "instructions")
+heatmap_plot(df, "median.cycles", "cycles")
+heatmap_plot(df, "median.ipc", "IPC")
+heatmap_plot(df, "median.cpi", "cycles/instruction")
+heatmap_plot(df, "median.ips", "instructions/second")
+heatmap_plot(df, "median.cps", "cycles/second")
 
-# Render the plot
-print(p)
+cutlevel = 0.5
+# To plot the median.time we crop the larger values:
+df_filtered = filter(df, between(median.time,
+  median(time) - (cutlevel * sd(time)),
+  median(time) + (cutlevel * sd(time))))
 
-# Save the png image
-dev.off()
+heatmap_plot(df_filtered, "median.time", "execution time (seconds)")
+heatmap_plot(df_filtered, "log.median.time", "execution time")
