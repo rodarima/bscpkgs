@@ -26,6 +26,25 @@ def process_run(tree, runPath):
 
 	tree['perf'] = perf_data
 
+	with open("stdout.log", "r") as f:
+		lines = [line.strip() for line in f.readlines()]
+
+	time_line = None
+	for line in lines:
+
+		if re.match(r'^ ?time .*', line):
+			time_line = line
+			break
+
+	if time_line is None:
+		eprint("missing time line, aborting")
+		eprint("stdout file = {}/stdout.log".format(runPath))
+		exit(1)
+
+	time_str = time_line.split()[1]
+
+	tree['time'] = float(time_str)
+
 	print(json.dumps(tree))
 
 def process_result_tree(resultTree):
