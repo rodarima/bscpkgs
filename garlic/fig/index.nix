@@ -70,5 +70,6 @@ in
     "osu/latencyMt"   = osu.latencyMt;
     "osu/bw"          = osu.bw;
     "osu/bwShm"       = osu.bwShm;
+    "heat/cache"      = heat.cache;
   };
 }
