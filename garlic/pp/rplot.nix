@@ -15,7 +15,7 @@ with stdenv.lib;
 
 let
   customR = rWrapper.override {
-    packages = with rPackages; [ tidyverse ] ++ extraRPackages;
+    packages = with rPackages; [ tidyverse viridis ] ++ extraRPackages;
   };
 
 in stdenv.mkDerivation {
