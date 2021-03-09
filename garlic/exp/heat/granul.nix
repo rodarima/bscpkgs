@@ -5,6 +5,7 @@
 , targetMachine
 , stages
 , garlicTools
+, enablePerf ? false
 }:
 
 with stdenv.lib;
@@ -54,6 +55,12 @@ let
     inherit varConf genConf;
   };
 
+  perf = {nextStage, conf, ...}: stages.perf {
+    inherit nextStage;
+    perfOptions = "stat -o .garlic/perf.csv -x , " +
+      "-e cycles,instructions,cache-references,cache-misses";
+  };
+
   exec = {nextStage, conf, ...}: stages.exec {
     inherit nextStage;
     argv = [
@@ -74,7 +81,9 @@ let
     inherit (conf) gitBranch;
   };
 
-  pipeline = stdexp.stdPipeline ++ [ exec program ];
+  pipeline = stdexp.stdPipeline ++
+    (optional enablePerf perf) ++
+    [ exec program ];
 
 in
  
