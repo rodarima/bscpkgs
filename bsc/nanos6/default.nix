@@ -31,6 +31,8 @@ stdenv.mkDerivation rec {
     sha256 = "17z6gr122cw0l4lsp0qdrdbcl1zcls4i0haxqpj3g60fvjx3fznp";
   };
 
+  patches = [ ./clock-monotonic.patch ];
+
   prePatch = ''
     patchShebangs scripts/generate_config.sh
   '';
