@@ -82,7 +82,9 @@ let
       dontStrip = true;
       enableDebugging = true;
     });
-    nanos6Jemalloc = bsc.nanos6.override { enableJemalloc = true; };
+    nanos6GlibcxxDebug = bsc.nanos6Debug.override {
+      enableGlibcxxDebug = true;
+    };
 
     jemalloc = self.jemalloc.overrideAttrs (old:
     {

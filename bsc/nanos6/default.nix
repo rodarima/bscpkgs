@@ -14,6 +14,7 @@
 , enableJemalloc ? true
 , jemalloc ? null
 , cachelineBytes ? 64
+, enableGlibcxxDebug ? false
 }:
 
 assert enableJemalloc -> (jemalloc != null);
@@ -44,7 +45,8 @@ stdenv.mkDerivation rec {
   '';
 
   configureFlags = [] ++
-    optional enableJemalloc "--with-jemalloc=${jemalloc}";
+    optional enableJemalloc "--with-jemalloc=${jemalloc}" ++
+    optional enableGlibcxxDebug "CXXFLAGS=-D_GLIBCXX_DEBUG";
 
   # The "bindnow" flags are incompatible with ifunc resolution mechanism. We
   # disable all by default, which includes bindnow.
