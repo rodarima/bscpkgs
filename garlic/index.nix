@@ -10,11 +10,11 @@
     commonPackages = with self; [
       coreutils htop procps-ng vim which strace
       tmux gdb kakoune universal-ctags bashInteractive
-      glibcLocales ncurses git screen curl
+      glibcLocales ncurses git screen curl boost
       # Add more nixpkgs packages here...
     ];
     bscPackages = with bsc; [
-      slurm clangOmpss2 icc mcxx perf tampi impi
+      slurm clangOmpss2 icc mcxx perf tampi impi vtk
       # Add more bsc packages here...
     ];
     packages = commonPackages ++ bscPackages;
