@@ -79,7 +79,7 @@ let
     inherit nextStage;
     env = optionalString (conf.enableCTF) ''
       export NANOS6_CONFIG_OVERRIDE="version.instrument=ctf,\
-        instrument.ctf.conversor.enabled=false"
+        instrument.ctf.converter.enabled=false"
     '';
   };
 
