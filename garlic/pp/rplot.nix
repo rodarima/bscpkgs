@@ -2,6 +2,7 @@
   stdenv
 , rWrapper
 , rPackages
+, fontconfig
 }:
 
 {
@@ -26,6 +27,7 @@ in stdenv.mkDerivation {
   phases = [ "installPhase" ];
 
   installPhase = ''
+    export FONTCONFIG_PATH=${fontconfig.out}/etc/fonts
     mkdir -p $out
     cd $out
     ln -s ${dataset} input
