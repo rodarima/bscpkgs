@@ -17,4 +17,6 @@
   };
 
   perf.stat = callPackage ./perf/stat.nix {};
+
+  ctf.mode = callPackage ./ctf/mode.nix {};
 }
