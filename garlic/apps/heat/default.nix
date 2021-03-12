@@ -14,6 +14,8 @@ stdenv.mkDerivation rec {
     ref = gitBranch;
   };
 
+  patches = [ ./print-times.patch ];
+
   buildInputs = [
     mpi
     mcxx

@@ -1,0 +1,13 @@
+diff --git a/src/mpi/main.c b/src/mpi/main.c
+index 44f4a99..08a1f5c 100644
+--- a/src/mpi/main.c
++++ b/src/mpi/main.c
+@@ -83,6 +83,8 @@ int main(int argc, char **argv)
+ 				conf.rows, conf.cols, conf.rows/nranks, totalElements, totalElements/nranks,
+ 				conf.rbs, conf.cbs, nranks, threads, conf.timesteps, end-start, throughput);
+ 		printf("time %e\n", end - start);
++		printf("start_time %.9f\n", start);
++		printf("end_time %.9f\n", end);
+ 	}
+ 
+ 	if (conf.generateImage) {
