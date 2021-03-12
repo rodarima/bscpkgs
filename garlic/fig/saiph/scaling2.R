@@ -125,7 +125,7 @@ p = ggplot(D, aes(x=nblPerProc, y=time)) +
 	theme(plot.subtitle=element_text(size=8)) +
 	theme(legend.position = c(0.5, 0.5)) +
 
-	geom_point(aes(color=nblz), shape=21, size=3) +
+	geom_point(aes(color=nbly), shape=21, size=3) +
 	#scale_x_continuous(trans=log2_trans()) +
 	scale_y_continuous(trans=log2_trans()) +
 	facet_wrap( ~ nodes)
@@ -192,7 +192,7 @@ png("test1.png", width=w*ppi, height=h*ppi, res=ppi)
 p = ggplot(D, aes(x=nblPerProc, y=tn)) +
 
 	labs(x="nblPerProc", y="Time (s) * nodes",
-              title=sprintf("Saiph-Heat3D granularity per nblz blocks"), 
+              title=sprintf("Saiph-Heat3D granularity per nbly blocks"), 
               subtitle=input_file) +
 	theme_bw() +
 	theme(plot.subtitle=element_text(size=8)) +
@@ -201,7 +201,7 @@ p = ggplot(D, aes(x=nblPerProc, y=tn)) +
   geom_line(aes(color=nodes, group=nodes)) +
 	#scale_x_continuous(trans=log2_trans()) +
 	scale_y_continuous(trans=log2_trans()) +
-	facet_wrap( ~ nblz)
+	facet_wrap( ~ nbly)
 
 # Render the plot
 print(p)

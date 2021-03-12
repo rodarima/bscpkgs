@@ -11,35 +11,13 @@ with stdenv.lib;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    #nbl = [ 1 2 4 8 16 32 64 ];
-    nodes = [ 1 2 4 8 ];
-
-    input = [
-      { nbly=12 ; nblz=1; nbltotal=12 ; }
-      { nbly=24 ; nblz=1; nbltotal=24 ; }
-      { nbly=48 ; nblz=1; nbltotal=48 ; }
-      { nbly=96 ; nblz=1; nbltotal=96 ; }
-
-      { nbly=6 ;  nblz=2; nbltotal=12 ; }
-      { nbly=12 ; nblz=2; nbltotal=24 ; }
-      { nbly=24 ; nblz=2; nbltotal=48 ; }
-      { nbly=48 ; nblz=2; nbltotal=96 ; }
-      { nbly=96 ; nblz=2; nbltotal=192 ; }
-
-      { nbly=3  ; nblz=4; nbltotal=12 ; }
-      { nbly=6  ; nblz=4; nbltotal=24 ; }
-      { nbly=12 ; nblz=4; nbltotal=48 ; }
-      { nbly=24 ; nblz=4; nbltotal=96 ; }
-      { nbly=48 ; nblz=4; nbltotal=192 ; }
-      { nbly=96 ; nblz=4; nbltotal=384 ; }
-    ];
-
   };
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
     expName = "saiph";
-    unitName = "${expName}-N${toString nodes}" + "-nblx${toString nblx}-nbly${toString nbly}" + "-par-init-One-dimensionalDistribution";
+    unitName = "${expName}-debug";
+
 #    unitName = if (gitCommit == "3b52a616d44f4b86880663e2d951ad89c1dcab4f") 
 #      then "${expName}-N${toString nodes}" + "-nblx${toString nblx}-nbly${toString nbly}" + "-par-init"
 #      else  "${expName}-N${toString nodes}" + "-nblx${toString nblx}-nbly${toString nbly}" + "-seq-init";
@@ -50,33 +28,36 @@ let
     manualDist = 1;
     nbgx = 1;
     nbgy = 1;
-    nbgz = nodes*2;
+    nbgz = 8;
     nblx = 1;
-    #nbly = c.nbl;
-    #nblz = c.nbl;
+    nbly = 4;
+    nblz = 96;
+    nbltotal = 384;
     mpi = impi;
     gitBranch = "garlic/tampi+isend+oss+task+simd";
-    #gitCommit = c.gitCommit; # if exp involves more than 1 commit
     gitCommit = "3fa116620f1c7fbd1127d785c8bdc5d2372837b3";
+    #gitCommit = c.gitCommit; # if exp involves more than 1 commit
     #inherit (c) gitCommit;   # if exp fixes the commit
-    inherit (c.input) nbly nblz nbltotal ;
 
     # Repeat the execution of each unit 50 times
-    loops = 10;
+    loops = 1;
 
     # Resources
-    qos = "bsc_cs";
+    qos = "debug";
     ntasksPerNode = hw.socketsPerNode;
-    nodes = c.nodes;
+    nodes = 4;
     cpusPerTask = hw.cpusPerSocket;
     jobName = "${unitName}";
+
+    # Compile flags
+    debugFlags = 1;
+    asanFlags = 0;
   };
 
   # Compute the array of configurations
-  configsAll = stdexp.buildConfigs {
+  configs = stdexp.buildConfigs {
     inherit varConf genConf;
   };
-  configs = filter (el: if (el.nbly == 24 && el.nblz == 4) && el.nodes == 4 then false else true) configsAll;
 
   exec = {nextStage, conf, ...}: with conf; stages.exec {
     inherit nextStage;
@@ -84,6 +65,13 @@ let
       export OMP_NUM_THREADS=${toString hw.cpusPerSocket}
       export ASAN_SYMBOLIZER_PATH=${bsc.clangOmpss2Unwrapped}/bin/llvm-symbolizer
     '';
+    pre = ''
+      ulimit -c unlimited
+    '';
+  };
+
+  valgrind = {nextStage, ...}: stages.valgrind {
+    inherit nextStage;
   };
 
   program = {nextStage, conf, ...}:
@@ -91,14 +79,11 @@ let
     customPkgs = stdexp.replaceMpi conf.mpi;
   in
     customPkgs.apps.saiph.override {
-      inherit (conf) manualDist nbgx nbgy nbgz nblx nbly nblz nbltotal mpi gitBranch gitCommit;
+      inherit (conf) manualDist nbgx nbgy nbgz nblx nbly nblz nbltotal mpi gitBranch gitCommit debugFlags asanFlags;
     };
 
-  pipeline = stdexp.stdPipeline ++ [ exec program ];
+  pipeline = stdexp.stdPipeline ++ [ exec valgrind program ];
 
 in
  
-	stdexp.genExperiment { inherit configs pipeline; }
-
-
-# last plot hash: f5xb7jv1c4mbrcy6d9s9j10msfz3kkj0-plot
+  stdexp.genExperiment { inherit configs pipeline; }

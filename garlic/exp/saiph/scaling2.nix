@@ -15,23 +15,23 @@ let
     nodes = [ 1 2 4 8 ];
 
     input = [
-      { nbly=12 ; nblz=1; nbltotal=12 ; }
-      { nbly=24 ; nblz=1; nbltotal=24 ; }
-      { nbly=48 ; nblz=1; nbltotal=48 ; }
-      { nbly=96 ; nblz=1; nbltotal=96 ; }
+      { nblz=12 ; nbly=1; nbltotal=12 ; }
+      { nblz=24 ; nbly=1; nbltotal=24 ; }
+      { nblz=48 ; nbly=1; nbltotal=48 ; }
+      { nblz=96 ; nbly=1; nbltotal=96 ; }
 
-      { nbly=6 ;  nblz=2; nbltotal=12 ; }
-      { nbly=12 ; nblz=2; nbltotal=24 ; }
-      { nbly=24 ; nblz=2; nbltotal=48 ; }
-      { nbly=48 ; nblz=2; nbltotal=96 ; }
-      { nbly=96 ; nblz=2; nbltotal=192 ; }
+      { nblz=6 ;  nbly=2; nbltotal=12 ; }
+      { nblz=12 ; nbly=2; nbltotal=24 ; }
+      { nblz=24 ; nbly=2; nbltotal=48 ; }
+      { nblz=48 ; nbly=2; nbltotal=96 ; }
+      { nblz=96 ; nbly=2; nbltotal=192 ; }
 
-      { nbly=3  ; nblz=4; nbltotal=12 ; }
-      { nbly=6  ; nblz=4; nbltotal=24 ; }
-      { nbly=12 ; nblz=4; nbltotal=48 ; }
-      { nbly=24 ; nblz=4; nbltotal=96 ; }
-      { nbly=48 ; nblz=4; nbltotal=192 ; }
-      { nbly=96 ; nblz=4; nbltotal=384 ; }
+      { nblz=3  ; nbly=4; nbltotal=12 ; }
+      { nblz=6  ; nbly=4; nbltotal=24 ; }
+      { nblz=12 ; nbly=4; nbltotal=48 ; }
+      { nblz=24 ; nbly=4; nbltotal=96 ; }
+      { nblz=48 ; nbly=4; nbltotal=192 ; }
+      { nblz=96 ; nbly=4; nbltotal=384 ; }
     ];
 
   };
@@ -73,10 +73,10 @@ let
   };
 
   # Compute the array of configurations
-  configsAll = stdexp.buildConfigs {
+  configs = stdexp.buildConfigs {
     inherit varConf genConf;
   };
-  configs = filter (el: if (el.nbly == 24 && el.nblz == 4) && el.nodes == 4 then false else true) configsAll;
+  #configs = filter (el: if (el.nbly == 24 && el.nblz == 4) && el.nodes == 4 then false else true) configsAll;
 
   exec = {nextStage, conf, ...}: with conf; stages.exec {
     inherit nextStage;
