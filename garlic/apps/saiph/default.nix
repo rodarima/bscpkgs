@@ -18,6 +18,8 @@
 , nblz ? null
 , nsteps ? null
 , vectFlags ? null
+, debugFlags ? null
+, asanFlags ? null
 , cachelineBytes ? 64
 }:
 
@@ -74,7 +76,9 @@ stdenv.mkDerivation rec {
     ++ optional (nblz != null) "NBL_Z=${toString nblz}"
     ++ optional (nsteps != null) "NSTEPS=${toString nsteps}"
     ++ optional (numComm != null) "NUM_COMM=${toString numComm}"
-    ++ optional (vectFlags != null) "VECT_FLAGS=${toString vectFlags}"
+    ++ optional (vectFlags != null) "VECT_CHECKS=${toString vectFlags}"
+    ++ optional (debugFlags != null) "DEBUG_CHECKS=${toString debugFlags}"
+    ++ optional (asanFlags != null) "SANITIZE_CHECKS=${toString asanFlags}"
     ;
     
   installPhase = ''
