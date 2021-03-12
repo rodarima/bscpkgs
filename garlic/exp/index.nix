@@ -103,4 +103,8 @@
     impi = callPackage ./osu/impi.nix { };
     bwShm = bw.override { interNode = false; };
   };
+
+  examples = {
+    granularity = callPackage ./examples/granularity.nix { };
+  };
 }

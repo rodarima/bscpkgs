@@ -74,4 +74,8 @@ in
     "osu/bwShm"       = osu.bwShm;
     "heat/cache"      = heat.cache;
   };
+
+  examples = with exp.examples; {
+    granularity = stdPlot ./examples/granularity.R [ granularity ];
+  };
 }
