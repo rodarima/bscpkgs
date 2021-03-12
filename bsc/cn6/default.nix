@@ -27,7 +27,7 @@ stdenv.mkDerivation rec {
 
   installPhase = ''
     mkdir -p $out/bin
-    cp cn6 $out/bin
+    cp cn6 dur $out/bin
 
     mkdir -p $out/lib/nanos6
     cp prv.so $out/lib/nanos6/
