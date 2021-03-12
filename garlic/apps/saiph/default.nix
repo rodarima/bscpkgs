@@ -16,6 +16,7 @@
 , nblx ? null
 , nbly ? null
 , nblz ? null
+, nbltotal ? null
 , nsteps ? null
 , vectFlags ? null
 , debugFlags ? null
