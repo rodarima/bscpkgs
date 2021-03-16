@@ -20,7 +20,6 @@ let
       { nodes=16 ; nprocz=32 ; granul= 5;  time= "02:00:00"; }
       { nodes=16 ; nprocz=32 ; granul= 4;  time= "02:00:00"; }
       { nodes=16 ; nprocz=32 ; granul= 2;  time= "02:00:00"; }
-      { nodes=16 ; nprocz=32 ; granul= 1;  time= "02:00:00"; }
     ];
 
     gitBranch = [
