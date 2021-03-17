@@ -66,7 +66,7 @@
   heat = rec {
     granul = callPackage ./heat/granul.nix { };
     cache = granul.override { enablePerf = true; };
-    ctf = cache.override { enableCTF = true; };
+    ctf = granul.override { enableCTF = true; };
   };
 
   bigsort = rec {
