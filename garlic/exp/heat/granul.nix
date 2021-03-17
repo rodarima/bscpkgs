@@ -15,12 +15,12 @@ with garlicTools;
 let
   # Initial variable configuration
   varConf = with bsc; {
-    #cbs = range2 32 4096;
-    #rbs = range2 32 4096;
-    cbs = [ 64 256 1024 4096 ];
-    rbs = [ 32 128 512 1024 ];
+    cbs = range2 32 4096;
+    rbs = range2 32 4096;
+    #cbs = [ 64 256 1024 4096 ];
+    #rbs = [ 32 128 512 1024 ];
     #cbs = [ 4096 ];
-    #rbs = [ 32 ];
+    #rbs = [ 512 ];
   };
 
   machineConfig = targetMachine.config;
@@ -94,23 +94,23 @@ let
 
           ${bsc.cn6}/bin/cn6 -s $tracedir
 
-          awk -F: "NR==1 {print} \$6 >= $begin && \$6 <= $end" $tracedir/prv/trace.prv |\
-            ${bsc.cn6}/bin/dur 6400025 0 |\
+          ${bsc.cn6}/bin/cut $begin $end \
+            < $tracedir/prv/trace.prv \
+            > $tracedir/prv/trace-cut.prv
+
+          ${bsc.cn6}/bin/dur 6400025 0 < $tracedir/prv/trace-cut.prv |\
             awk '{s+=$1} END {print s}' >> .garlic/time_mode_dead.csv &
 
-          awk -F: "NR==1 {print} \$6 >= $begin && \$6 <= $end" $tracedir/prv/trace.prv |\
-            ${bsc.cn6}/bin/dur 6400025 1 |\
+          ${bsc.cn6}/bin/dur 6400025 1 < $tracedir/prv/trace-cut.prv |\
             awk '{s+=$1} END {print s}' >> .garlic/time_mode_runtime.csv &
 
-          awk -F: "NR==1 {print} \$6 >= $begin && \$6 <= $end" $tracedir/prv/trace.prv |\
-            ${bsc.cn6}/bin/dur 6400025 3 |\
+          ${bsc.cn6}/bin/dur 6400025 3 < $tracedir/prv/trace-cut.prv |\
             awk '{s+=$1} END {print s}' >> .garlic/time_mode_task.csv &
 
           wait
 
           # Remove the traces at the end, as they are huge
           rm -rf $tracedir
-          #cp -a $tracedir .garlic/
         done
       fi
     '';
