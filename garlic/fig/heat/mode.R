@@ -3,6 +3,7 @@ library(dplyr)
 library(scales)
 library(jsonlite)
 library(viridis)
+library(tidyr)
 
 args=commandArgs(trailingOnly=TRUE)
 
@@ -19,6 +20,7 @@ df = select(dataset, config.cbs, config.rbs,
     ctf_mode.runtime,
     ctf_mode.task,
     ctf_mode.dead,
+    config.cpusPerTask,
     time) %>%
 	rename(
     cbs=config.cbs,
@@ -26,6 +28,7 @@ df = select(dataset, config.cbs, config.rbs,
     runtime=ctf_mode.runtime,
     task=ctf_mode.task,
     dead=ctf_mode.dead,
+    cpusPerTask=config.cpusPerTask,
   )
 
 df$cbs = as.factor(df$cbs)
@@ -33,16 +36,16 @@ df$rbs = as.factor(df$rbs)
 
 # Normalize the time by the median
 df = df %>%
-	mutate(runtime = runtime * 1e-9) %>%
-	mutate(dead = dead * 1e-9) %>%
-	mutate(task = task * 1e-9) %>%
+	mutate(runtime = runtime * 1e-9 / cpusPerTask) %>%
+	mutate(dead = dead * 1e-9 / cpusPerTask) %>%
+	mutate(task = task * 1e-9 / cpusPerTask) %>%
   group_by(cbs, rbs) %>%
 	mutate(median.time = median(time)) %>%
 	mutate(log.median.time = log(median.time)) %>%
 	mutate(median.dead = median(dead)) %>%
 	mutate(median.runtime = median(runtime)) %>%
 	mutate(median.task = median(task)) %>%
-  ungroup()# %>%
+  ungroup() #%>%
 
 print(df)
 
@@ -79,3 +82,40 @@ df_filtered = filter(df, between(median.time,
 
 heatmap_plot(df, "median.time", "execution time (seconds)")
 heatmap_plot(df, "log.median.time", "execution time")
+
+df_square = filter(df, cbs == rbs) %>%
+  gather(key = time.from, value = acc.time, 
+    c("median.dead", "median.runtime", "median.task"))
+
+# Colors similar to Paraver
+colors <- c("median.dead" = "gray",
+  "median.runtime" = "blue",
+  "median.task" = "red")
+
+p = ggplot(df_square, aes(x=cbs, y=acc.time)) +
+  geom_area(aes(fill=time.from, group=time.from)) +
+  scale_fill_manual(values = colors) +
+  geom_point(aes(y=median.time, color="black")) +
+  geom_line(aes(y=median.time, group=0, color="black")) +
+  theme_bw() +
+  theme(legend.position=c(0.5, 0.7)) +
+  scale_color_identity(breaks = c("black"),
+    labels = c("Total time"), guide = "legend") +
+  labs(x="Blocksize (side)", y="Time (s)",
+    fill="Estimated", color="Direct measurement",
+    title="Heat granularity: time distribution", subtitle=input_file)
+
+ggsave("area.time.png", plot=p, width=6, height=6, dpi=300)
+ggsave("area.time.pdf", plot=p, width=6, height=6, dpi=300)
+
+p = ggplot(df_square, aes(x=cbs, y=acc.time)) +
+  geom_col(aes(fill=time.from, group=time.from)) +
+  scale_fill_manual(values = colors) +
+  theme_bw() +
+  theme(legend.position=c(0.5, 0.7)) +
+  labs(x="Blocksize (side)", y="Time (s)",
+    fill="Estimated", color="Direct measurement",
+    title="Heat granularity: time distribution", subtitle=input_file)
+
+ggsave("col.time.png", plot=p, width=6, height=6, dpi=300)
+ggsave("col.time.pdf", plot=p, width=6, height=6, dpi=300)
