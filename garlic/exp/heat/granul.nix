@@ -94,8 +94,8 @@ let
 
           ${bsc.cn6}/bin/cn6 -s $tracedir
 
-          ${bsc.cn6}/bin/cut $begin $end \
-            < $tracedir/prv/trace.prv \
+          ${bsc.cn6}/bin/cut $begin $end < $tracedir/prv/trace.prv |\
+            ${bsc.cn6}/bin/hcut 1 ${toString conf.cpusPerTask} \
             > $tracedir/prv/trace-cut.prv
 
           ${bsc.cn6}/bin/dur 6400025 0 < $tracedir/prv/trace-cut.prv |\
