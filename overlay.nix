@@ -197,6 +197,7 @@ let
 
     dummy = callPackage ./bsc/dummy/default.nix { };
     mpptest = callPackage ./bsc/mpptest/default.nix { };
+    cpuid = callPackage ./bsc/cpuid/default.nix { };
 
     # =================================================================
     #  Garlic benchmark
