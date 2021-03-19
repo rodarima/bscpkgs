@@ -120,5 +120,18 @@ ABSTRACT
   we build within Nix, they will be copied with the current data and 
   consequently not updated during the Nix compilation process.
 
+1.9 Sbatch silently fails on parsing
+
+  When submitting a job with a wrong specification in MN4 with SLURM 
+  17.11.9-2, for example this bogus line:
+    
+    #SBATCH --nodes=1 2
+
+  It silently fails to parse the options, falling back to the defaults, 
+  without any error.
+
+  We have improved our checking to detect bogus options passed to SLURM, 
+  so we prevent this problem from happening.
+
 /* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
 

@@ -22,13 +22,30 @@
 , time ? null
 , output ? "stdout.log"
 , error ? "stderr.log"
-, contiguous ? null
 , extra ? null
 , acctgFreq ? null
 }:
 
 with stdenv.lib;
 with garlicTools;
+
+# sbatch fails silently if we pass garbage, so we assert the types here to avoid
+# sending `nodes = [ 1 2 ]` by mistake.
+assert (jobName != null) -> isString jobName;
+assert (chdir != null) -> isString chdir;
+assert (nixPrefix != null) -> isString nixPrefix;
+assert (ntasks != null) -> isInt ntasks;
+assert (ntasksPerNode != null) -> isInt ntasksPerNode;
+assert (ntasksPerSocket != null) -> isInt ntasksPerSocket;
+assert (cpusPerTask != null) -> isInt cpusPerTask;
+assert (nodes != null) -> isInt nodes;
+assert (exclusive != null) -> isBool exclusive;
+assert (qos != null) -> isString qos;
+assert (reservation != null) -> isString reservation;
+assert (time != null) -> isString time;
+assert (output != null) -> isString output;
+assert (error != null) -> isString error;
+assert (extra != null) -> isString extra;
 
 let
 
