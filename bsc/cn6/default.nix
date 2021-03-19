@@ -20,16 +20,5 @@ stdenv.mkDerivation rec {
     ref = "master";
   };
 
-  # Fix the search path
-  configurePhase = ''
-    sed -i "s@^PRV_LIB_PATH=.*@PRV_LIB_PATH=$out/lib/nanos6@" Makefile
-  '';
-
-  installPhase = ''
-    mkdir -p $out/bin
-    cp cn6 dur $out/bin
-
-    mkdir -p $out/lib/nanos6
-    cp prv.so $out/lib/nanos6/
-  '';
+  makeFlags = [ "PREFIX=$(out)" ];
 }
