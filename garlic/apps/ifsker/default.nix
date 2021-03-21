@@ -5,6 +5,7 @@
 , tampi
 , nanos6
 , mcxx
+, gitBranch ? "garlic/mpi+isend+seq"
 }:
 
 with stdenv.lib;
@@ -13,8 +14,8 @@ stdenv.mkDerivation rec {
   name = "ifsker";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/ksala/ifsker.git";
-    ref = "master";
+    url = "ssh://git@bscpm03.bsc.es/garlic/apps/ifsker.git";
+    ref = gitBranch;
   };
 
   buildInputs = [ tampi mpi nanos6 mcxx gfortran ];
@@ -41,10 +42,13 @@ stdenv.mkDerivation rec {
 
   installPhase = ''
     mkdir -p $out/bin
-    cp *.bin $out/bin/
+    cp ${name} $out/bin/
+
+    mkdir -p $out/etc
+    cp -r data $out/etc/
+    cp nanos6.toml $out/etc
   '';
 
-  # TODO: Split the app into variants
-  programPath = "/bin/03.ifsker.mpi.ompss2.tasks.bin";
+  programPath = "/bin/${name}";
 
 }
