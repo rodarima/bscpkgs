@@ -12,8 +12,8 @@ let
   # Initial variable configuration
   varConf = {
     input = [
+      { nodes=4 ; nprocz=8 ; granul=128; time= "02:00:00"; }
       { nodes=4 ; nprocz=8 ; granul=64;  time= "02:00:00"; }
-      { nodes=4 ; nprocz=8 ; granul=37;  time= "02:00:00"; }
       { nodes=4 ; nprocz=8 ; granul=32;  time= "02:00:00"; }
       { nodes=4 ; nprocz=8 ; granul=16;  time= "02:00:00"; }
       { nodes=4 ; nprocz=8 ; granul= 9;  time= "02:00:00"; }
