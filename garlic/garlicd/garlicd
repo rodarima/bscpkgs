@@ -47,7 +47,7 @@ done
 
 while true; do
   msg "Waiting for experiments ..."
-  read -r tre < "$run"
+  tre=$(head -1 "$run")
 
   msg "Attempting to run: $tre"
   msg "Copying files to MN4..."
@@ -65,7 +65,7 @@ while true; do
 
   msg "Waiting for nix to finish the build..."
 
-  read -r tre2 < "$wipe"
+  tre2=$(head -1 "$wipe")
   if [ "$tre" != "$tre2" ]; then
     msg "error: trebuchet mismatch"
     exit 1
