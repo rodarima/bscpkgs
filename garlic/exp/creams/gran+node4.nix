@@ -12,7 +12,6 @@ let
   # Initial variable configuration
   varConf = {
     input = [
-      { nodes=4 ; nprocz=8 ; granul=128; time= "02:00:00"; }
       { nodes=4 ; nprocz=8 ; granul=64;  time= "02:00:00"; }
       { nodes=4 ; nprocz=8 ; granul=32;  time= "02:00:00"; }
       { nodes=4 ; nprocz=8 ; granul=16;  time= "02:00:00"; }
@@ -20,10 +19,10 @@ let
       { nodes=4 ; nprocz=8 ; granul= 5;  time= "02:00:00"; }
       { nodes=4 ; nprocz=4 ; granul= 4;  time= "02:00:00"; }
       { nodes=4 ; nprocz=8 ; granul= 2;  time= "02:00:00"; }
+      { nodes=4 ; nprocz=8 ; granul= 1;  time= "02:00:00"; }
     ];
 
     gitBranch = [
-      "garlic/mpi+send+omp+fork"
       "garlic/mpi+send+omp+task"
       "garlic/mpi+send+oss+task"
       "garlic/mpi+isend+omp+task"
