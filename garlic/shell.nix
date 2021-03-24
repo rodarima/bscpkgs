@@ -10,7 +10,7 @@ mkShell {
     # Packages from garlic
     (with garlic; [ tool garlicd ]) ++
     # Packages from bsc
-    [ groff paraver icc nix openssh git cn6 nix-diff ];
+    [ groff paraver icc nix openssh git cn6 nix-diff clangOmpss2 gdb ];
 
   # inputsFrom to get build dependencies
 
