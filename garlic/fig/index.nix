@@ -53,7 +53,11 @@ in
 
   creams = with exp.creams; {
     ss = stdPlot ./creams/ss.R [ ss.hybrid ss.pure ];
-    gran = stdPlot ./creams/gran.R [ gran.node1 gran.node2 gran.node4 gran.node8 gran.node16 ];
+    gran1 = stdPlot ./creams/gran.R [ gran.node1 ];
+    gran2 = stdPlot ./creams/gran.R [ gran.node2 ];
+    gran4 = stdPlot ./creams/gran.R [ gran.node4 ];
+    gran8 = stdPlot ./creams/gran.R [ gran.node8 ];
+    gran16 = stdPlot ./creams/gran.R [ gran.node16 ];
   };
 
   osu = with exp.osu; {
