@@ -9,6 +9,8 @@
 {
   nbody = rec {
     baseline = callPackage ./nbody/nblocks.nix { };
+    granularity = callPackage ./nbody/granularity-mpi.nix { };
+    scaling = callPackage ./nbody/scaling.nix { };
 
     # Experiment variants
     small = baseline.override {
@@ -24,10 +26,6 @@
         steps = 1;
       };
 
-    };
-
-    scaling = callPackage ./nbody/scaling.nix {
-      particles = 12 * 4096;
     };
   };
 

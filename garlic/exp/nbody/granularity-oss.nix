@@ -4,36 +4,38 @@
 , bsc
 , targetMachine
 , stages
+, garlicTools
 }:
 
 with stdenv.lib;
+with garlicTools;
 
 let
+
   # Initial variable configuration
-  varConf = with bsc; {
+  varConf = {
     blocksize = [ 128 256 512 1024 2048 4096 ];
   };
 
   # Generate the complete configuration for each unit
-  genConf = with bsc; c: targetMachine.config // rec {
-    # nbody options
-    particles = 1024 * 64;
+  genConf = c: targetMachine.config // rec {
+    hw = targetMachine.config.hw;
+    particles = 4096 * hw.cpusPerSocket;
     timesteps = 10;
-    inherit (c) blocksize;
-    cc = icc;
-    mpi = impi;
+    blocksize = c.blocksize;
+    
     gitBranch = "garlic/oss+task";
+    expName = "nbody-granularity";
+    unitName = expName + "-bs${toString blocksize}";
 
-    # Repeat the execution of each unit 30 times
     loops = 30;
 
-    # Resources
     qos = "debug";
     ntasksPerNode = 1;
     nodes = 1;
     time = "02:00:00";
-    cpuBind = "sockets,verbose";
-    jobName = "nbody-bs-${toString blocksize}-${gitBranch}";
+    cpusPerTask = hw.cpusPerSocket;
+    jobName = unitName;
   };
 
   # Compute the array of configurations
@@ -41,18 +43,14 @@ let
     inherit varConf genConf;
   };
 
-  exec = {nextStage, conf, ...}: with conf; stages.exec {
+  exec = {nextStage, conf, ...}: stages.exec {
     inherit nextStage;
-    argv = [ "-t" timesteps "-p" particles ];
+    argv = [ "-t" conf.timesteps "-p" conf.particles ];
   };
 
-  program = {nextStage, conf, ...}: with conf;
-  let
-    customPkgs = stdexp.replaceMpi conf.mpi;
-  in
-    customPkgs.apps.nbody.override {
-      inherit cc blocksize mpi gitBranch;
-    };
+  program = {nextStage, conf, ...}: with conf; bsc.garlic.apps.nbody.override {
+    inherit (conf) blocksize gitBranch;
+  };
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];
 

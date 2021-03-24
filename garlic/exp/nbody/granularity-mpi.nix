@@ -4,48 +4,42 @@
 , bsc
 , targetMachine
 , stages
+, garlicTools
 }:
 
 with stdenv.lib;
+with garlicTools;
 
 let
   # Initial variable configuration
   varConf = with bsc; {
     blocksize = [ 128 256 512 1024 2048 4096 ];
+    gitBranch = [
+      "garlic/mpi+send+oss+task" 
+      "garlic/tampi+send+oss+task" 
+      "garlic/tampi+isend+oss+task"
+    ];
   };
 
-  machineConfig = targetMachine.config;
-
   # Generate the complete configuration for each unit
-  genConf = with bsc; c: targetMachine.config // rec {
-    expName = "nbody.test";
-    unitName = "${expName}.nb-${toString nblocks}";
-
-    inherit (machineConfig) hw;
-    # nbody options
-    particles = 1024 * 64;
+  genConf = c: targetMachine.config // rec {
+    hw = targetMachine.config.hw;
+    particles = 4096 * hw.cpusPerSocket;
     timesteps = 10;
-    inherit (c) blocksize;
-    totalTasks = ntasksPerNode * nodes;
-    particlesPerTask = particles / totalTasks;
-    cc = icc;
-    mpi = impi;
-    gitBranch = "garlic/mpi+send";
+    blocksize = c.blocksize;
+    gitBranch = c.gitBranch;
 
-    # Repeat the execution of each unit 30 times
-    loops = 10;
+    expName = "nbody-granularity";
+    unitName = expName + "-${toString gitBranch}" + "-bs${toString blocksize}";
 
-    # Resources
-    qos = "debug";
-    ntasksPerNode = 48;
+    loops = 30;
+
+    qos = "bsc_cs";
+    ntasksPerNode = 1;
     nodes = 1;
-    time = "02:00:00";
-    cpuBind = "sockets,verbose";
-    jobName = "bs-${toString blocksize}-${gitBranch}-nbody";
-
-    # Experiment revision: this allows a user to run again a experiment already
-    # executed
-    rev = 0;
+    time = "04:00:00";
+    cpusPerTask = hw.cpusPerSocket;
+    jobName = unitName;
   };
 
   # Compute the array of configurations
@@ -53,18 +47,13 @@ let
     inherit varConf genConf;
   };
 
-  exec = {nextStage, conf, ...}: with conf; stages.exec {
+  exec = {nextStage, conf, ...}: stages.exec {
     inherit nextStage;
-    argv = [ "-t" timesteps "-p" particles ];
+    argv = [ "-t" conf.timesteps "-p" conf.particles ];
   };
 
-  program = {nextStage, conf, ...}: with conf;
-  # FIXME: This is becoming very slow:
-  #let
-  #  customPkgs = stdexp.replaceMpi conf.mpi;
-  #in
-  bsc.garlic.apps.nbody.override {
-    inherit cc blocksize mpi gitBranch;
+  program = {nextStage, conf, ...}: with conf; bsc.garlic.apps.nbody.override {
+    inherit (conf) blocksize gitBranch;
   };
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];

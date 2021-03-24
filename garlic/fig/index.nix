@@ -30,11 +30,12 @@ let
 in
 {
   nbody = with exp.nbody; {
-    baseline  = stdPlot ./nbody/baseline.R [ baseline ];
-    small     = stdPlot ./nbody/baseline.R [ small ];
-    jemalloc  = stdPlot ./nbody/jemalloc.R [ baseline jemalloc ];
-    ctf       = stdPlot ./nbody/baseline.R [ ctf ];
-    scaling   = stdPlot ./nbody/baseline.R [ scaling ];
+    baseline    = stdPlot ./nbody/baseline.R    [ baseline ];
+    small       = stdPlot ./nbody/baseline.R    [ small ];
+    jemalloc    = stdPlot ./nbody/jemalloc.R    [ baseline jemalloc ];
+    ctf         = stdPlot ./nbody/baseline.R    [ ctf ];
+    scaling     = stdPlot ./nbody/baseline.R    [ scaling ];
+    granularity = stdPlot ./nbody/granularity.R [ granularity ];
   };
 
   hpcg = with exp.hpcg; {
