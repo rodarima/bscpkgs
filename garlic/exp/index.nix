@@ -32,15 +32,8 @@
   };
 
   saiph = {
-    numcomm = callPackage ./saiph/numcomm.nix { };
-    granularity = callPackage ./saiph/granularity.nix { };
-    scaling = callPackage ./saiph/scaling.nix { };
-    scaling2 = callPackage ./saiph/scaling2.nix { };
-    debug = callPackage ./saiph/debug.nix { };
-    blockingY = callPackage ./saiph/blocking_Y.nix { };
-    blockingZ = callPackage ./saiph/blocking_Z.nix { };
-    blockingYZ = callPackage ./saiph/blocking_YZ.nix { };
-    blockingZY = callPackage ./saiph/blocking_ZY.nix { };
+    granularity-saiph = callPackage ./saiph/granularity-saiph.nix { };
+    scalability-saiph = callPackage ./saiph/scalability-saiph.nix { };
   };
 
   creams = rec {

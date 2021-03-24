@@ -42,14 +42,8 @@ in
   };
 
   saiph = with exp.saiph; {
-    granularity = stdPlot ./saiph/granularity.R [ granularity ];
-    scaling =  stdPlot ./saiph/scaling.R [ scaling ];
-    scaling2 =  stdPlot ./saiph/scaling2.R [ scaling2 ];
-    scalingnblyz =  stdPlot ./saiph/scalingnblyz.R [ scaling scaling2 ];
-    blockingY = stdPlot ./saiph/granularityY.R [ blockingY ];
-    blockingZ = stdPlot ./saiph/granularityZ.R [ blockingZ ];
-    blockingYZ = stdPlot ./saiph/granularityYZ.R [ blockingYZ ];
-    blockingZY = stdPlot ./saiph/granularityZY.R [ blockingZY ];
+    granularity-saiph = stdPlot ./saiph/granularity-saiph.R [ granularity-saiph ];
+    scalability-saiph = stdPlot ./saiph/scalability-saiph.R [ scalability-saiph ];
   };
 
   heat = with exp.heat; {
