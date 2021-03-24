@@ -8,25 +8,7 @@
 
 {
   nbody = rec {
-    baseline = callPackage ./nbody/nblocks.nix { };
     granularity = callPackage ./nbody/granularity-mpi.nix { };
-    scaling = callPackage ./nbody/scaling.nix { };
-
-    # Experiment variants
-    small = baseline.override {
-      particles = 12 * 4096;
-    };
-
-    # Some experiments with traces
-    trace = {
-      # Only one unit repeated 30 times
-      baseline = small.override {
-        enableCTF = true;
-        loops = 30;
-        steps = 1;
-      };
-
-    };
   };
 
   saiph = {
