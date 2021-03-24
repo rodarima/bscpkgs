@@ -18,20 +18,32 @@ let
 #      "garlic/tampi+send+oss+task"
 #      "garlic/mpi+send+omp+task"
        "garlic/mpi+send+oss+task"
+       "garlic/mpi+send+oss+task+noreuse"
 #      "garlic/mpi+send+seq"
 #      "garlic/oss+task"
 #      "garlic/omp+task"
 #      "garlic/seq"
     ];
 
-    #blocksize = [ 1 2 4 8 16 32 ];
     blocksize = [ 1 2 4 8 ];
+    #blocksize = [ 1 2 ];
 
     n = [
-    	#{nx=500; nz=500; ny=1000; ntpn=1; nn=1;}
-    	{nx=500; nz=500; ny=2000; ntpn=2; nn=1;}
+#   	{nx=50;  ny=4000; nz=50;}
+#   	{nx=20;  ny=4000; nz=20;}
+#    	{nx=300; ny=8000; nz=300;} # half node, /
+#    	{nx=300; ny=1000; nz=300;} # half node, /
+#    	{nx=200; ny=1000; nz=200;} # half node, not enough tasks
+#    	{nx=200; ny=4000; nz=200;} # --/ half node
+#    	{nx=250; ny=2000; nz=250;} # / half node
+    	{nx=300; ny=2000; nz=300;} # / half node
+#    	{nx=100; ny=2000; nz=100;} # \-// half node
+#    	{nx=150; ny=2000; nz=150;} # \-/ half node
+#	{nx=200; ny=64000; nz=200;} # --/ 16 nodes
+#    	{nx=200; ny=4000; nz=200;} # --/ half node
+#    	{nx=200; ny=8000; nz=200;} # --/ 1 node
+#    	{nx=100; ny=8000; nz=100;} # --/ half node
     ];
-
   };
 
 # The c value contains something like:
@@ -57,14 +69,11 @@ let
     #nz = c.n.nz;
 
     # Same but shorter:
-    inherit (c.n) nx ny nz ntpn nn;
+    inherit (c.n) nx ny nz;
 
     fwiInput = bsc.apps.fwi.input.override {
       inherit (c.n) nx ny nz;
     };
-
-    # Other FWI parameters
-    ioFreq = -1;
 
     # Repeat the execution of each unit several times
     loops = 10;
@@ -72,13 +81,11 @@ let
 
     # Resources
     cpusPerTask = hw.cpusPerSocket;
-    ntasksPerNode = ntpn;
-    nodes = nn;
+    ntasksPerNode = 1;
+    nodes = 1;
     qos = "debug";
     time = "02:00:00";
     jobName = unitName;
-
-    tracing = "no";
 
     # Enable permissions to write in the local storage
     extraMounts = [ fs.local.temp ];
@@ -93,10 +100,8 @@ let
   exec = {nextStage, conf, ...}: stages.exec {
     inherit nextStage;
     pre = ''
-      CDIR=$PWD
-      if [[ "${conf.tracing}" == "yes" ]]; then
-          export NANOS6_CONFIG_OVERRIDE="version.instrument=ctf"
-      fi
+      #CDIR=$PWD
+      #export NANOS6_CONFIG_OVERRIDE="version.instrument=ctf"
       EXECDIR="${fs.local.temp}/out/$GARLIC_USER/$GARLIC_UNIT/$GARLIC_RUN"
       mkdir -p $EXECDIR
       cd $EXECDIR
@@ -108,13 +113,11 @@ let
       conf.blocksize
       "-1" # Fordward steps
       "-1" # Backward steps
-      conf.ioFreq # Write/read frequency
+      "-1" # Write/read frequency
     ];
     post = ''
       rm -rf Results || true
-      if [[ "${conf.tracing}" == "yes" ]]; then
-          mv trace_* $CDIR
-      fi
+      #mv trace_* $CDIR
     '';
   };
 
