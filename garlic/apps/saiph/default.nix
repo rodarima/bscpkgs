@@ -8,20 +8,20 @@
 , boost
 , gitBranch ? "master"
 , gitCommit ? null
-, numComm ? null
-, manualDist ? 0
+, enableManualDist ? false
 , nbgx ? null
 , nbgy ? null
 , nbgz ? null
 , nblx ? null
 , nbly ? null
 , nblz ? null
-, nbltotal ? null
 , nsteps ? null
-, vectFlags ? null
-, debugFlags ? null
-, asanFlags ? null
+, numComm ? null
+, enableVectFlags ? false
+, enableDebugFlags ? false
+, enableAsanFlags ? false
 , cachelineBytes ? 64
+, l3sizeKBytes ? 33792
 }:
 
 with stdenv.lib;
@@ -50,7 +50,6 @@ stdenv.mkDerivation rec {
     cc
     vtk
     boost
-#    breakpointHook
   ];
 
   # Required for nanos6
@@ -63,23 +62,27 @@ stdenv.mkDerivation rec {
     make clean
   '';
 
+  #NIX_CFLAGS_COMPILE = "-O1 -g";
+  #NIX_DEBUG = 5;
+
   makeFlags = [
     "-f" "Makefile.${cc.CC}"
     "apps"
     "APP=Heat3D_vect"
     "ROW_ALIGNMENT=${toString cachelineBytes}"
-  ] ++ optional (manualDist != 0) "DIST_SET=${toString manualDist}"
-    ++ optional (manualDist != 0) "NBG_X=${toString nbgx}"
-    ++ optional (manualDist != 0) "NBG_Y=${toString nbgy}"
-    ++ optional (manualDist != 0) "NBG_Z=${toString nbgz}"
+    "L3_SIZE_K=${toString l3sizeKBytes}"
+  ] ++ optional (enableManualDist) "DIST_SET=1"
+    ++ optional (enableManualDist) "NBG_X=${toString nbgx}"
+    ++ optional (enableManualDist) "NBG_Y=${toString nbgy}"
+    ++ optional (enableManualDist) "NBG_Z=${toString nbgz}"
     ++ optional (nblx != null) "NBL_X=${toString nblx}"
     ++ optional (nbly != null) "NBL_Y=${toString nbly}"
     ++ optional (nblz != null) "NBL_Z=${toString nblz}"
     ++ optional (nsteps != null) "NSTEPS=${toString nsteps}"
     ++ optional (numComm != null) "NUM_COMM=${toString numComm}"
-    ++ optional (vectFlags != null) "VECT_CHECKS=${toString vectFlags}"
-    ++ optional (debugFlags != null) "DEBUG_CHECKS=${toString debugFlags}"
-    ++ optional (asanFlags != null) "SANITIZE_CHECKS=${toString asanFlags}"
+    ++ optional (enableVectFlags) "VECT_CHECKS=1"
+    ++ optional (enableDebugFlags) "DEBUG_CHECKS=1"
+    ++ optional (enableAsanFlags) "SANITIZE_CHECKS=1"
     ;
     
   installPhase = ''
