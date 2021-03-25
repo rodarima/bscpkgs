@@ -9,6 +9,7 @@
 {
   nbody = rec {
     granularity = callPackage ./nbody/granularity-mpi.nix { };
+    nodesorsockets = callPackage ./nbody/nodes-or-sockets-mpi.nix { };
   };
 
   saiph = {
