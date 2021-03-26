@@ -65,13 +65,13 @@
       inherit genInput;
     };
 
-    ossScalability = callPackage ./hpcg/oss.scalability.192.nix {
-      inherit genInput;
-    };
-
-    # slices = callPackage ./hpcg/slices.nix {
+    # ossScalability = callPackage ./hpcg/oss.scalability.192.nix {
     #   inherit genInput;
     # };
+
+    ossSlicesWeakscaling = callPackage ./hpcg/oss.slices.weakscaling.nix {
+      inherit genInput;
+    };
   };
 
   heat = rec {
