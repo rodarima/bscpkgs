@@ -72,6 +72,9 @@
     ossSlicesWeakscaling = callPackage ./hpcg/oss.slices.weakscaling.nix {
       inherit genInput;
     };
+    ossSlicesStrongscaling = callPackage ./hpcg/oss.slices.strongscaling.nix {
+      inherit genInput;
+    };
   };
 
   heat = rec {
