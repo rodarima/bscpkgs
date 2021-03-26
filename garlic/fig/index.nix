@@ -32,6 +32,7 @@ in
   nbody = with exp.nbody; {
     granularity = stdPlot ./nbody/granularity.R [ granularity ];
     nodesorsockets = stdPlot ./nbody/nodes-or-sockets.R [ nodesorsockets ];
+    scaling = stdPlot ./nbody/scaling.R [ scaling ];
   };
 
   hpcg = with exp.hpcg; {

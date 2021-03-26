@@ -4,37 +4,44 @@
 , bsc
 , targetMachine
 , stages
+, garlicTools
 }:
 
 with stdenv.lib;
+with garlicTools;
 
 let
   # Initial variable configuration
   varConf = with bsc; {
-    numProcsAndParticles = [ 1 2 4 8 16 32 48 ];
+    blocksize = [ 512 ];
+    nodes = [ 1 2 4 8 16 ];
+    gitBranch = [
+      "garlic/mpi+send+oss+task" 
+      "garlic/tampi+send+oss+task" 
+      "garlic/tampi+isend+oss+task"
+    ];
   };
 
   # Generate the complete configuration for each unit
-  genConf = with bsc; c: targetMachine.config // rec {
-    # nbody options
-    inherit (c) numProcsAndParticles;
-    particles = 1024 * numProcsAndParticles * 2;
+  genConf = c: targetMachine.config // rec {
+    hw = targetMachine.config.hw;
+    particles = 16 * 4096 * hw.cpusPerSocket;
     timesteps = 10;
-    blocksize = 1024;
-    cc = icc;
-    mpi = impi;
-    gitBranch = "garlic/mpi+send";
+    blocksize = c.blocksize;
+    numNodes  = c.nodes;
+    gitBranch = c.gitBranch;
 
-    # Repeat the execution of each unit 30 times
+    expName = "nbody-scaling";
+    unitName = expName + "-${toString gitBranch}" + "-nodes${toString numNodes}";
+
     loops = 30;
 
-    # Resources
+    nodes = numNodes;
     qos = "debug";
-    ntasksPerNode = numProcsAndParticles;
-    nodes = 1;
+    ntasksPerNode = 2;
     time = "02:00:00";
-    cpuBind = "sockets,verbose";
-    jobName = "nbody-bs-${toString numProcsAndParticles}-${gitBranch}";
+    cpusPerTask = hw.cpusPerSocket;
+    jobName = unitName;
   };
 
   # Compute the array of configurations
@@ -42,18 +49,14 @@ let
     inherit varConf genConf;
   };
 
-  exec = {nextStage, conf, ...}: with conf; stages.exec {
+  exec = {nextStage, conf, ...}: stages.exec {
     inherit nextStage;
-    argv = [ "-t" timesteps "-p" particles ];
+    argv = [ "-t" conf.timesteps "-p" conf.particles ];
   };
 
-  program = {nextStage, conf, ...}: with conf;
-  let
-    customPkgs = stdexp.replaceMpi conf.mpi;
-  in
-    customPkgs.apps.nbody.override {
-      inherit cc blocksize mpi gitBranch;
-    };
+  program = {nextStage, conf, ...}: with conf; bsc.garlic.apps.nbody.override {
+    inherit (conf) blocksize gitBranch;
+  };
 
   pipeline = stdexp.stdPipeline ++ [ exec program ];
 
