@@ -16,19 +16,23 @@ let
   varConf = {
     gitBranch = [
        "garlic/tampi+send+oss+task"
-       "garlic/mpi+send+omp+task"
-       "garlic/mpi+send+oss+task"
+#      "garlic/mpi+send+omp+task"
+#      "garlic/mpi+send+oss+task"
 #      "garlic/mpi+send+seq"
 #      "garlic/oss+task"
 #      "garlic/omp+task"
 #      "garlic/seq"
     ];
 
-    blocksize = [ 1 2 4 8 16 32 ];
+    blocksize = [ 1 2 4 8 ];
 
     n = [
-    	{nx=500; nz=500; ny=2000; ntpn=2; nn=1;}
+        {nx=500; nz=500; ny=16000;}
     ];
+
+    nodes = [ 1 2 4 8 16 ];
+
+    ioFreq = [ 9999 (-1) ];
 
   };
 
@@ -55,14 +59,14 @@ let
     #nz = c.n.nz;
 
     # Same but shorter:
-    inherit (c.n) nx ny nz ntpn nn;
+    inherit (c.n) nx ny nz;
 
     fwiInput = bsc.apps.fwi.input.override {
       inherit (c.n) nx ny nz;
     };
 
     # Other FWI parameters
-    ioFreq = -1;
+    ioFreq = c.ioFreq;
 
     # Repeat the execution of each unit several times
     loops = 10;
@@ -70,8 +74,8 @@ let
 
     # Resources
     cpusPerTask = hw.cpusPerSocket;
-    ntasksPerNode = ntpn;
-    nodes = nn;
+    ntasksPerNode = 2;
+    nodes = c.nodes;
     qos = "debug";
     time = "02:00:00";
     jobName = unitName;

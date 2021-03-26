@@ -15,20 +15,24 @@ let
   # Initial variable configuration
   varConf = {
     gitBranch = [
-       "garlic/tampi+send+oss+task"
-       "garlic/mpi+send+omp+task"
-       "garlic/mpi+send+oss+task"
-#      "garlic/mpi+send+seq"
+#      "garlic/tampi+send+oss+task"
+#      "garlic/mpi+send+omp+task"
+#      "garlic/mpi+send+oss+task"
+#      "garlic/mpi+send+omp+fork"
+       "garlic/mpi+send+seq"
 #      "garlic/oss+task"
 #      "garlic/omp+task"
 #      "garlic/seq"
     ];
 
-    blocksize = [ 1 2 4 8 16 32 ];
+    blocksize = [ 0 ];
 
     n = [
-    	{nx=500; nz=500; ny=2000; ntpn=2; nn=1;}
+        {nx=500; nz=500; ny=16000;}
     ];
+
+    # Not enough planes for 8 and 16 nodes
+    nodes = [ 1 2 4 ];
 
   };
 
@@ -55,7 +59,7 @@ let
     #nz = c.n.nz;
 
     # Same but shorter:
-    inherit (c.n) nx ny nz ntpn nn;
+    inherit (c.n) nx ny nz;
 
     fwiInput = bsc.apps.fwi.input.override {
       inherit (c.n) nx ny nz;
@@ -69,9 +73,9 @@ let
     #loops = 1;
 
     # Resources
-    cpusPerTask = hw.cpusPerSocket;
-    ntasksPerNode = ntpn;
-    nodes = nn;
+    cpusPerTask = 1;
+    ntasksPerNode = hw.cpusPerNode;
+    nodes = c.nodes;
     qos = "debug";
     time = "02:00:00";
     jobName = unitName;
@@ -103,7 +107,6 @@ let
     argv = [
       "${conf.fwiInput}/fwi_params.txt"
       "${conf.fwiInput}/fwi_frequencies.txt"
-      conf.blocksize
       "-1" # Fordward steps
       "-1" # Backward steps
       conf.ioFreq # Write/read frequency

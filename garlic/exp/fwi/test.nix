@@ -16,16 +16,16 @@ let
   varConf = {
     gitBranch = [
 #      "garlic/tampi+send+oss+task"
-#      "garlic/mpi+send+omp+task"
-       "garlic/mpi+send+oss+task"
+       "garlic/mpi+send+omp+task"
+#      "garlic/mpi+send+oss+task"
 #      "garlic/mpi+send+seq"
 #      "garlic/oss+task"
 #      "garlic/omp+task"
 #      "garlic/seq"
     ];
 
-    #blocksize = [ 1 2 4 8 16 32 ];
-    blocksize = [ 1 2 4 8 ];
+    blocksize = [ 1 2 4 8 16 32 ];
+    #blocksize = [ 1 2 4 8 ];
 
     n = [
     	#{nx=500; nz=500; ny=1000; ntpn=1; nn=1;}

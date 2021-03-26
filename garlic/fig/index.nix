@@ -62,7 +62,10 @@ in
   };
 
   fwi = with exp.fwi; {
-    test = stdPlot ./fwi/test.R [ test ];
+    test              = stdPlot ./fwi/test.R [ test ];
+    strong_scaling    = stdPlot ./fwi/strong_scaling.R [ strong_scaling_task strong_scaling_forkjoin strong_scaling_mpionly ];
+    strong_scaling_io = stdPlot ./fwi/strong_scaling_io.R [ strong_scaling_io ];
+    granularity       = stdPlot ./fwi/granularity.R [ granularity ];
   };
 
   osu = with exp.osu; {

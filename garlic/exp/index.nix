@@ -98,7 +98,12 @@
   };
 
   fwi = {
-    test = callPackage ./fwi/test.nix { };
+    test                    = callPackage ./fwi/test.nix { };
+    strong_scaling_task     = callPackage ./fwi/strong_scaling_task.nix { };
+    strong_scaling_forkjoin = callPackage ./fwi/strong_scaling_forkjoin.nix { };
+    strong_scaling_mpionly  = callPackage ./fwi/strong_scaling_mpionly.nix { };
+    strong_scaling_io       = callPackage ./fwi/strong_scaling_io.nix { };
+    granularity             = callPackage ./fwi/granularity.nix { };
   };
 
   osu = rec {

@@ -15,8 +15,8 @@ let
   # Initial variable configuration
   varConf = {
     gitBranch = [
-       "garlic/tampi+send+oss+task"
-       "garlic/mpi+send+omp+task"
+#      "garlic/tampi+send+oss+task"
+#      "garlic/mpi+send+omp+task"
        "garlic/mpi+send+oss+task"
 #      "garlic/mpi+send+seq"
 #      "garlic/oss+task"
@@ -24,11 +24,16 @@ let
 #      "garlic/seq"
     ];
 
-    blocksize = [ 1 2 4 8 16 32 ];
+    blocksize = [ 1 ];
 
     n = [
-    	{nx=500; nz=500; ny=2000; ntpn=2; nn=1;}
+#       {nx=500; nz=500; ny=8000;}
+        {nx=500; nz=500; ny=2000;}
     ];
+
+    nodes = [ 1 ]
+
+    numactl = [ true false ]
 
   };
 
@@ -49,13 +54,14 @@ let
 
     cc = icc;
     inherit (c) gitBranch blocksize;
+    useNumactl = c.numactl
 
     #nx = c.n.nx;
     #ny = c.n.ny;
     #nz = c.n.nz;
 
     # Same but shorter:
-    inherit (c.n) nx ny nz ntpn nn;
+    inherit (c.n) nx ny nz;
 
     fwiInput = bsc.apps.fwi.input.override {
       inherit (c.n) nx ny nz;
@@ -69,9 +75,9 @@ let
     #loops = 1;
 
     # Resources
-    cpusPerTask = hw.cpusPerSocket;
-    ntasksPerNode = ntpn;
-    nodes = nn;
+    cpusPerTask = if (useNumactl) then hw.cpusPerNode else hw.cpusPerSocket;
+    ntasksPerNode = hw.cpusPerNode / cpusPerTask;
+    nodes = c.nodes;
     qos = "debug";
     time = "02:00:00";
     jobName = unitName;
@@ -88,7 +94,7 @@ let
     inherit varConf genConf;
   };
 
-  exec = {nextStage, conf, ...}: stages.exec {
+  exec = {nextStage, conf, ...}: stages.exec ({
     inherit nextStage;
     pre = ''
       CDIR=$PWD
@@ -114,7 +120,9 @@ let
           mv trace_* $CDIR
       fi
     '';
-  };
+  } // optionalAttrs (conf.useNumact) {
+    program = "${numactl}/bin/numactl --interleave=all ${stageProgram nextStage}";
+  });
 
   apps = bsc.garlic.apps;
 

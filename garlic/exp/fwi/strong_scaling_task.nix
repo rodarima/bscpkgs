@@ -24,11 +24,13 @@ let
 #      "garlic/seq"
     ];
 
-    blocksize = [ 1 2 4 8 16 32 ];
+    blocksize = [ 1 2 4 8 ];
 
     n = [
-    	{nx=500; nz=500; ny=2000; ntpn=2; nn=1;}
+        {nx=500; nz=500; ny=16000;}
     ];
+
+    nodes = [ 1 2 4 8 16 ];
 
   };
 
@@ -55,7 +57,7 @@ let
     #nz = c.n.nz;
 
     # Same but shorter:
-    inherit (c.n) nx ny nz ntpn nn;
+    inherit (c.n) nx ny nz;
 
     fwiInput = bsc.apps.fwi.input.override {
       inherit (c.n) nx ny nz;
@@ -70,8 +72,8 @@ let
 
     # Resources
     cpusPerTask = hw.cpusPerSocket;
-    ntasksPerNode = ntpn;
-    nodes = nn;
+    ntasksPerNode = 2;
+    nodes = c.nodes;
     qos = "debug";
     time = "02:00:00";
     jobName = unitName;
