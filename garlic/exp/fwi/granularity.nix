@@ -16,6 +16,7 @@ let
   varConf = {
     gitBranch = [
        "garlic/tampi+send+oss+task"
+       "garlic/tampi+isend+oss+task"
        "garlic/mpi+send+omp+task"
        "garlic/mpi+send+oss+task"
 #      "garlic/mpi+send+seq"
