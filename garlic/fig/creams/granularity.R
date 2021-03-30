@@ -70,28 +70,13 @@ ggsave("normalized.time.pdf", plot=p, width=w, height=h, dpi=dpi)
 
 # ---------------------------------------------------------------------
 
-p = ggplot(df, aes(x=granul, y=time)) +
+p = ggplot(df, aes(x=granul, y=time, color=branch)) +
   geom_point(shape=21, size=3) +
-  geom_line(aes(y=median.time, group=iterations)) +
+  geom_line(aes(y=median.time, group=branch)) +
   theme_bw() +
-  facet_wrap(branch ~ .) +
   labs(x="granul", y="Time (s)", title="Creams granularity: time", 
     subtitle=input_file) + 
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("time.png", plot=p, width=w, height=h, dpi=dpi)
 ggsave("time.pdf", plot=p, width=w, height=h, dpi=dpi)
-
-# ---------------------------------------------------------------------
-
-p = ggplot(df, aes(x=granul, y=time.iter, color=iterations)) +
-  geom_point(shape=21, size=3) +
-  geom_line(aes(y=median.time.iter, group=iterations)) +
-  theme_bw() +
-  facet_wrap(branch ~ .) +
-  labs(x="granul", y="Time (s)", title="Creams granularity: time / iterations", 
-    subtitle=input_file) + 
-  theme(plot.subtitle=element_text(size=8))
-
-ggsave("time.iter.png", plot=p, width=w, height=h, dpi=dpi)
-ggsave("time.iter.pdf", plot=p, width=w, height=h, dpi=dpi)

@@ -28,7 +28,7 @@ let
     ];
 
     # Max. number of iterations
-    iterations = [ 10 20 ];
+    iterations = [ 20 ] ++ optionals (enableExtended) [ 10 ];
 
     nodes = [ 1 ] ++ optionals (enableExtended) (range2 2 16);
   };
