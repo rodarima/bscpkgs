@@ -52,12 +52,12 @@ in
   };
 
   creams = with exp.creams; {
-    ss = stdPlot ./creams/ss.R [ ss.hybrid ss.pure ];
-    gran1 = stdPlot ./creams/gran.R [ gran.node1 ];
-    gran2 = stdPlot ./creams/gran.R [ gran.node2 ];
-    gran4 = stdPlot ./creams/gran.R [ gran.node4 ];
-    gran8 = stdPlot ./creams/gran.R [ gran.node8 ];
-    gran16 = stdPlot ./creams/gran.R [ gran.node16 ];
+    ss = stdPlot ./creams/ss.R [ ss ];
+    granularity = stdPlot ./creams/granularity.R [ granularity ];
+
+    # Extended version (we could use another R script for those plots
+    big.ss = stdPlot ./creams/ss.R [ big.ss ];
+    big.granularity = stdPlot ./creams/granularity.R [ big.granularity ];
   };
 
   osu = with exp.osu; {

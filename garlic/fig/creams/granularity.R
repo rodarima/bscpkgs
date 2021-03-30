@@ -31,12 +31,11 @@ df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
   mutate(branch = str_replace(gitBranch, "garlic/", "")) %>%
 
   # Computations  before converting to factor
-  mutate(time.nodes = time * nodes) %>%
-  mutate(time.nodes.iter = time.nodes / iterations) %>%
+  mutate(time.iter = time / iterations) %>%
 
   # Convert to factors
   mutate(unit = as.factor(unit)) %>%
-  mutate(nodes = as.factor(nodes)) %>%
+  mutate(nodesFactor = as.factor(nodes)) %>%
   mutate(gitBranch = as.factor(gitBranch)) %>%
   mutate(granul = as.factor(granul)) %>%
   mutate(iterations = as.factor(iterations)) %>%
@@ -45,25 +44,24 @@ df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
   # Compute median times
   group_by(unit) %>%
   mutate(median.time = median(time)) %>%
-  mutate(median.time.nodes = median(time.nodes)) %>%
   mutate(normalized.time = time / median.time - 1) %>%
   mutate(log.median.time = log(median.time)) %>%
-  mutate(median.time.nodes.iter = median(time.nodes.iter)) %>%
+  mutate(median.time.iter = median(time.iter)) %>%
   ungroup()
 
 dpi = 300
-h = 5
-w = 8
+h = 6
+w = 6
 
 # ---------------------------------------------------------------------
 
-p = ggplot(df, aes(x=nodes, y=normalized.time, fill=granul, color=iterations)) +
+p = ggplot(df, aes(x=granul, y=normalized.time)) +
   geom_boxplot() +
   geom_hline(yintercept=c(-0.01, 0.01), linetype="dashed", color="red") +
   theme_bw() +
   facet_wrap(branch ~ .) +
-  labs(x="nodes", y="Normalized time",
-    title="Creams strong scaling: normalized time", 
+  labs(x="granul", y="Normalized time",
+       title="Creams granularity: normalized time", 
     subtitle=input_file) + 
   theme(plot.subtitle=element_text(size=8))
 
@@ -72,12 +70,12 @@ ggsave("normalized.time.pdf", plot=p, width=w, height=h, dpi=dpi)
 
 # ---------------------------------------------------------------------
 
-p = ggplot(df, aes(x=nodes, y=time, color=gitBranch)) +
+p = ggplot(df, aes(x=granul, y=time)) +
   geom_point(shape=21, size=3) +
-  geom_line(aes(y=median.time, group=gitBranch)) +
+  geom_line(aes(y=median.time, group=iterations)) +
   theme_bw() +
-#  facet_wrap(branch ~ .) +
-  labs(x="nodes", y="Time (s)", title="Creams strong scaling: time", 
+  facet_wrap(branch ~ .) +
+  labs(x="granul", y="Time (s)", title="Creams granularity: time", 
     subtitle=input_file) + 
   theme(plot.subtitle=element_text(size=8))
 
@@ -86,42 +84,14 @@ ggsave("time.pdf", plot=p, width=w, height=h, dpi=dpi)
 
 # ---------------------------------------------------------------------
 
-p = ggplot(df, aes(x=nodes, y=median.time.nodes, color=branch)) +
+p = ggplot(df, aes(x=granul, y=time.iter, color=iterations)) +
   geom_point(shape=21, size=3) +
-  geom_line(aes(group=branch)) +
-  theme_bw() +
-  #facet_wrap(branch ~ .) +
-  labs(x="nodes", y="Median time * nodes (s)", title="Creams strong scaling: median time * nodes", 
-    subtitle=input_file) + 
-  theme(plot.subtitle=element_text(size=8))
-
-ggsave("median.time.nodes.png", plot=p, width=w, height=h, dpi=dpi)
-ggsave("median.time.nodes.pdf", plot=p, width=w, height=h, dpi=dpi)
-
-# ---------------------------------------------------------------------
-
-p = ggplot(df, aes(x=nodes, y=time.nodes, color=branch)) +
-  geom_boxplot() +
+  geom_line(aes(y=median.time.iter, group=iterations)) +
   theme_bw() +
   facet_wrap(branch ~ .) +
-  labs(x="nodes", y="Time * nodes (s)", title="Creams strong scaling: time * nodes", 
+  labs(x="granul", y="Time (s)", title="Creams granularity: time / iterations", 
     subtitle=input_file) + 
   theme(plot.subtitle=element_text(size=8))
 
-ggsave("time.nodes.boxplot.png", plot=p, width=w, height=h, dpi=dpi)
-ggsave("time.nodes.boxplot.pdf", plot=p, width=w, height=h, dpi=dpi)
-
-# ---------------------------------------------------------------------
-
-#p = ggplot(df, aes(x=nodes, y=time.nodes.iter, color=branch)) +
-#  geom_point(shape=21, size=3) +
-#  geom_line(aes(y=median.time.nodes.iter, group=interaction(granul,iterations))) +
-#  theme_bw() +
-#  #facet_wrap(branch ~ .) +
-#  labs(x="nodes", y="Time * nodes / iterations (s)",
-#    title="Creams strong scaling: time * nodes / iterations", 
-#    subtitle=input_file) + 
-#  theme(plot.subtitle=element_text(size=8))
-#
-#ggsave("time.nodes.iter.png", plot=p, width=w, height=h, dpi=dpi)
-#ggsave("time.nodes.iter.pdf", plot=p, width=w, height=h, dpi=dpi)
+ggsave("time.iter.png", plot=p, width=w, height=h, dpi=dpi)
+ggsave("time.iter.pdf", plot=p, width=w, height=h, dpi=dpi)
