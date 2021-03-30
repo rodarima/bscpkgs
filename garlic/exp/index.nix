@@ -36,18 +36,14 @@
     granularity = callPackage ./saiph/granularity.nix { };
   };
 
-  creams = {
-    ss = {
-      pure = callPackage ./creams/ss+pure.nix { };
-      hybrid = callPackage ./creams/ss+hybrid.nix { };
-    };
-    gran = {
-      node1 = callPackage ./creams/gran+node1.nix { };
-      node2 = callPackage ./creams/gran+node2.nix { };
-      node4 = callPackage ./creams/gran+node4.nix { };
-      node8 = callPackage ./creams/gran+node8.nix { };
-      node16 = callPackage ./creams/gran+node16.nix { };
-    };
+  creams = rec {
+    ss = callPackage ./creams/ss.nix { };
+    granularity = callPackage ./creams/granularity.nix { };
+
+    # These experiments are the extended versions of the previous
+    # ones. We split them so we can keep a reasonable execution time
+    big.granularity = granularity.override { enableExtended = true; };
+    big.ss = granularity.override { enableExtended = true; };
   };
 
   hpcg = rec {
