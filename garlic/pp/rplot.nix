@@ -3,6 +3,7 @@
 , rWrapper
 , rPackages
 , fontconfig
+, jq
 }:
 
 {
@@ -21,7 +22,7 @@ let
 
 in stdenv.mkDerivation {
   name = "plot";
-  buildInputs = [ customR ];
+  buildInputs = [ customR jq ];
   preferLocalBuild = true;
   dontPatchShebangs = true;
   phases = [ "installPhase" ];
@@ -32,5 +33,7 @@ in stdenv.mkDerivation {
     cd $out
     ln -s ${dataset} input
     Rscript --vanilla ${script} ${dataset}
+    jq -c .total_time input |\
+      awk '{s+=$1} END {printf "%f\n", s/60}' > total_job_time_minutes
   '';
 }
