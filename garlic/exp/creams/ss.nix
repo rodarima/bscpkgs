@@ -75,9 +75,9 @@ let
   };
 
   # Compute the array of configurations
-  configs = stdexp.buildConfigs {
+  configs = unique (stdexp.buildConfigs {
     inherit varConf genConf;
-  };
+  });
 
   # Custom srun stage to copy the creams input dataset
   customSrun = {nextStage, conf, ...}:
