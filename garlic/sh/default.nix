@@ -34,5 +34,6 @@ in
       chmod +x $out/bin/garlic
       mkdir -p $out/share/man/man1
       cp garlic.1 $out/share/man/man1
+      cp garlic-git-table $out/bin
     '';
   }
