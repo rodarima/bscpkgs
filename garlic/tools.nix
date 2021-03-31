@@ -85,6 +85,11 @@ let
     in
       toInt front;
 
+    # Returns the given gitCommit if not null, or the one stored in the
+    # gitTable for the branch gitBranch.
+    findCommit = {gitCommit ? null, gitTable, gitBranch}:
+      if (gitCommit != null) then gitCommit else gitTable."${gitBranch}";
+
   };
 in
   gen
