@@ -15,11 +15,13 @@ EOF
 	exit 1
 fi
 
-echo 'gitTable = {'
-echo "  # Auto-generated with $progname on $(date --rfc-3339=date)"
+echo '{'
+echo "  # Auto-generated with $progname on $(date --rfc-3339=date) for repo:"
+echo "  # $1"
+echo
 git ls-remote $1 'garlic/*' |\
 	sed 's@refs/heads/@@' |\
 	awk '{printf "\"%s\" = \"%s\";\n", $2, $1}' |\
 	column -t -o ' ' |\
 	sed 's/^/  /'
-echo '};'
+echo '}'
