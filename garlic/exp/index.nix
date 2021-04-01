@@ -32,8 +32,8 @@
   };
 
   saiph = {
-    granularity-saiph = callPackage ./saiph/granularity-saiph.nix { };
-    scalability-saiph = callPackage ./saiph/scalability-saiph.nix { };
+    granularity = callPackage ./saiph/granularity.nix { };
+    ss = callPackage ./saiph/ss.nix { };
   };
 
   creams = rec {
