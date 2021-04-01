@@ -42,8 +42,8 @@ in
   };
 
   saiph = with exp.saiph; {
-    granularity-saiph = stdPlot ./saiph/granularity-saiph.R [ granularity-saiph ];
-    scalability-saiph = stdPlot ./saiph/scalability-saiph.R [ scalability-saiph ];
+    granularity = stdPlot ./saiph/granularity.R [ granularity ];
+    ss = stdPlot ./saiph/ss.R [ ss ];
   };
 
   heat = with exp.heat; {
