@@ -87,9 +87,53 @@ let
 
     # Returns the given gitCommit if not null, or the one stored in the
     # gitTable for the branch gitBranch.
-    findCommit = {gitCommit ? null, gitTable, gitBranch}:
-      if (gitCommit != null) then gitCommit else gitTable."${gitBranch}";
+    findCommit = {gitCommit ? null, gitTable ? null, gitBranch}:
+      assert (gitCommit == null) -> (gitTable != null);
+      assert (gitTable == null) -> (gitCommit != null);
+      if (gitCommit != null) then gitCommit
+      else
+        assert (assertMsg (gitTable ? "${gitBranch}")
+        ''
+          The git branch "${gitBranch}" was not found in the gitTable.
+          Is the gitTable outdated?
+        '');
+        gitTable."${gitBranch}";
 
+    # Custom wrapper around fetchGit to be able to quickly specify apps
+    # and change the repository source for all at once. Returns an
+    # attributte set with the `src` as well as the selected gitCommit,
+    # gitBranch and gitURL.
+    fetchGarlicApp = {
+      gitBranch,
+      appName ? null,
+      gitURL ? null,
+      gitCommit ? null,
+      gitTable ? null
+    }:
+    assert (appName == null) -> (gitURL != null);
+    assert (gitURL == null) -> (appName != null);
+    let
+      _gitURL = if (gitURL != null) then gitURL
+        else "ssh://git@bscpm03.bsc.es/garlic/apps/${appName}.git";
+      _gitCommit = findCommit {
+        inherit gitCommit gitTable gitBranch;
+      };
+      _gitBranch = gitBranch;
+    in
+      {
+        src = builtins.fetchGit {
+          url = _gitURL;
+          ref = _gitBranch;
+          rev = _gitCommit;
+        };
+        gitBranch = _gitBranch;
+        gitCommit = _gitCommit;
+
+        # The gitURL is not stored in the derivation, as we dont really
+        # care of where the source comes from, as long as is the same
+        # commit.
+        gitURL = _gitURL;
+      };
   };
 in
   gen
