@@ -13,6 +13,8 @@
 
   saiph = callPackage ./saiph/default.nix {
     cc = bsc.clangOmpss2;
+    L3SizeKB = garlic.targetMachine.config.hw.cacheSizeKB.L3;
+    cachelineBytes = garlic.targetMachine.config.hw.cachelineBytes;
   };
 
   creams = callPackage ./creams/default.nix {

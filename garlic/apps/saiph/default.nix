@@ -20,11 +20,20 @@
 , enableVectFlags ? false
 , enableDebugFlags ? false
 , enableAsanFlags ? false
-, cachelineBytes ? 64
-, l3sizeKBytes ? 33792
+, cachelineBytes ? null
+, L3SizeKB ? null
+# Problem size:
+, sizex ? 3
+, sizey ? 4
+, sizez ? 4
 }:
 
+assert enableManualDist -> (nbgx != null);
+assert enableManualDist -> (nbgy != null);
+assert enableManualDist -> (nbgz != null);
+
 with stdenv.lib;
+with stdenv.lib.versions;
 
 stdenv.mkDerivation rec {
   name = "saiph";
@@ -33,9 +42,9 @@ stdenv.mkDerivation rec {
   src = builtins.fetchGit ({
     url = "ssh://git@bscpm03.bsc.es/DSLs/saiph.git";
     ref = "${gitBranch}";
-  } // (if (gitCommit != null) then {
-    rev = gitCommit;
-  } else {}));
+  } // (optionalAttrs (gitCommit != null) {
+    rev = "${gitCommit}";
+  }));
 
   programPath = "/bin/Heat3D_vect";
 
@@ -53,36 +62,37 @@ stdenv.mkDerivation rec {
   ];
 
   # Required for nanos6
-  hardeningDisable = [ "bindnow" ];
+  hardeningDisable = [ "all" ];
   
   preBuild = ''
     cd saiphv2/cpp/src 
-    export VTK_VERSION=8.2
+    export VTK_VERSION=${majorMinor (getVersion vtk.name)}
     export VTK_HOME=${vtk}
     make clean
-  '';
 
-  #NIX_CFLAGS_COMPILE = "-O1 -g";
-  #NIX_DEBUG = 5;
+    sed -i '/SIZEX =/s/3/${toString sizex}/g' testApp/Heat3D_vect.cpp
+    sed -i '/SIZEY =/s/4/${toString sizey}/g' testApp/Heat3D_vect.cpp
+    sed -i '/SIZEZ =/s/4/${toString sizez}/g' testApp/Heat3D_vect.cpp
+  '';
 
   makeFlags = [
     "-f" "Makefile.${cc.CC}"
     "apps"
     "APP=Heat3D_vect"
-    "ROW_ALIGNMENT=${toString cachelineBytes}"
-    "L3_SIZE_K=${toString l3sizeKBytes}"
-  ] ++ optional (enableManualDist) "DIST_SET=1"
-    ++ optional (enableManualDist) "NBG_X=${toString nbgx}"
-    ++ optional (enableManualDist) "NBG_Y=${toString nbgy}"
-    ++ optional (enableManualDist) "NBG_Z=${toString nbgz}"
-    ++ optional (nblx != null) "NBL_X=${toString nblx}"
-    ++ optional (nbly != null) "NBL_Y=${toString nbly}"
-    ++ optional (nblz != null) "NBL_Z=${toString nblz}"
-    ++ optional (nsteps != null) "NSTEPS=${toString nsteps}"
-    ++ optional (numComm != null) "NUM_COMM=${toString numComm}"
-    ++ optional (enableVectFlags) "VECT_CHECKS=1"
-    ++ optional (enableDebugFlags) "DEBUG_CHECKS=1"
-    ++ optional (enableAsanFlags) "SANITIZE_CHECKS=1"
+  ] ++ optional (cachelineBytes != null) "ROW_ALIGNMENT=${toString cachelineBytes}"
+    ++ optional (L3SizeKB != null)  "L3_SIZE_K=${toString L3SizeKB}"
+    ++ optional (enableManualDist)  "DIST_SET=1"
+    ++ optional (enableManualDist)  "NBG_X=${toString nbgx}"
+    ++ optional (enableManualDist)  "NBG_Y=${toString nbgy}"
+    ++ optional (enableManualDist)  "NBG_Z=${toString nbgz}"
+    ++ optional (nblx != null)      "NBL_X=${toString nblx}"
+    ++ optional (nbly != null)      "NBL_Y=${toString nbly}"
+    ++ optional (nblz != null)      "NBL_Z=${toString nblz}"
+    ++ optional (nsteps != null)    "NSTEPS=${toString nsteps}"
+    ++ optional (numComm != null)   "NUM_COMM=${toString numComm}"
+    ++ optional (enableVectFlags)   "VECT_CHECKS=1"
+    ++ optional (enableDebugFlags)  "DEBUG_CHECKS=1"
+    ++ optional (enableAsanFlags)   "SANITIZE_CHECKS=1"
     ;
     
   installPhase = ''
