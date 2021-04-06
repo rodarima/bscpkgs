@@ -91,6 +91,7 @@
 
   slurm = {
     cpu = callPackage ./slurm/cpu.nix { };
+    sigsegv = callPackage ./slurm/sigsegv.nix { };
   };
 
   lulesh = {
