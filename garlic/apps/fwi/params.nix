@@ -59,4 +59,6 @@ in
       mkdir -p $out/bin
       cp ModelGenerator $out/bin/
     '';
+
+    hardeningDisable = [ "all" ];
   }

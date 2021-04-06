@@ -43,4 +43,5 @@ stdenv.mkDerivation rec {
 
   programPath = "/bin/miniAMR.x";
 
+  hardeningDisable = [ "all" ];
 }

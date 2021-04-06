@@ -40,4 +40,6 @@ stdenv.mkDerivation rec {
   '';
 
   programPath = "/bin/genseq";
+
+  hardeningDisable = [ "all" ];
 }

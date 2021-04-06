@@ -54,4 +54,5 @@ in
       cp nbody* $out/bin/${name}
     '';
 
+    hardeningDisable = [ "all" ];
   }

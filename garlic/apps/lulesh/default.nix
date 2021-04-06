@@ -43,4 +43,5 @@ in
     '';
     programPath = "/bin/${name}";
 
+    hardeningDisable = [ "all" ];
   }

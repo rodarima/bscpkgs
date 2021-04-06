@@ -71,4 +71,6 @@ in
     '';
 
     programPath = "/bin/fwi";
+
+    hardeningDisable = [ "all" ];
   }

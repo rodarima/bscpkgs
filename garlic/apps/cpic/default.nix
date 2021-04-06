@@ -38,4 +38,6 @@ stdenv.mkDerivation rec {
     mkdir -p $out/bin
     cp cpic $out/bin/cpic
   '';
+
+  hardeningDisable = [ "all" ];
 }

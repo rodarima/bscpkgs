@@ -37,8 +37,6 @@ in
 
     buildInputs = [ nanos6 mpi cc tampi mcxx ];
 
-    hardeningDisable = [ "all" ];
-
     configurePhase = ''
       export TAMPI_HOME=${tampi}
 
@@ -54,4 +52,6 @@ in
       mkdir -p $out/bin
       cp -a build/* $out/bin
     '';
+
+    hardeningDisable = [ "all" ];
   }

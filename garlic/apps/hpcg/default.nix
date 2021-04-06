@@ -40,4 +40,5 @@ in
 
     programPath = "/bin/xhpcg";
 
+    hardeningDisable = [ "all" ];
   }

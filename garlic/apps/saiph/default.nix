@@ -62,9 +62,6 @@ in
       vtk
       boost
     ];
-
-    # Required for nanos6
-    hardeningDisable = [ "all" ];
     
     preBuild = ''
       cd saiphv2/cpp/src 
@@ -103,4 +100,6 @@ in
       cp obj/libsaiphv2.so $out/lib/
       cp bin/Heat3D_vect $out/bin/
     '';
+
+    hardeningDisable = [ "all" ];
   }

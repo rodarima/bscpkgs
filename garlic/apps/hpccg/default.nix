@@ -50,4 +50,5 @@ in
       cp test_HPCCG-mpi.exe $out/bin
     '';
 
+    hardeningDisable = [ "all" ];
   }

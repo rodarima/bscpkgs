@@ -34,4 +34,6 @@ in
       mkdir -p $out/etc
       cp heat.conf $out/etc/
     '';
+
+    hardeningDisable = [ "all" ];
   }

@@ -31,4 +31,5 @@ stdenv.mkDerivation {
   '';
 
   buildInputs = [ mpi ];
+  hardeningDisable = [ "all" ];
 }

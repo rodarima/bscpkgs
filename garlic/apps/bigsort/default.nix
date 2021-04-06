@@ -48,4 +48,6 @@ stdenv.mkDerivation rec {
   '';
 
   programPath = "/bin/BigSort";
+
+  hardeningDisable = [ "all" ];
 }

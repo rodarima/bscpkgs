@@ -33,4 +33,6 @@ in
       mkdir -p $out
       cp -a SodTubeBenchmark $out/
     '';
+
+    hardeningDisable = [ "all" ];
   }

@@ -40,4 +40,6 @@ stdenv.mkDerivation rec {
   '';
 
   programPath = "/bin/shuffle";
+
+  hardeningDisable = [ "all" ];
 }
