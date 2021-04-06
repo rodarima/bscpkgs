@@ -8,7 +8,7 @@
 
 {
   nbody = rec {
-    granularity = callPackage ./nbody/granularity-mpi.nix { };
+    granularity = callPackage ./nbody/granularity.nix { };
     nodesorsockets = callPackage ./nbody/nodes-or-sockets-mpi.nix { };
     scaling = callPackage ./nbody/strong-scaling-mpi.nix { };
   };
