@@ -1,0 +1,26 @@
+Git message guidelines
+----------------------
+
+  1. Don't use uppercase in the beggining of your subject line (the
+     first line of the commit message)
+
+  2. Prepend the subsystem, package or the app to your subject in
+     lowercase separated by a colon (example "nbody: simplify the
+     granularity experiment")
+
+  3. Use the imperative mood in the subject line (use "add X", not
+     "added X" nor "adding X"). A properly formed Git commit subject
+     line (without the prefix) should always be able to complete the
+     following sentence:
+
+       "If applied, this commit will <your subject here>"
+
+  4. Limit the subject line to 50 characters and keep it simple
+
+  5. Separate subject from body with a blank line
+
+  6. Do not end the subject line with a period
+
+  7. Wrap the body at 72 characters
+
+  8. Use the body to explain the details
