@@ -14,7 +14,7 @@
       # Add more nixpkgs packages here...
     ];
     bscPackages = with bsc; [
-      slurm clangOmpss2 icc mcxx perf tampi impi vtk
+      slurm clangOmpss2 icc mcxx perf tampi impi vtk paraver
       # Add more bsc packages here...
     ];
     packages = commonPackages ++ bscPackages;
