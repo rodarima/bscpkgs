@@ -214,9 +214,10 @@ let
       inherit self super bsc callPackage;
     };
 
-#    test = {
+    test = {
 #      hwloc = callPackage ./test/bugs/hwloc.nix { };
-#    };
+      sigsegv = callPackage ./test/reproducers/sigsegv.nix { };
+    };
   });
 
 in
