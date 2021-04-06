@@ -133,5 +133,15 @@ ABSTRACT
   We have improved our checking to detect bogus options passed to SLURM, 
   so we prevent this problem from happening.
 
+1.10 The srun program misses signals after MPI_Finalize
+
+  When a program receives a signal such as SIGSEGV after calling 
+  MPI_Finalize, srun at version 17.11.7 doesn't return a error code but 
+  exits with 0.
+
+  This can cause bogus programs to go undetected when only checking the 
+  return code of srun. A better approach is to check the exit code with 
+  sacct(1) or write the exit code to a file and check it later.
+
 /* vim: set ts=2 sw=2 tw=72 fo=watqc expandtab spell autoindent: */
 
