@@ -99,13 +99,17 @@ rec {
         inherit nextStage;
       }
     );
+
+    baywatch = {nextStage, ...}: stages.baywatch {
+      inherit nextStage;
+    };
   };
 
   stdPipelineOverride = {overrides ? {}}:
   let
     stages = stdStages // overrides;
   in
-    with stages; [ sbatch isolate control srun isolate ];
+    with stages; [ sbatch isolate control srun isolate baywatch ];
 
 
   stdPipeline = stdPipelineOverride {};

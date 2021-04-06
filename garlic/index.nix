@@ -76,6 +76,7 @@
   stages = {
     sbatch     = callPackage ./stages/sbatch.nix { };
     srun       = callPackage ./stages/srun.nix { };
+    baywatch   = callPackage ./stages/baywatch.nix { };
     control    = callPackage ./stages/control.nix { };
     exec       = callPackage ./stages/exec.nix { };
     script     = callPackage ./stages/script.nix { };
