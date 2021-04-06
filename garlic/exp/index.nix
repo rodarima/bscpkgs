@@ -64,9 +64,9 @@
   };
 
   heat = rec {
-    granul = callPackage ./heat/granul.nix { };
-    cache = granul.override { enablePerf = true; };
-    ctf = granul.override { enableCTF = true; };
+    granularity = callPackage ./heat/granularity.nix { };
+    cache = granularity.override { enablePerf = true; };
+    ctf = granularity.override { enableCTF = true; };
   };
 
   bigsort = rec {

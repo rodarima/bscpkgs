@@ -47,7 +47,7 @@ in
   };
 
   heat = with exp.heat; {
-    granul = stdPlot ./heat/granul.R [ granul ];
+    granularity = stdPlot ./heat/granularity.R [ granularity ];
     cache = customPlot ./heat/cache.R (ds.perf.stat cache.result);
     ctf = customPlot ./heat/mode.R (ds.ctf.mode ctf.result);
   };
