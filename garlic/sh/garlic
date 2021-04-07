@@ -105,6 +105,10 @@ do_fetch() {
     exit 1
   fi
 
+  unitNameList=$(grep '^/nix/store/.*-unit$' $experiment |\
+    sort -u |\
+    sed 's@^/nix/store/@@')
+
   cwd=$(pwd)
 
   repeat=1
@@ -113,17 +117,21 @@ do_fetch() {
     cd $exp
     test $verbose && >&2 echo "$exp: checking units"
 
-    for unit in *-unit; do
-      cd $exp/$unit
-      if [ ! -e status ]; then
-        
-        test $verbose && >&2 echo "$unit: no status"
+    for unit in $unitNameList; do
+      if [ ! -e $exp/$unit ]; then
+        test $verbose && >&2 echo "$unit: missing unit"
         repeat=1
       else
-        st=$(cat status)
-        test $verbose && >&2 echo "$unit: $st"
-        if [ "$st" != "completed" ]; then
+        cd $exp/$unit
+        if [ ! -e status ]; then
+          test $verbose && >&2 echo "$unit: no status"
           repeat=1
+        else
+          st=$(cat status)
+          test $verbose && >&2 echo "$unit: $st"
+          if [ "$st" != "completed" ]; then
+            repeat=1
+          fi
         fi
       fi
     done
