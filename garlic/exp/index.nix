@@ -116,6 +116,8 @@
     bw = callPackage ./osu/bw.nix { };
     impi = callPackage ./osu/impi.nix { };
     bwShm = bw.override { interNode = false; };
+    mtu = callPackage ./osu/mtu.nix { };
+    eager = callPackage ./osu/eager.nix { };
   };
 
   examples = {
