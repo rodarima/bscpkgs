@@ -1,3 +1,10 @@
+# Strong scaling test for FWI variants based on tasks with and without I/O.
+# This experiment solves a computationally expensive input which brings the
+# storage devices to saturation when I/O is enabled.  the same input us run
+# without I/O for comparison purposes..  Also, the experiments are runt for a
+# range of block sizes deemed as efficient according to the granularity
+# experiment.
+
 {
   stdenv
 , stdexp

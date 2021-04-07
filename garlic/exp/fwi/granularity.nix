@@ -1,3 +1,5 @@
+# Regular granularity test for FWI
+
 {
   stdenv
 , stdexp
@@ -15,20 +17,20 @@ let
   # Initial variable configuration
   varConf = {
     gitBranch = [
-       "garlic/tampi+send+oss+task"
-       "garlic/tampi+isend+oss+task"
-       "garlic/mpi+send+omp+task"
-       "garlic/mpi+send+oss+task"
+#      "garlic/tampi+send+oss+task"
+      "garlic/tampi+isend+oss+task"
+#      "garlic/mpi+send+omp+task"
+#      "garlic/mpi+send+oss+task"
 #      "garlic/mpi+send+seq"
 #      "garlic/oss+task"
 #      "garlic/omp+task"
 #      "garlic/seq"
     ];
 
-    blocksize = [ 1 2 4 8 16 32 ];
+    blocksize = [ 1 2 4 8 16 32 64 128 256 ];
 
     n = [
-    	{nx=500; nz=500; ny=2000; ntpn=2; nn=1;}
+    	{nx=100; nz=100; ny=8000; ntpn=2; nn=1;}
     ];
 
   };

@@ -1,3 +1,23 @@
+# This test compares a FWI version using poor data locality (+NOREUSE) versus
+# the optimized version (used for all other experiments). Follows a pseudocode
+# snippet illustrating the fundamental difference between version.
+#
+# NOREUSE
+# ----------------------
+# for (y) for (x) for (z)
+#   computA(v[y][x][z]);
+# for (y) for (x) for (z)
+#   computB(v[y][x][z]);
+# for (y) for (x) for (z)
+#   computC(v[y][x][z]);
+#
+# Optimized version
+# ----------------------
+# for (y) for (x) for (z)
+#   computA(v[y][x][z]);
+#   computB(v[y][x][z]);
+#   computC(v[y][x][z]);
+
 {
   stdenv
 , stdexp
@@ -15,34 +35,14 @@ let
   # Initial variable configuration
   varConf = {
     gitBranch = [
-#      "garlic/tampi+send+oss+task"
-#      "garlic/mpi+send+omp+task"
        "garlic/mpi+send+oss+task"
-       "garlic/mpi+send+oss+task+noreuse"
-#      "garlic/mpi+send+seq"
-#      "garlic/oss+task"
-#      "garlic/omp+task"
-#      "garlic/seq"
+       "garlic/mpi+send+oss+task+NOREUSE"
     ];
 
     blocksize = [ 1 2 4 8 ];
-    #blocksize = [ 1 2 ];
 
     n = [
-#   	{nx=50;  ny=4000; nz=50;}
-#   	{nx=20;  ny=4000; nz=20;}
-#    	{nx=300; ny=8000; nz=300;} # half node, /
-#    	{nx=300; ny=1000; nz=300;} # half node, /
-#    	{nx=200; ny=1000; nz=200;} # half node, not enough tasks
-#    	{nx=200; ny=4000; nz=200;} # --/ half node
-#    	{nx=250; ny=2000; nz=250;} # / half node
     	{nx=300; ny=2000; nz=300;} # / half node
-#    	{nx=100; ny=2000; nz=100;} # \-// half node
-#    	{nx=150; ny=2000; nz=150;} # \-/ half node
-#	{nx=200; ny=64000; nz=200;} # --/ 16 nodes
-#    	{nx=200; ny=4000; nz=200;} # --/ half node
-#    	{nx=200; ny=8000; nz=200;} # --/ 1 node
-#    	{nx=100; ny=8000; nz=100;} # --/ half node
     ];
   };
 

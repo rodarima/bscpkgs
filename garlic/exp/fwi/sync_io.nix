@@ -1,3 +1,7 @@
+# This experiment compares the effect of not using I/O versus using O_DIRECT |
+# O_DSYNC enabled I/O. This is a reduced version of the strong_scaling_io
+# experiment.
+
 {
   stdenv
 , stdexp
@@ -15,9 +19,9 @@ let
   # Initial variable configuration
   varConf = {
     gitBranch = [
-#      "garlic/tampi+send+oss+task"
+       "garlic/tampi+send+oss+task"
 #      "garlic/mpi+send+omp+task"
-       "garlic/mpi+send+oss+task"
+#      "garlic/mpi+send+oss+task"
 #      "garlic/mpi+send+seq"
 #      "garlic/oss+task"
 #      "garlic/omp+task"
@@ -27,13 +31,12 @@ let
     blocksize = [ 1 ];
 
     n = [
-#       {nx=500; nz=500; ny=8000;}
-        {nx=500; nz=500; ny=2000;}
+        {nx=500; nz=500; ny=16000;}
     ];
 
-    nodes = [ 1 ]
+    nodes = [ 4 ];
 
-    numactl = [ true false ]
+    ioFreq = [ 9999 (-1) ];
 
   };
 
@@ -54,7 +57,6 @@ let
 
     cc = icc;
     inherit (c) gitBranch blocksize;
-    useNumactl = c.numactl
 
     #nx = c.n.nx;
     #ny = c.n.ny;
@@ -68,15 +70,15 @@ let
     };
 
     # Other FWI parameters
-    ioFreq = -1;
+    ioFreq = c.ioFreq;
 
     # Repeat the execution of each unit several times
     loops = 10;
     #loops = 1;
 
     # Resources
-    cpusPerTask = if (useNumactl) then hw.cpusPerNode else hw.cpusPerSocket;
-    ntasksPerNode = hw.cpusPerNode / cpusPerTask;
+    cpusPerTask = hw.cpusPerSocket;
+    ntasksPerNode = 2;
     nodes = c.nodes;
     qos = "debug";
     time = "02:00:00";
@@ -94,7 +96,7 @@ let
     inherit varConf genConf;
   };
 
-  exec = {nextStage, conf, ...}: stages.exec ({
+  exec = {nextStage, conf, ...}: stages.exec {
     inherit nextStage;
     pre = ''
       CDIR=$PWD
@@ -120,9 +122,7 @@ let
           mv trace_* $CDIR
       fi
     '';
-  } // optionalAttrs (conf.useNumact) {
-    program = "${numactl}/bin/numactl --interleave=all ${stageProgram nextStage}";
-  });
+  };
 
   apps = bsc.garlic.apps;
 

@@ -30,7 +30,7 @@ w=5
 ####################################################################
 ### Line Graph
 ####################################################################
-png("time.png", width=w*ppi, height=h*ppi, res=ppi)
+png("mtime.png", width=w*ppi, height=h*ppi, res=ppi)
 
 ## Create the plot with the normalized time vs nblocks
 p = ggplot(df, aes(x = blocksize, y=mtime, group=gitBranch, color=gitBranch)) +
@@ -49,22 +49,23 @@ print(p)
 dev.off()
 
 ####################################################################
-### Boxplot
+### Line Graph
 ####################################################################
-png("box.png", width=w*ppi, height=h*ppi, res=ppi)
-# Create the plot with the normalized time vs nblocks
-p = ggplot(df, aes(x=blocksize, y=time, group=gitBranch, colour=gitBranch)) +
-        # Labels
-        labs(x="Blocksize", y="Normalized time",
-              title=sprintf("FWI Time"),
-              subtitle=input_file) +
-        # Draw boxplots
-        geom_boxplot() +
-        theme_bw() +
-        theme(plot.subtitle=element_text(size=8)) +
-        theme(legend.position = c(0.5, 0.88))
+png("time.png", width=w*ppi, height=h*ppi, res=ppi)
+
+## Create the plot with the normalized time vs nblocks
+p = ggplot(df, aes(x = blocksize, y=time, group=gitBranch, color=gitBranch)) +
+  geom_point() +
+  geom_line() +
+  theme_bw() +
+  labs(x="Blocksize", y="Time (s)", title="FWI granularity",
+    subtitle=input_file) +
+  theme(plot.subtitle=element_text(size=8)) +
+  theme(legend.position = c(0.5, 0.88))
+
 # Render the plot
 print(p)
-## Save the png image
+
+# Save the png image
 dev.off()
 

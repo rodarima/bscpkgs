@@ -34,6 +34,7 @@ stdenv.mkDerivation rec {
   # FIXME: Allow multiple MPI implementations
   postPatch = ''
     sed -i 's/= OPENMPI$/= INTEL/g' Makefile
+    sed -i 's/USE_O_DIRECT ?= NO/USE_O_DIRECT ?= YES/g' Makefile || true
   '';
 
   # FIXME: This is an ugly hack.

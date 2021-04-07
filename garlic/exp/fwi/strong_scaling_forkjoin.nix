@@ -1,3 +1,6 @@
+# Strong scaling test for FWI variants based on forkjoint. This
+# experiment does not rely on block sizes.
+
 {
   stdenv
 , stdexp
@@ -15,20 +18,13 @@ let
   # Initial variable configuration
   varConf = {
     gitBranch = [
-#      "garlic/tampi+send+oss+task"
-#      "garlic/mpi+send+omp+task"
-#      "garlic/mpi+send+oss+task"
        "garlic/mpi+send+omp+fork"
-#      "garlic/mpi+send+seq"
-#      "garlic/oss+task"
-#      "garlic/omp+task"
-#      "garlic/seq"
     ];
 
     blocksize = [ 0 ];
 
     n = [
-        {nx=500; nz=500; ny=16000;}
+        {nx=100; nz=100; ny=8000;}
     ];
 
     nodes = [ 1 2 4 8 16 ];

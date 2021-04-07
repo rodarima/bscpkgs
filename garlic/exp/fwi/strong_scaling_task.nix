@@ -1,3 +1,7 @@
+# Strong scaling test for FWI variants based on tasks. This
+# experiment explores a range of block sizes deemed as efficient
+# according to the granularity experiment.
+
 {
   stdenv
 , stdexp
@@ -19,16 +23,12 @@ let
        "garlic/tampi+isend+oss+task"
        "garlic/mpi+send+omp+task"
        "garlic/mpi+send+oss+task"
-#      "garlic/mpi+send+seq"
-#      "garlic/oss+task"
-#      "garlic/omp+task"
-#      "garlic/seq"
     ];
 
-    blocksize = [ 1 2 4 8 ];
+    blocksize = [ 1 2 4 8 16 ];
 
     n = [
-        {nx=500; nz=500; ny=16000;}
+        {nx=100; nz=100; ny=8000;}
     ];
 
     nodes = [ 1 2 4 8 16 ];

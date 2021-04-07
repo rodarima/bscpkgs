@@ -14,7 +14,7 @@ dataset = jsonlite::stream_in(file(input_file)) %>%
   jsonlite::flatten()
 
 # Select block size to display
-useBlocksize = 1
+useBlocksize = 2
 
 # We only need the nblocks and time
 df = select(dataset, config.blocksize, config.gitBranch, config.nodes, time) %>%
@@ -59,7 +59,7 @@ print(p)
 dev.off()
 
 ####################################################################
-### Line plot (timei x nodes)
+### Line plot (time x nodes)
 ####################################################################
 png("nxtime.png", width=w*ppi, height=h*ppi, res=ppi)
 
