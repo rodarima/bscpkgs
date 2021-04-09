@@ -46,7 +46,7 @@ in
     # /nix/store/a3x76fbnfbacn2xhz3q65fklfp0qbb6p-plot
     ossWeakscalingPerAxisPerBlock = stdPlot ./hpcg/oss.slices.weakscaling.R [ ossSlicesWeakscaling ];
 
-    # /nix/store/pxf41v2c37h5fh5x8hm6dv297hkdka04-plot
+    # /nix/store/096rl6344pbz5wrzgxgqn651pysfkkjc-plot
     ossStrongscalingPerBlock = stdPlot ./hpcg/oss.slices.strongscaling.R [ ossSlicesStrongscaling ];
   };
 

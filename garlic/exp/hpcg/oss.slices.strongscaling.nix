@@ -13,7 +13,7 @@ let
   # Initial variable configuration
   varConf = {
     n = [
-        { x = 192; y = 192; z = 16 * 192; }
+        { x = 192 / 4; y = 192 / 4; z = 16 * 192; }
     ];
     nprocs = [
         # { x = 2; y = 1; z = 1; }
@@ -36,7 +36,7 @@ let
 
     ];
     # nblocks = [ 12 24 48 96 192 384 768 1536 ];
-    nblocks = [ 24 48 96 192 ];
+    nblocks = [ 24 48 96 192 384 ];
     ncommblocks = [ 1 ];
     # nodes = [ 1 ];
     # nodes = [ 1 2 4 8 16 ];
@@ -61,7 +61,7 @@ let
     gitBranch = "garlic/tampi+isend+oss+task";
 
     # Repeat the execution of each unit 30 times
-    loops = 1;
+    loops = 10;
 
     disableAspectRatio = true;
 
