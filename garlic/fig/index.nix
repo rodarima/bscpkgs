@@ -84,10 +84,8 @@ in
   # The figures used in the article contained in a directory per figure
   article = with fig; linkTree "article-fig" {
     "osu/latency"     = osu.latency;
-    "osu/latencyMt"   = osu.latencyMt;
     "osu/bw"          = osu.bw;
-    "osu/bwShm"       = osu.bwShm;
-    "heat/cache"      = heat.cache;
+    "osu/mtu"         = osu.mtu;
   };
 
   examples = with exp.examples; {
