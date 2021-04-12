@@ -37,10 +37,6 @@ let
     inherit (c) gitBranch blocksize;
     inherit (c.n) nx ny nz ntpn nodes;
 
-    fwiInput = bsc.apps.fwi.input.override {
-      inherit (c.n) nx ny nz;
-    };
-
     # Other FWI parameters
     ioFreq = -1;
 

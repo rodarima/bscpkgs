@@ -60,10 +60,6 @@ let
     inherit (c) gitBranch blocksize;
     inherit (c.n) nx ny nz;
 
-    fwiInput = bsc.apps.fwi.input.override {
-      inherit (c.n) nx ny nz;
-    };
-
     # Repeat the execution of each unit several times
     loops = 10;
 
