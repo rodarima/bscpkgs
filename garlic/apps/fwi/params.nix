@@ -9,7 +9,7 @@ with stdenv.lib;
 with builtins;
 
 stdenv.mkDerivation rec {
-  name = "fwi-input";
+  name = "fwi-params";
 
   src = builtins.fetchGit {
     url = "ssh://git@bscpm03.bsc.es/garlic/apps/fwi.git";
@@ -41,13 +41,15 @@ stdenv.mkDerivation rec {
   # Also, we need to compile it with the builder platform as target, as is going
   # to be executed during the build to generate the src/generated_model_params.h
   # header.
-  makeFlags = [ "COMPILER=GNU" "params" "input" ];
+  makeFlags = [ "COMPILER=GNU" "params" ];
 
   installPhase = ''
     mkdir -p $out/
     cp src/generated_model_params.h $out/
     cp SetupParams/fwi_params.txt $out/
     cp SetupParams/fwi_frequencies.txt $out/
-    cp -r InputModels $out/
+
+    mkdir -p $out/bin
+    cp ModelGenerator $out/bin/
   '';
 }

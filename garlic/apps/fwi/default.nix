@@ -5,7 +5,7 @@
 , mcxx ? null
 , cc
 , gitBranch ? "garlic/tampi+send+oss+task"
-, fwiInput
+, fwiParams
 }:
 
 with stdenv.lib;
@@ -47,7 +47,7 @@ stdenv.mkDerivation rec {
 
     make depend
 
-    cp ${fwiInput}/generated_model_params.h src/
+    cp ${fwiParams}/generated_model_params.h src/
   '';
   
   # We compile the ModelGenerator using gcc *only*, as otherwise it will
