@@ -100,9 +100,8 @@
   fwi = {
     granularity = callPackage ./fwi/granularity.nix { };
     ss = callPackage ./fwi/ss.nix { };
+    reuse = callPackage ./fwi/reuse.nix { };
 
-    strong_scaling_mpionly  = callPackage ./fwi/strong_scaling_mpionly.nix { };
-    data_reuse              = callPackage ./fwi/data_reuse.nix { };
     strong_scaling_io       = callPackage ./fwi/strong_scaling_io.nix { };
     sync_io                 = callPackage ./fwi/sync_io.nix { };
   };
