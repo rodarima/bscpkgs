@@ -102,7 +102,9 @@
     ss = callPackage ./fwi/ss.nix { };
     reuse = callPackage ./fwi/reuse.nix { };
     io = callPackage ./fwi/io.nix { };
-    ioBig = io.override { enableExtended = true; };
+
+    # Extended experiments
+    big.io = io.override { enableExtended = true; };
   };
 
   osu = rec {
