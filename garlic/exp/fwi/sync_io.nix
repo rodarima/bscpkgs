@@ -8,11 +8,14 @@
 , bsc
 , targetMachine
 , stages
+, callPackage
 }:
 
 with stdenv.lib;
 
 let
+  common = callPackage ./common.nix {};
+  inherit (common) getConfigs getResources pipeline;
 
   inherit (targetMachine) fs;
 
@@ -35,34 +38,20 @@ let
     ];
 
     nodes = [ 4 ];
-
     ioFreq = [ 9999 (-1) ];
-
   };
-
-# The c value contains something like:
-# {
-#   n = { nx=500; ny=500; nz=500; }
-#   blocksize = 1;
-#   gitBranch = "garlic/tampi+send+oss+task";
-# }
 
   machineConfig = targetMachine.config;
 
   # Generate the complete configuration for each unit
   genConf = with bsc; c: targetMachine.config // rec {
-    expName = "fwi";
-    unitName = "${expName}-test";
+    expName = "fwi-sync-io";
+    unitName = "${expName}"
+      + "-ioFreq${toString ioFreq}"
+      + "-${toString gitBranch}";
+
     inherit (machineConfig) hw;
-
-    cc = icc;
     inherit (c) gitBranch blocksize;
-
-    #nx = c.n.nx;
-    #ny = c.n.ny;
-    #nz = c.n.nz;
-
-    # Same but shorter:
     inherit (c.n) nx ny nz;
 
     fwiInput = bsc.apps.fwi.input.override {
@@ -74,64 +63,27 @@ let
 
     # Repeat the execution of each unit several times
     loops = 10;
-    #loops = 1;
 
     # Resources
-    cpusPerTask = hw.cpusPerSocket;
-    ntasksPerNode = 2;
+    inherit (getResources { inherit gitBranch hw; })
+      cpusPerTask ntasksPerNode;
+
     nodes = c.nodes;
     qos = "debug";
     time = "02:00:00";
     jobName = unitName;
 
-    tracing = "no";
+    enableCTF = false;
 
     # Enable permissions to write in the local storage
     extraMounts = [ fs.local.temp ];
+    tempDir = fs.local.temp;
 
   };
 
-  # Compute the array of configurations
-  configs = stdexp.buildConfigs {
+  configs = getConfigs {
     inherit varConf genConf;
   };
-
-  exec = {nextStage, conf, ...}: stages.exec {
-    inherit nextStage;
-    pre = ''
-      CDIR=$PWD
-      if [[ "${conf.tracing}" == "yes" ]]; then
-          export NANOS6_CONFIG_OVERRIDE="version.instrument=ctf"
-      fi
-      EXECDIR="${fs.local.temp}/out/$GARLIC_USER/$GARLIC_UNIT/$GARLIC_RUN"
-      mkdir -p $EXECDIR
-      cd $EXECDIR
-      ln -fs ${conf.fwiInput}/InputModels InputModels || true
-    '';
-    argv = [
-      "${conf.fwiInput}/fwi_params.txt"
-      "${conf.fwiInput}/fwi_frequencies.txt"
-      conf.blocksize
-      "-1" # Fordward steps
-      "-1" # Backward steps
-      conf.ioFreq # Write/read frequency
-    ];
-    post = ''
-      rm -rf Results || true
-      if [[ "${conf.tracing}" == "yes" ]]; then
-          mv trace_* $CDIR
-      fi
-    '';
-  };
-
-  apps = bsc.garlic.apps;
-
-  # FWI program
-  program = {nextStage, conf, ...}: apps.fwi.solver.override {
-    inherit (conf) cc gitBranch fwiInput;
-  };
-
-  pipeline = stdexp.stdPipeline ++ [ exec program ];
 
 in
  
