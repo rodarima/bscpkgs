@@ -33,11 +33,11 @@ rec {
 
   getResources = {gitBranch, hw}:
   if (gitBranch == "garlic/mpi+send+seq") then {
-    cpusPerTask = hw.cpusPerSocket;
-    ntasksPerNode = hw.socketsPerNode;
-  } else {
     cpusPerTask = 1;
     ntasksPerNode = hw.cpusPerNode;
+  } else {
+    cpusPerTask = hw.cpusPerSocket;
+    ntasksPerNode = hw.socketsPerNode;
   };
 
   exec = {nextStage, conf, ...}:
