@@ -9,6 +9,7 @@
 , targetMachine
 , stages
 , garlicTools
+, callPackage
 , enableExtended ? false
 }:
 
@@ -17,23 +18,20 @@ with garlicTools;
 
 let
 
-  inherit (targetMachine) fs;
+  common = callPackage ./common.nix {};
 
-  # We split these into a separate group so we can remove the blocksize
-  # later.
-  forkJoinBranches = [
-       "garlic/mpi+send+omp+fork"
-  ];
+  inherit (targetMachine) fs;
 
   # Initial variable configuration
   varConf = {
     gitBranch = [
       "garlic/tampi+isend+oss+task"
-    ] ++ optionals (enableExtended) ([
+    ] ++ optionals (enableExtended) [
       "garlic/tampi+send+oss+task"
       "garlic/mpi+send+omp+task"
       "garlic/mpi+send+oss+task"
-    ] ++ forkJoinBranches);
+      "garlic/mpi+send+omp+fork"
+    ];
 
     blocksize = if (enableExtended)
       then range2 1 16
@@ -47,7 +45,7 @@ let
   machineConfig = targetMachine.config;
 
   # Generate the complete configuration for each unit
-  genConf = c: targetMachine.config // rec {
+  genConf = c: machineConfig // rec {
     expName = "fwi-ss";
     unitName = "${expName}"
     + "-nodes${toString nodes}"
@@ -80,14 +78,8 @@ let
 
     # Enable permissions to write in the local storage
     extraMounts = [ fs.local.temp ];
-
+    tempDir = fs.local.temp;
   };
-
-  # Returns true if the given config is in the forkJoinBranches list
-  isForkJoin = c: any (e: c.gitBranch == e) forkJoinBranches;
-
-  # Set the blocksize to null for the fork join branch
-  fixBlocksize = c: if (isForkJoin c) then (c // { blocksize = null; }) else c;
 
   # Compute the array of configurations
   allConfigs = stdexp.buildConfigs {
@@ -98,42 +90,7 @@ let
   # join branch, even if we have multiple blocksizes.
   configs = unique (map fixBlocksize allConfigs);
 
-  exec = {nextStage, conf, ...}: stages.exec {
-    inherit nextStage;
-    pre = ''
-      CDIR=$(pwd)
-      EXECDIR="${fs.local.temp}/out/$GARLIC_USER/$GARLIC_UNIT/$GARLIC_RUN"
-      mkdir -p "$EXECDIR"
-      cd "$EXECDIR"
-      ln -fs ${conf.fwiInput}/InputModels InputModels || true
-    '' + optionalString (conf.enableCTF) ''
-      export NANOS6_CONFIG_OVERRIDE="version.instrument=ctf"
-    '';
-    argv = [
-      "${conf.fwiInput}/fwi_params.txt"
-      "${conf.fwiInput}/fwi_frequencies.txt"
-    ]
-    ++ optional (isForkJoin conf) conf.blocksize
-    ++ [
-      "-1" # Fordward steps
-      "-1" # Backward steps
-      conf.ioFreq # Write/read frequency
-    ];
-    post = ''
-      rm -rf Results || true
-    '' + optionalString (conf.enableCTF) ''
-      mv trace_* "$CDIR"
-    '';
-  };
-
-  apps = bsc.garlic.apps;
-
-  # FWI program
-  program = {nextStage, conf, ...}: apps.fwi.solver.override {
-    inherit (conf) gitBranch fwiInput;
-  };
-
-  pipeline = stdexp.stdPipeline ++ [ exec program ];
+  inherit (common) fixBlocksize pipeline;
 
 in
  
