@@ -1,6 +1,9 @@
-# This experiment compares the effect of not using I/O versus using O_DIRECT |
-# O_DSYNC enabled I/O. This is a reduced version of the strong_scaling_io
-# experiment.
+# Test FWI variants based on tasks with and without I/O.
+# This experiment solves a computationally expensive input which brings the
+# storage devices to saturation when I/O is enabled. The same input runs
+# without I/O for comparison purposes. Also, a range of block sizes
+# deemed as efficient according to the granularity experiment are
+# explored.
 
 {
   stdenv
@@ -9,6 +12,7 @@
 , targetMachine
 , stages
 , callPackage
+, enableExtended ? false
 }:
 
 with stdenv.lib;
@@ -21,41 +25,27 @@ let
 
   # Initial variable configuration
   varConf = {
-    gitBranch = [
-       "garlic/tampi+send+oss+task"
-#      "garlic/mpi+send+omp+task"
-#      "garlic/mpi+send+oss+task"
-#      "garlic/mpi+send+seq"
-#      "garlic/oss+task"
-#      "garlic/omp+task"
-#      "garlic/seq"
-    ];
-
-    blocksize = [ 1 ];
-
-    n = [
-        {nx=500; nz=500; ny=16000;}
-    ];
-
-    nodes = [ 4 ];
+    gitBranch = [ "garlic/tampi+send+oss+task" ];
+    blocksize = [ 1 2 4 8 ];
+    n = [ {nx=500; nz=500; ny=16000;} ];
+    nodes = if (enableExtended) then range2 1 16 else [ 4 ];
     ioFreq = [ 9999 (-1) ];
   };
 
   machineConfig = targetMachine.config;
 
   # Generate the complete configuration for each unit
-  genConf = with bsc; c: targetMachine.config // rec {
-    expName = "fwi-sync-io";
+  genConf = c: targetMachine.config // rec {
+    expName = "fwi-io";
     unitName = "${expName}"
-      + "-ioFreq${toString ioFreq}"
-      + "-${toString gitBranch}";
+    + "-nodes${toString nodes}"
+    + "-bs${toString blocksize}"
+    + "-ioFreq${toString ioFreq}"
+    + "-${toString gitBranch}";
 
     inherit (machineConfig) hw;
-    inherit (c) gitBranch blocksize;
+    inherit (c) gitBranch blocksize ioFreq nodes;
     inherit (c.n) nx ny nz;
-
-    # Other FWI parameters
-    ioFreq = c.ioFreq;
 
     # Repeat the execution of each unit several times
     loops = 10;
@@ -64,7 +54,6 @@ let
     inherit (getResources { inherit gitBranch hw; })
       cpusPerTask ntasksPerNode;
 
-    nodes = c.nodes;
     qos = "debug";
     time = "02:00:00";
     jobName = unitName;
@@ -74,7 +63,6 @@ let
     # Enable permissions to write in the local storage
     extraMounts = [ fs.local.temp ];
     tempDir = fs.local.temp;
-
   };
 
   configs = getConfigs {

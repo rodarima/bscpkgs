@@ -97,12 +97,12 @@
     test = callPackage ./lulesh/test.nix { };
   };
 
-  fwi = {
+  fwi = rec {
     granularity = callPackage ./fwi/granularity.nix { };
     ss = callPackage ./fwi/ss.nix { };
-    ss-io = callPackage ./fwi/ss-io.nix { };
     reuse = callPackage ./fwi/reuse.nix { };
-    sync-io = callPackage ./fwi/sync-io.nix { };
+    io = callPackage ./fwi/io.nix { };
+    ioBig = io.override { enableExtended = true; };
   };
 
   osu = rec {
