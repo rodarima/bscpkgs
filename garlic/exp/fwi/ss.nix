@@ -17,6 +17,8 @@ with stdenv.lib;
 with garlicTools;
 
 let
+  common = callPackage ./common.nix {};
+  inherit (common) getConfigs getResources pipeline;
 
   inherit (targetMachine) fs;
 
@@ -29,13 +31,16 @@ let
       "garlic/mpi+send+omp+task"
       "garlic/mpi+send+oss+task"
       "garlic/mpi+send+omp+fork"
+      # FIXME: the mpi pure version has additional constraints with the
+      # number of planes in Y. By now is disabled.
+      #"garlic/mpi+send+seq"
     ];
 
     blocksize = if (enableExtended)
       then range2 1 16
       else [ 2 ];
 
-    n = [ {nx=100; nz=100; ny=8000;} ];
+    n = [ { nx=100; ny=8000; nz=100; } ];
 
     nodes = range2 1 16;
   };
@@ -65,8 +70,9 @@ let
     loops = 10;
 
     # Resources
-    cpusPerTask = hw.cpusPerSocket;
-    ntasksPerNode = hw.socketsPerNode;
+    inherit (getResources { inherit gitBranch hw; })
+      cpusPerTask ntasksPerNode;
+
     nodes = c.nodes;
     qos = "debug";
     time = "02:00:00";
@@ -78,10 +84,6 @@ let
     extraMounts = [ fs.local.temp ];
     tempDir = fs.local.temp;
   };
-
-  common = callPackage ./common.nix {};
-
-  inherit (common) getConfigs pipeline;
 
   configs = getConfigs {
     inherit varConf genConf;

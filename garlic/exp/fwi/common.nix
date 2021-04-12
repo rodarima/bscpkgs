@@ -31,6 +31,15 @@ rec {
     # join branch, even if we have multiple blocksizes.
     unique (map fixBlocksize allConfigs);
 
+  getResources = {gitBranch, hw}:
+  if (gitBranch == "garlic/mpi+send+seq") then {
+    cpusPerTask = hw.cpusPerSocket;
+    ntasksPerNode = hw.socketsPerNode;
+  } else {
+    cpusPerTask = 1;
+    ntasksPerNode = hw.cpusPerNode;
+  };
+
   exec = {nextStage, conf, ...}: stages.exec {
     inherit nextStage;
 
