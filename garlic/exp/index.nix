@@ -51,11 +51,7 @@
     #mpi = callPackage ./hpcg/mpi.nix { };
     #omp = callPackage ./hpcg/omp.nix { };
     #mpi_omp = callPackage ./hpcg/mpi+omp.nix { };
-    #input = callPackage ./hpcg/gen.nix {
-    #  inherit (bsc.garlic.pp) resultFromTrebuchet;
-    #};
-    genInput = callPackage ./hpcg/gen.nix {
-    };
+    genInput = callPackage ./hpcg/gen.nix { };
 
     oss = callPackage ./hpcg/oss.nix {
       inherit genInput;
@@ -65,13 +61,10 @@
       inherit genInput;
     };
 
-    # ossScalability = callPackage ./hpcg/oss.scalability.192.nix {
-    #   inherit genInput;
-    # };
-
     ossSlicesWeakscaling = callPackage ./hpcg/oss.slices.weakscaling.nix {
       inherit genInput;
     };
+
     ossSlicesStrongscaling = callPackage ./hpcg/oss.slices.strongscaling.nix {
       inherit genInput;
     };

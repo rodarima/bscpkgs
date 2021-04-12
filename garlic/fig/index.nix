@@ -41,8 +41,6 @@ in
     # /nix/store/8dr191vch1nw7vfz8nj36d5nhwnbdnf3-plot
     ossGranularity = stdPlot ./hpcg/oss.granularity.R [ ossGranularity ];
 
-    # ossScalability = stdPlot ./hpcg/oss.scalability.R [ ossScalability ];
-
     # /nix/store/a3x76fbnfbacn2xhz3q65fklfp0qbb6p-plot
     ossWeakscalingPerAxisPerBlock = stdPlot ./hpcg/oss.slices.weakscaling.R [ ossSlicesWeakscaling ];
 
