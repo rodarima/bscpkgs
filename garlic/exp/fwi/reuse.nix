@@ -42,9 +42,7 @@ let
 
     blocksize = [ 1 2 4 8 ];
 
-    n = [
-    	{nx=300; ny=2000; nz=300;} # / half node
-    ];
+    n = [ {nx=300; ny=2000; nz=300;} ]; # / half node
   };
 
   machineConfig = targetMachine.config;
@@ -60,6 +58,9 @@ let
     inherit (c) gitBranch blocksize;
     inherit (c.n) nx ny nz;
 
+    enableCTF = false;
+    enableIO = true;
+
     # Repeat the execution of each unit several times
     loops = 10;
 
@@ -70,9 +71,6 @@ let
     qos = "debug";
     time = "02:00:00";
     jobName = unitName;
-
-    enableCTF = false;
-    ioFreq = -1;
 
     # Enable permissions to write in the local storage
     extraMounts = [ fs.local.temp ];

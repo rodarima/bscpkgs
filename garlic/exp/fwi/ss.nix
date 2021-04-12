@@ -60,7 +60,8 @@ let
     inherit (c.n) nx ny nz;
 
     # Other FWI parameters
-    ioFreq = -1;
+    enableIO = true;
+    enableCTF = false;
 
     # Repeat the execution of each unit several times
     loops = 10;
@@ -73,8 +74,6 @@ let
     qos = "debug";
     time = "02:00:00";
     jobName = unitName;
-
-    enableCTF = false;
 
     # Enable permissions to write in the local storage
     extraMounts = [ fs.local.temp ];

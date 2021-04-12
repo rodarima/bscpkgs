@@ -29,7 +29,7 @@ let
     blocksize = [ 1 2 4 8 ];
     n = [ {nx=500; nz=500; ny=16000;} ];
     nodes = if (enableExtended) then range2 1 16 else [ 4 ];
-    ioFreq = [ 9999 (-1) ];
+    enableIO = [ false true ];
   };
 
   machineConfig = targetMachine.config;
@@ -40,11 +40,11 @@ let
     unitName = "${expName}"
     + "-nodes${toString nodes}"
     + "-bs${toString blocksize}"
-    + "-ioFreq${toString ioFreq}"
+    + (if (enableIO) then "-io1" else "-io0")
     + "-${toString gitBranch}";
 
     inherit (machineConfig) hw;
-    inherit (c) gitBranch blocksize ioFreq nodes;
+    inherit (c) gitBranch blocksize enableIO nodes;
     inherit (c.n) nx ny nz;
 
     # Repeat the execution of each unit several times

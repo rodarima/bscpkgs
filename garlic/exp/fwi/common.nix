@@ -45,6 +45,9 @@ rec {
     fwiParams = bsc.apps.fwi.params.override {
       inherit (conf) nx ny nz;
     };
+
+    ioFreq = if (conf.enableIO) then (conf.ioFreq or "-1") else "9999";
+
   in stages.exec {
     inherit nextStage;
 
@@ -84,7 +87,7 @@ rec {
     ] ++ optional (needsBlocksize conf) conf.blocksize ++ [
       "-1" # Fordward steps
       "-1" # Backward steps
-      conf.ioFreq # Write/read frequency
+      ioFreq # Write/read frequency
     ];
 
     post = ''
