@@ -19,21 +19,9 @@ let
 
   # Initial variable configuration
   varConf = {
-    gitBranch = [
-#      "garlic/tampi+send+oss+task"
-      "garlic/tampi+isend+oss+task"
-#      "garlic/mpi+send+omp+task"
-#      "garlic/mpi+send+oss+task"
-#      "garlic/mpi+send+seq"
-#      "garlic/oss+task"
-#      "garlic/omp+task"
-#      "garlic/seq"
-    ];
-
+    gitBranch = [ "garlic/tampi+isend+oss+task" ];
     blocksize = range2 1 256;
-
     n = [ {nx=100; nz=100; ny=8000; ntpn=2; nodes=1;} ];
-
   };
 
   machineConfig = targetMachine.config;
@@ -74,14 +62,13 @@ let
 
   };
 
-  # Compute the array of configurations
-  configs = stdexp.buildConfigs {
-    inherit varConf genConf;
-  };
-
   common = callPackage ./common.nix {};
 
-  inherit (common) fixBlocksize pipeline;
+  inherit (common) getConfigs pipeline;
+
+  configs = getConfigs {
+    inherit varConf genConf;
+  };
 
 in
  

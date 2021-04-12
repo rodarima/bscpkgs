@@ -18,8 +18,6 @@ with garlicTools;
 
 let
 
-  common = callPackage ./common.nix {};
-
   inherit (targetMachine) fs;
 
   # Initial variable configuration
@@ -81,16 +79,13 @@ let
     tempDir = fs.local.temp;
   };
 
-  # Compute the array of configurations
-  allConfigs = stdexp.buildConfigs {
+  common = callPackage ./common.nix {};
+
+  inherit (common) getConfigs pipeline;
+
+  configs = getConfigs {
     inherit varConf genConf;
   };
-
-  # The unique function ensures that we only run one config for the fork
-  # join branch, even if we have multiple blocksizes.
-  configs = unique (map fixBlocksize allConfigs);
-
-  inherit (common) fixBlocksize pipeline;
 
 in
  

@@ -7,17 +7,29 @@
 
 with stdenv.lib;
 
+# Common definitions used by fwi experiments
 rec {
 
-  # We split these into a separate group so we can remove the blocksize
-  # later.
-  forkJoinBranches = [ "garlic/mpi+send+omp+fork" ];
+  branchesWithoutBlocksize = [
+    "garlic/mpi+send+omp+fork"
+    "garlic/mpi+send+seq"
+  ];
 
   # Returns true if the given config is in the forkJoinBranches list
-  isForkJoin = c: any (e: c.gitBranch == e) forkJoinBranches;
+  needsBlocksize = c: ! any (e: c.gitBranch == e) branchesWithoutBlocksize;
 
   # Set the blocksize to null for the fork join branch
-  fixBlocksize = c: if (isForkJoin c) then (c // { blocksize = null; }) else c;
+  fixBlocksize = c: if (needsBlocksize c) then c
+    else (c // { blocksize = null; });
+
+  # Generate the configs by filtering the unneded blocksizes
+  getConfigs = {varConf, genConf}:
+  let
+    allConfigs = stdexp.buildConfigs { inherit varConf genConf; };
+  in
+    # The unique function ensures that we only run one config for the fork
+    # join branch, even if we have multiple blocksizes.
+    unique (map fixBlocksize allConfigs);
 
   exec = {nextStage, conf, ...}: stages.exec {
     inherit nextStage;
@@ -35,7 +47,7 @@ rec {
     argv = [
       "${conf.fwiInput}/fwi_params.txt"
       "${conf.fwiInput}/fwi_frequencies.txt"
-    ] ++ optional (! isForkJoin conf) conf.blocksize ++ [
+    ] ++ optional (needsBlocksize conf) conf.blocksize ++ [
       "-1" # Fordward steps
       "-1" # Backward steps
       conf.ioFreq # Write/read frequency
