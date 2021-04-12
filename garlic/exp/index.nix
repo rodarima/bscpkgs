@@ -100,10 +100,9 @@
   fwi = {
     granularity = callPackage ./fwi/granularity.nix { };
     ss = callPackage ./fwi/ss.nix { };
+    ss-io = callPackage ./fwi/ss-io.nix { };
     reuse = callPackage ./fwi/reuse.nix { };
-
-    strong_scaling_io       = callPackage ./fwi/strong_scaling_io.nix { };
-    sync_io                 = callPackage ./fwi/sync_io.nix { };
+    sync-io = callPackage ./fwi/sync-io.nix { };
   };
 
   osu = rec {
