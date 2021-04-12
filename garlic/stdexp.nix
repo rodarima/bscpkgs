@@ -76,12 +76,12 @@ rec {
       inherit nextStage;
     };
 
-    srun = {nextStage, conf, preSrun ? "", ...}: (
+    srun = {nextStage, conf, preSrun ? "", postSrun ? "", ...}: (
       assert (assertMsg (!(conf ? cpuBind))
         "cpuBind is no longer available in the standard srun stage");
       stages.srun {
         inherit (conf) nixPrefix;
-        inherit nextStage preSrun;
+        inherit nextStage preSrun postSrun;
 
         # Binding is set to cores always
         cpuBind = "cores,verbose";
