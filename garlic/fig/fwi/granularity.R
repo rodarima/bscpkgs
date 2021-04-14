@@ -1,71 +1,73 @@
 library(ggplot2)
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 library(scales)
 library(jsonlite)
+library(viridis, warn.conflicts = FALSE)
+library(stringr)
 
-args=commandArgs(trailingOnly=TRUE)
+args = commandArgs(trailingOnly=TRUE)
 
-# Read the timetable from args[1]
-input_file = "input.json"
-if (length(args)>0) { input_file = args[1] }
+# Set the input dataset if given in argv[1], or use "input" as default
+if (length(args)>0) { input_file = args[1] } else { input_file = "input" }
 
-# Load the dataset in NDJSON format
-dataset = jsonlite::stream_in(file(input_file)) %>%
-	jsonlite::flatten()
+df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
 
-# We only need the nblocks and time
-df = select(dataset, config.blocksize, config.gitBranch, time) %>%
-	rename(blocksize=config.blocksize, gitBranch=config.gitBranch) %>%
-  group_by(blocksize, gitBranch) %>%
-  mutate(mtime = median(time)) %>%
+  jsonlite::flatten() %>%
+
+  select(unit,
+    config.blocksize,
+    config.gitBranch,
+    time) %>%
+
+	rename(blocksize=config.blocksize,
+    gitBranch=config.gitBranch) %>%
+
+  # Remove the "garlic/" prefix from the gitBranch
+  mutate(branch = str_replace(gitBranch, "garlic/", "")) %>%
+
+  mutate(unit = as.factor(unit)) %>%
+  mutate(gitBranch = as.factor(gitBranch)) %>%
+  mutate(branch = as.factor(branch)) %>%
+  mutate(blocksize = as.factor(blocksize)) %>%
+
+  group_by(unit) %>%
+  mutate(median.time = median(time)) %>%
+  mutate(normalized.time = time / median.time - 1) %>%
   ungroup()
 
-df$gitBranch = as.factor(df$gitBranch)
-df$blocksize = as.factor(df$blocksize)
 
-ppi=300
-h=5
-w=5
+dpi = 300
+h = 6
+w = 6
 
-####################################################################
-### Line Graph
-####################################################################
-png("mtime.png", width=w*ppi, height=h*ppi, res=ppi)
+main_title = "FWI granularity"
 
-## Create the plot with the normalized time vs nblocks
-p = ggplot(df, aes(x = blocksize, y=mtime, group=gitBranch, color=gitBranch)) +
-  geom_point() +
-  geom_line() +
+# ---------------------------------------------------------------------
+
+p = ggplot(df, aes(x=blocksize, y=normalized.time)) +
+  geom_boxplot() +
+  geom_hline(yintercept=c(-0.01, 0.01), linetype="dashed", color="red") +
   theme_bw() +
-  labs(x="Blocksize", y="Median Time (s)", title="FWI granularity",
-    subtitle=input_file) +
-  theme(plot.subtitle=element_text(size=8)) +
-  theme(legend.position = c(0.5, 0.88))
+  facet_wrap(branch ~ .) +
+  labs(y="Normalized time",
+    title=sprintf("%s: normalized time", main_title), 
+    subtitle=input_file) + 
+  theme(plot.subtitle=element_text(size=8))
 
-# Render the plot
-print(p)
+ggsave("normalized.time.png", plot=p, width=w, height=h, dpi=dpi)
+ggsave("normalized.time.pdf", plot=p, width=w, height=h, dpi=dpi)
 
-# Save the png image
-dev.off()
+# ---------------------------------------------------------------------
 
-####################################################################
-### Line Graph
-####################################################################
-png("time.png", width=w*ppi, height=h*ppi, res=ppi)
-
-## Create the plot with the normalized time vs nblocks
-p = ggplot(df, aes(x = blocksize, y=time, group=gitBranch, color=gitBranch)) +
-  geom_point() +
-  geom_line() +
+p = ggplot(df, aes(x=blocksize, y=time, color=branch)) +
+  geom_point(shape=21, size=3) +
+  geom_line(aes(y=median.time, group=branch)) +
   theme_bw() +
-  labs(x="Blocksize", y="Time (s)", title="FWI granularity",
-    subtitle=input_file) +
-  theme(plot.subtitle=element_text(size=8)) +
-  theme(legend.position = c(0.5, 0.88))
+  labs(y="Time (s)",
+    title=sprintf("%s: time", main_title), 
+    subtitle=input_file) + 
+  theme(legend.position="bottom") +
+  theme(plot.subtitle=element_text(size=8))
 
-# Render the plot
-print(p)
-
-# Save the png image
-dev.off()
-
+ggsave("time.png", plot=p, width=w, height=h, dpi=dpi)
+ggsave("time.pdf", plot=p, width=w, height=h, dpi=dpi)
