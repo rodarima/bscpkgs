@@ -15,27 +15,24 @@ dataset = jsonlite::stream_in(file(input_file)) %>%
   jsonlite::flatten()
 
 # We only need the nblocks and time
-df = select(dataset, config.blocksize, config.ioFreq, config.gitBranch, config.nodes, time) %>%
+df = select(dataset, config.blocksize, config.ioFreq, config.gitBranch, config.nodes, time, unit) %>%
   rename(
      blocksize=config.blocksize,
-     io=config.ioFreq,
+     enableIO=config.enableIO,
      gitBranch=config.gitBranch,
      nodes=config.nodes
   ) %>%
   filter(blocksize == 1) %>%
-  group_by(nodes, gitBranch, io) %>%
+  group_by(unit) %>%
   mutate(mtime = median(time)) %>%
   mutate(nxmtime = mtime * nodes) %>%
   mutate(nxtime = time * nodes) %>%
   ungroup()
 
 df$gitBranch = as.factor(df$gitBranch)
-df$io        = as.factor(df$io)
+df$enableIO  = as.factor(df$enableIO)
 df$blocksize = as.factor(df$blocksize)
 df$nodes     = as.factor(df$nodes)
-
-df$io = fct_recode(df$io, enabled = "-1", disabled = "9999")
-
 
 ppi=300
 h=5
@@ -46,7 +43,7 @@ w=5
 ####################################################################
 png("time.png", width=w*ppi, height=h*ppi, res=ppi)
 
-p = ggplot(df, aes(x=nodes, y=time, group=io, color=io)) +
+p = ggplot(df, aes(x=nodes, y=time, group=enableIO, color=enableIO)) +
   geom_point() +
   geom_line() +
   theme_bw() +
@@ -66,7 +63,7 @@ dev.off()
 ####################################################################
 png("nxtime.png", width=w*ppi, height=h*ppi, res=ppi)
 
-p = ggplot(df, aes(x=nodes, y=nxtime, group=io, color=io)) +
+p = ggplot(df, aes(x=nodes, y=nxtime, group=enableIO, color=enableIO)) +
   geom_point() +
   geom_line() +
   theme_bw() +
