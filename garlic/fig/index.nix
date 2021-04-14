@@ -62,12 +62,10 @@ in
   };
 
   fwi = with exp.fwi; {
-    granularity       = stdPlot ./fwi/granularity.R [ granularity ];
-    strong_scaling    = stdPlot ./fwi/strong_scaling.R [ strong_scaling_task strong_scaling_forkjoin ];
-    #strong_scaling    = stdPlot ./fwi/strong_scaling.R [ strong_scaling_task strong_scaling_forkjoin strong_scaling_mpionly ];
-    data_reuse        = stdPlot ./fwi/granularity.R [ data_reuse ];
-    strong_scaling_io = stdPlot ./fwi/strong_scaling_io.R [ strong_scaling_io ];
-    sync_io           = stdPlot ./fwi/strong_scaling_io.R [ sync_io ];
+    granularity = stdPlot ./fwi/granularity.R [ granularity ];
+    reuse       = stdPlot ./fwi/granularity.R [ reuse ];
+    ss = stdPlot ./fwi/ss.R [ ss ];
+    io = stdPlot ./fwi/io.R [ io ];
   };
 
   osu = with exp.osu; {
