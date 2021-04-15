@@ -97,6 +97,7 @@ stdenv.mkDerivation rec {
     cat > $out/run <<EOF
     #!/bin/sh -e
     ${slurm}/bin/sbatch ${nixPrefix}$out/job
+    echo queued > status
     EOF
     chmod +x $out/run
   '';
