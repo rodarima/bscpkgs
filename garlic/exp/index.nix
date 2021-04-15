@@ -123,4 +123,8 @@
   examples = {
     granularity = callPackage ./examples/granularity.nix { };
   };
+
+  test = {
+    exit1 = callPackage ./test/exit1.nix { };
+  };
 }
