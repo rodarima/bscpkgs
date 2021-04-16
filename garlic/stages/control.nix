@@ -18,9 +18,25 @@ stdenv.mkDerivation {
   installPhase = ''
     cat > $out <<"EOF"
     #!/bin/sh -e
-    for n in $(seq 1 ${toString loops}); do
+
+    function badexit() {
+      errcode=$?
+      if [ $errcode != 0 ]; then
+        printf "exit %d\n" $errcode > "$basedir/status"
+        echo "exiting with $errcode"
+      fi
+
+      echo 1 > "$basedir/done"
+      exit $errcode
+    }
+
+    trap badexit EXIT
+
+    basedir=$(pwd)
+    loops=${toString loops}
+    for n in $(seq 1 $loops); do
       export GARLIC_RUN="$n"
-      echo "running $n of ${toString loops}" > status
+      echo "run $n/$loops" > status
       mkdir "$n"
       cd "$n"
       mkdir .garlic
@@ -29,7 +45,7 @@ stdenv.mkDerivation {
       date +%s > .garlic/total_time_end
       cd ..
     done
-    echo "completed" > status
+    echo "ok" > status
     EOF
     chmod +x $out
   '';
