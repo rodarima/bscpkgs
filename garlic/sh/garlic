@@ -6,6 +6,10 @@ PATH=@PATH@
 
 usage() { echo "Usage: garlic [-RFwv] trebuchet" 1>&2; exit 1; }
 
+msg() {
+  >&2 echo "garlic: $@"
+}
+
 findClosure() {
   what=$1
   from=$2
@@ -95,6 +99,37 @@ checkMountpoint() {
   fi
 }
 
+status_line() {
+  unithash="$1"
+  name="$2"
+  status="$3"
+
+  red=$(tput -T ansi setaf 1)
+  green=$(tput -T ansi setaf 2)
+  yellow=$(tput -T ansi setaf 3)
+  color_reset=$(tput -T ansi sgr0)
+
+  case $status in
+    ok)
+      color_st="$green"
+      ;;
+    run*)
+      color_st="$yellow"
+      ;;
+    exit*)
+      color_st="$red"
+      ;;
+    *)
+      color_st=""
+      ;;
+  esac
+
+  if [ $verbose ]; then
+    >&2 printf "garlic: %s  %s%-9s%s  %s\n" \
+      "$unithash" "$color_st" "$status" "$color_reset" "$name"
+  fi
+}
+
 do_fetch() {
   expName=$(basename $experiment)
   user=$(ssh -G "$sshHost" | awk '/^user /{print $2}')
@@ -112,32 +147,51 @@ do_fetch() {
   cwd=$(pwd)
 
   repeat=1
+  bad=0
   while [ 1 ]; do
     repeat=0
-    cd $exp
-    test $verbose && >&2 echo "$exp: checking units"
+    test $verbose && msg "Checking units $(date --rfc-3339=seconds)..."
+
+    declare -A unit_names
 
     for unit in $unitNameList; do
-      if [ ! -e $exp/$unit ]; then
-        test $verbose && >&2 echo "$unit: missing unit"
-        repeat=1
-      else
-        cd $exp/$unit
-        if [ ! -e status ]; then
-          test $verbose && >&2 echo "$unit: no status"
-          repeat=1
-        else
-          st=$(cat status)
-          test $verbose && >&2 echo "$unit: $st"
-          if [ "$st" != "completed" ]; then
-            repeat=1
+
+      unit_hash="${unit%-unit}"
+      unit_status="?"
+      unit_name="?"
+
+      if [ -e "$exp/$unit" ]; then
+        st_file="$exp/$unit/status"
+        conf_json="$exp/$unit/garlic_config.json"
+        done_file="$exp/$unit/done"
+
+        if [ -z "${unit_names[$unit_hash]}" ]; then
+          if [ -e "$conf_json" ]; then
+            unit_names+=([$unit_hash]=$(jq -r .unitName "$conf_json"))
+            unit_name="${unit_names[$unit_hash]}"
           fi
+        else
+          unit_name="${unit_names[$unit_hash]}"
         fi
+
+        if [ -e "$st_file" ]; then
+          unit_status=$(cat "$st_file")
+        fi
+      fi
+
+      status_line "$unit_hash" "$unit_name" "$unit_status"
+
+      if [ ! -e "$done_file" ]; then
+        repeat=1
+      elif [ "$unit_status" != "ok" ]; then
+        bad=1
       fi
     done
 
     if [ $repeat -eq 0 ]; then
       break
+    else
+      test $verbose && msg ""
     fi
 
     if [ $waitResults -eq 1 ]; then
@@ -149,13 +203,18 @@ do_fetch() {
   done
 
   if [ $repeat -eq 1 ]; then
-    >&2 echo "$exp: execution incomplete"
+    #>&2 echo "$exp: execution incomplete"
+    exit 1
+  fi
+
+  if [ $bad -eq 1 ]; then
+    msg "Some units failed, aborting"
     exit 1
   fi
 
   cd "$cwd"
 
-  test $verbose && >&2 echo "$exp: execution complete, fetching results"
+  test $verbose && msg "execution complete, fetching results"
 
   mkdir -p "$outputDir"
 

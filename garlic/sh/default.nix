@@ -6,6 +6,7 @@
 , openssh
 , nix
 , jq
+, ncurses
 }:
 
 with garlicTools;
@@ -17,7 +18,7 @@ in
     name = "garlic-tool";
     preferLocalBuild = true;
 
-    buildInputs = [ rsync openssh nix jq ];
+    buildInputs = [ rsync openssh nix jq ncurses ];
     phases = [ "unpackPhase" "installPhase" ];
 
     src = ./.;
