@@ -26,7 +26,16 @@ in
 
         echo ${trebuchet} >> /garlic/run
         echo "resultTree: waiting for experiment results..."
+        stdbuf -o 0 tail -f /garlic/st &
+        stpid=$!
         res=$(cat /garlic/completed)
+
+        kill -TERM $stpid
+
+        if [ "$res" == "ERROR" ]; then
+          echo "resultTree: the experiment failed"
+          exit 1
+        fi
 
         if [ "$res" != "${trebuchet}" ]; then
           echo "resultTree: unknown trebuchet received"

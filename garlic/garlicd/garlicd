@@ -2,9 +2,14 @@
 
 set -e
 
-msg() {
+emsg() {
   >&2 echo "garlicd: $@"
-} 
+}
+
+msg() {
+  emsg "$@"
+  if [ ! -z "$st" ]; then echo "garlicd: $@" >>"$st"; fi
+}
 
 if [ ! -z "$1" ]; then
   >&2 echo "usage: garlicd"
@@ -18,8 +23,8 @@ garlic_sandbox=$(nix show-config |\
   grep -o '/garlic=[^ ]*' || true)
 
 if [ -z "$garlic_sandbox" ]; then
-  msg "Missing extra-sandbox-paths /garlic mountpoint"
-  msg "Check the ~/.config/nix/nix.conf file"
+  emsg "Missing extra-sandbox-paths /garlic mountpoint"
+  emsg "Check the ~/.config/nix/nix.conf file"
   exit 1
 fi
 
@@ -28,6 +33,7 @@ mountdir=$(readlink -f "$mountdir_rel")
 run="$mountdir/run"
 completed="$mountdir/completed"
 wipe="$mountdir/wipe"
+st="$mountdir/st"
 
 handle_bad_signal() {
   msg "cleaning FIFO pipes"
@@ -46,8 +52,11 @@ for fifo in "$run" "$completed" "$wipe"; do
 done
 
 while true; do
-  msg "Waiting for experiments ..."
+  emsg "--- Waiting for experiments ---"
   tre=$(head -1 "$run")
+
+  # Truncate state file
+  printf "" > "$st"
 
   msg "Attempting to run: $tre"
   msg "Copying files to MN4..."
@@ -55,12 +64,28 @@ while true; do
   # with the post build hook
   nix copy --to ssh://mn1 $tre || true
 
+  set +e
+
   msg "Launching the experiment..."
-  garlic -R "$tre"
+  garlic -R "$tre" 2>>"$st"
+  if [ "$?" != 0 ]; then
+    echo ERROR > "$completed"
+    msg "Failed to run the experiment :-("
+    continue
+  fi
 
   msg "Fetching results..."
-  garlic -FKv "$tre"
+  garlic -FKv "$tre" 2>>"$st"
 
+  if [ "$?" != 0 ]; then
+    echo ERROR > "$completed"
+    msg "The experiment failed :-("
+    continue
+  fi
+
+  set -e
+
+  msg "Signalling nix build..."
   echo -n "$tre" >> "$completed"
 
   msg "Waiting for nix to finish the build..."
@@ -72,7 +97,7 @@ while true; do
   fi
 
   msg "Removing temporal files..."
-  garlic -D "$tre"
+  garlic -D "$tre" 2>>"$st"
 
   echo -n "$tre" >> "$completed"
 
