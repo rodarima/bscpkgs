@@ -31,7 +31,7 @@ stdenv.mkDerivation {
     #!/bin/sh
 
     if [ -z "\$GARLIC_OUT" ]; then
-      >&2 echo "GARLIC_OUT not defined, aborting"
+      >&2 echo "experiment: GARLIC_OUT not defined, aborting"
       exit 1
     fi
 
@@ -40,7 +40,7 @@ stdenv.mkDerivation {
     export GARLIC_EXPERIMENT=$(basename $out)
 
     if [ -e "\$GARLIC_EXPERIMENT" ]; then
-      >&2 echo "skipping, experiment exists: \$(pwd)/\$GARLIC_EXPERIMENT"
+      >&2 echo "experiment: skipping, directory exists: \$GARLIC_EXPERIMENT"
       exit 0
     fi
 
@@ -49,7 +49,7 @@ stdenv.mkDerivation {
     cd "\$GARLIC_EXPERIMENT"
     ${unitsLinks}
 
-    echo "Running experiment \$GARLIC_EXPERIMENT"
+    >&2 echo "experiment: running \$GARLIC_EXPERIMENT"
 
     # This is an experiment formed by the following units:
     ${unitsString}

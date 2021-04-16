@@ -56,17 +56,17 @@ stdenv.mkDerivation {
     ${desc}
 
     if [ -z "\$GARLIC_OUT" ]; then
-      >&2 echo "GARLIC_OUT not defined, aborting"
+      >&2 echo "unit: GARLIC_OUT not defined, aborting"
       exit 1
     fi
 
     if [ -z "\$GARLIC_EXPERIMENT" ]; then
-      >&2 echo "GARLIC_EXPERIMENT not defined, aborting"
+      >&2 echo "unit: GARLIC_EXPERIMENT not defined, aborting"
       exit 1
     fi
 
     if [ -z "\$GARLIC_INDEX" ]; then
-      >&2 echo "GARLIC_INDEX not defined, aborting"
+      >&2 echo "unit: GARLIC_INDEX not defined, aborting"
       exit 1
     fi
 
@@ -86,7 +86,7 @@ stdenv.mkDerivation {
       "\$GARLIC_INDEX/${safeExpName}"
 
     if [ -e "\$GARLIC_UNIT" ]; then
-      >&2 echo "skipping, unit path already exists: \$GARLIC_UNIT"
+      >&2 echo "unit: skipping, already exists: \$GARLIC_UNIT"
       exit 0
     fi
 
