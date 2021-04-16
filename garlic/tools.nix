@@ -77,6 +77,14 @@ let
     optionalInherit = l: a: filterAttrs (n: v: v!=null)
       (overrideExisting (genNullAttr l) a);
 
+    # Given a float f, truncates it and returns the resulting the integer
+    floatTruncate = f: let
+      strFloat = toString f;
+      slices = splitString "." strFloat;
+      front = elemAt slices 0;
+    in
+      toInt front;
+
   };
 in
   gen
