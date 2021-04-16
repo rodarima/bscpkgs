@@ -92,6 +92,7 @@
   slurm = {
     cpu = callPackage ./slurm/cpu.nix { };
     sigsegv = callPackage ./slurm/sigsegv.nix { };
+    exit1 = callPackage ./slurm/exit1.nix { };
   };
 
   lulesh = {
@@ -122,9 +123,5 @@
 
   examples = {
     granularity = callPackage ./examples/granularity.nix { };
-  };
-
-  test = {
-    exit1 = callPackage ./test/exit1.nix { };
   };
 }
