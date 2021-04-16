@@ -15,8 +15,10 @@ rec {
 
   # Generate the complete configuration for each unit
   genConf = c: targetMachine.config // rec {
-    expName = "${c.expName}.gen";
-    unitName = "${c.unitName}.gen";
+    expName = "hpcg-gen";
+    unitName = expName
+    + "-nodes${toString nodes}"
+    + "-spt.z${toString sizePerTask.z}";
 
     inherit (targetMachine.config) hw;
 
