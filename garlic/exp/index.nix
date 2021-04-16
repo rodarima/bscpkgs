@@ -65,9 +65,9 @@
       inherit genInput;
     };
 
-    ossSlicesStrongscaling = callPackage ./hpcg/oss.slices.strongscaling.nix {
-      inherit genInput;
-    };
+    ss = callPackage ./hpcg/ss.nix { };
+
+    big.ss = ss.override { enableExtended = true; };
   };
 
   heat = rec {
