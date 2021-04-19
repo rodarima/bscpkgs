@@ -9,59 +9,49 @@
 , gnuDef
 , intelDef
 , cc
-, gitBranch
+, gitBranch ? "garlic/mpi+send+seq"
+, gitCommit ? null
+, garlicTools
 }:
 
 assert (mpi == impi || mpi == openmpi);
 
 let
-  mpiName = (if mpi == openmpi then
-    "OpenMPI"
-  else
-    "IntelMPI");
+  # FIXME: We should find a better way to specify the MPI implementation
+  # and the compiler.
+  mpiName = if mpi == openmpi then "OpenMPI" else "IntelMPI";
+  compName = if cc == intelDef then "Intel" else "GNU";
 
-  compName = (if cc == intelDef then
-    "Intel"
-  else
-    "GNU");
-
-in
-stdenv.mkDerivation rec {
-  name = "creams";
-
-  # src = /home/Computational/pmartin1/creams-simplified;
-  src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/pmartin1/creams-simplified.git";
-    ref = "${gitBranch}";
+  gitSource = garlicTools.fetchGarlicApp {
+    appName = "creams";
+    inherit gitCommit gitBranch;
+    gitTable = import ./git-table.nix;
   };
+in
+  stdenv.mkDerivation rec {
+    name = "creams";
 
-  programPath = "/bin/creams.exe";
+    inherit (gitSource) src gitBranch gitCommit;
 
-  buildInputs = [
-    nanos6
-    mpi
-    cc
-    tampi
-    mcxx
-  ];
+    programPath = "/bin/creams.exe";
 
-  hardeningDisable = [ "all" ];
+    buildInputs = [ nanos6 mpi cc tampi mcxx ];
 
-  configurePhase = ''
-    export TAMPI_HOME=${tampi}
+    hardeningDisable = [ "all" ];
 
-    . etc/bashrc
+    configurePhase = ''
+      export TAMPI_HOME=${tampi}
 
-    export FORTRAN_COMPILER=${compName}
-    export MPI_LIB=${mpiName}
+      . etc/bashrc
 
-    echo
+      export FORTRAN_COMPILER=${compName}
+      export MPI_LIB=${mpiName}
 
-    CREAMS_UPDATE_ENVIRONMENT
-  '';
+      CREAMS_UPDATE_ENVIRONMENT
+    '';
 
-  installPhase = ''
-    mkdir -p $out/bin
-    cp -a build/* $out/bin
-  '';
-}
+    installPhase = ''
+      mkdir -p $out/bin
+      cp -a build/* $out/bin
+    '';
+  }

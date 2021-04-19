@@ -20,12 +20,9 @@
   creams = callPackage ./creams/default.nix {
     gnuDef   = self.gfortran10 ; # Default GNU   compiler version
     intelDef = bsc.icc    ; # Default Intel compiler version
-    gitBranch = "garlic/mpi+send+seq";
   };
 
-  creamsInput = callPackage ./creams/input.nix {
-    gitBranch = "garlic/mpi+send+seq";
-  };
+  creamsInput = callPackage ./creams/input.nix { };
 
   hpcg = callPackage ./hpcg/default.nix {
     gitBranch = "garlic/tampi+isend+oss+task";
