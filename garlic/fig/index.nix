@@ -38,14 +38,10 @@ in
   };
 
   hpcg = with exp.hpcg; {
-    # /nix/store/8dr191vch1nw7vfz8nj36d5nhwnbdnf3-plot
-    ossGranularity = stdPlot ./hpcg/oss.granularity.R [ ossGranularity ];
-
-    # /nix/store/a3x76fbnfbacn2xhz3q65fklfp0qbb6p-plot
-    ossWeakscalingPerAxisPerBlock = stdPlot ./hpcg/oss.slices.weakscaling.R [ ossSlicesWeakscaling ];
-
-    # /nix/store/096rl6344pbz5wrzgxgqn651pysfkkjc-plot
-    ossStrongscalingPerBlock = stdPlot ./hpcg/oss.slices.strongscaling.R [ ossSlicesStrongscaling ];
+    ss = stdPlot ./hpcg/ss.R [ ss ];
+    ws = stdPlot ./hpcg/ws.R [ ws ];
+    size = stdPlot ./hpcg/size.R [ size ];
+    granularity = stdPlot ./hpcg/granularity.R [ granularity ];
   };
 
   saiph = with exp.saiph; {
