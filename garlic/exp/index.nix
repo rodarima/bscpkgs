@@ -47,25 +47,10 @@
   };
 
   hpcg = rec {
-    #serial = callPackage ./hpcg/serial.nix { };
-    #mpi = callPackage ./hpcg/mpi.nix { };
-    #omp = callPackage ./hpcg/omp.nix { };
-    #mpi_omp = callPackage ./hpcg/mpi+omp.nix { };
-    genInput = callPackage ./hpcg/gen.nix { };
-
-    oss = callPackage ./hpcg/oss.nix {
-      inherit genInput;
-    };
-
-    ossGranularity = callPackage ./hpcg/oss.granularity.192.nix {
-      inherit genInput;
-    };
-
-    ossSlicesWeakscaling = callPackage ./hpcg/oss.slices.weakscaling.nix {
-      inherit genInput;
-    };
-
-    ss = callPackage ./hpcg/ss.nix { };
+    granularity = callPackage ./hpcg/granularity.nix { };
+    ss = callPackage ./hpcg/scaling.nix { };
+    ws = ss.override { enableStrong=false; };
+    size = callPackage ./hpcg/size.nix { };
 
     big.ss = ss.override { enableExtended = true; };
   };

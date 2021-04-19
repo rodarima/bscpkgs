@@ -6,7 +6,6 @@
 , stages
 , garlicTools
 , callPackage
-, enableExtended ? false
 }:
 
 with stdenv.lib;
@@ -19,36 +18,33 @@ let
 
   # Initial variable configuration
   varConf = {
-    nodes = range2 1 16;
-    blocksPerCpu = if (enableExtended)
-      then range2 1 8
-      else [ 4 ];
-    gitBranch = [
-      "garlic/tampi+isend+oss+task"
-    ];
+    sizeFactor = [ 1 2 4 8 16 32 ];
   };
 
   # Generate the complete configuration for each unit
   genConf = c: targetMachine.config // rec {
-    expName = "hpcg-ss";
+    expName = "hpcg-size";
     unitName = "${expName}"
     + "-nodes${toString nodes}"
-    + "-bpc${toString blocksPerCpu}";
+    + "-sf${toString sizeFactor}";
 
     inherit (targetMachine.config) hw;
 
     # hpcg options
-    inherit (c) nodes blocksPerCpu gitBranch;
+    inherit (c) sizeFactor;
+    gitBranch = "garlic/tampi+isend+oss+task";
+    nodes = 16;
     totalTasks = ntasksPerNode * nodes;
-    sizePerCpu = { x=2; y=2; z=128 / totalTasks; };
+    sizePerCpu = { x = 2; y = 2; z = 4 * sizeFactor; };
     sizePerTask = getSizePerTask cpusPerTask sizePerCpu;
     nprocs = { x=1; y=1; z=totalTasks; };
+    blocksPerCpu = 4;
     nblocks = blocksPerCpu * cpusPerTask;
     ncomms = 1;
     disableAspectRatio = true;
 
     # Repeat the execution of each unit several times
-    loops = 10;
+    loops = 5;
 
     # Resources
     qos = "debug";
