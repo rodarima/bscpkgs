@@ -20,34 +20,34 @@ let
     gitTable = import ./git-table.nix;
   };
 in
-stdenv.mkDerivation rec {
-  name = "hpccg";
+  stdenv.mkDerivation rec {
+    name = "hpccg";
 
-  inherit (gitSource) src gitBranch gitCommit;
+    inherit (gitSource) src gitBranch gitCommit;
 
-  programPath = "/bin/test_HPCCG-mpi.exe";
+    programPath = "/bin/test_HPCCG-mpi.exe";
 
-  buildInputs = [
-    icc
-  ]
-  ++ optional (mpi != null) mpi
-  ++ optional (tampi != null) tampi
-  ++ optional (mcxx != null) mcxx;
+    buildInputs = [
+      icc
+    ]
+    ++ optional (mpi != null) mpi
+    ++ optional (tampi != null) tampi
+    ++ optional (mcxx != null) mcxx;
 
-  # The hpccg app fails to compile in parallel. Makefile must be fixed before.
-  enableParallelBuilding = false;
+    # The hpccg app fails to compile in parallel. Makefile must be fixed before.
+    enableParallelBuilding = false;
 
-  makeFlags = [
-    "USE_MPI=-DUSING_MPI"
-  ]
-  ++ optional (tampi != null) "TAMPI_HOME=${tampi}";
+    makeFlags = [
+      "USE_MPI=-DUSING_MPI"
+    ]
+    ++ optional (tampi != null) "TAMPI_HOME=${tampi}";
 
-  dontPatchShebangs = true;
+    dontPatchShebangs = true;
 
-  installPhase = ''
-    echo ${tampi}
-    mkdir -p $out/bin
-    cp test_HPCCG-mpi.exe $out/bin
-  '';
+    installPhase = ''
+      echo ${tampi}
+      mkdir -p $out/bin
+      cp test_HPCCG-mpi.exe $out/bin
+    '';
 
-}
+  }
