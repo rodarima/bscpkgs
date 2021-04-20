@@ -5,6 +5,7 @@
 , targetMachine
 , stages
 , garlicTools
+, numactl
 , callPackage
 }:
 
@@ -14,37 +15,40 @@ with garlicTools;
 let
   # Initial variable configuration
   varConf = {
-    blocksize = range2 64 2048;
-    gitBranch = [
-#      "garlic/mpi+send+oss+task" 
-#      "garlic/tampi+send+oss+task" 
-      "garlic/tampi+isend+oss+task"
-    ];
+    blocksize = range2 256 1024;
+    gitBranch = [ "garlic/tampi+send+oss+task" ];
+    attachToSocket = [ true false ];
+    interleaveMem = [ true false ];
   };
 
   # Generate the complete configuration for each unit
   genConf = c: targetMachine.config // rec {
     hw = targetMachine.config.hw;
-    particles = 8 * 1024 * hw.cpusPerSocket;
+    particles = 4 * 1024 * hw.cpusPerSocket;
     timesteps = 10;
-    blocksize = c.blocksize;
-    gitBranch = c.gitBranch;
 
-    expName = "nbody-granularity";
+    inherit (c) attachToSocket interleaveMem gitBranch blocksize;
+
+    expName = "nbody-numa";
     unitName = expName +
       "-${toString gitBranch}" +
-      "-bs${toString blocksize}";
+      "-bs.${toString blocksize}" +
+      "-tpn.${toString ntasksPerNode}" +
+      "-interleave.${if (interleaveMem) then "yes" else "no"}";
 
     loops = 10;
 
     qos = "debug";
-    cpusPerTask = hw.cpusPerSocket;
-    ntasksPerNode = hw.socketsPerNode;
-    nodes = 1;
+    cpusPerTask = if (attachToSocket)
+      then hw.cpusPerSocket
+      else hw.cpusPerNode;
+    ntasksPerNode = if (attachToSocket)
+      then hw.socketsPerNode
+      else 1;
+    nodes = 4;
     time = "02:00:00";
     jobName = unitName;
   };
-
 
   common = callPackage ./common.nix {};
 

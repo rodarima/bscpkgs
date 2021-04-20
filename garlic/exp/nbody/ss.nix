@@ -14,7 +14,8 @@ with garlicTools;
 let
   # Initial variable configuration
   varConf = {
-    blocksize = range2 64 2048;
+    blocksize = [ 128 ];
+    nodes = range2 1 16;
     gitBranch = [
 #      "garlic/mpi+send+oss+task" 
 #      "garlic/tampi+send+oss+task" 
@@ -27,24 +28,22 @@ let
     hw = targetMachine.config.hw;
     particles = 8 * 1024 * hw.cpusPerSocket;
     timesteps = 10;
-    blocksize = c.blocksize;
-    gitBranch = c.gitBranch;
 
-    expName = "nbody-granularity";
+    inherit (c) blocksize nodes gitBranch;
+
+    expName = "nbody-scaling";
     unitName = expName +
       "-${toString gitBranch}" +
-      "-bs${toString blocksize}";
+      "-nodes${toString nodes}";
 
-    loops = 10;
+    loops = 5;
 
     qos = "debug";
-    cpusPerTask = hw.cpusPerSocket;
     ntasksPerNode = hw.socketsPerNode;
-    nodes = 1;
     time = "02:00:00";
+    cpusPerTask = hw.cpusPerSocket;
     jobName = unitName;
   };
-
 
   common = callPackage ./common.nix {};
 
