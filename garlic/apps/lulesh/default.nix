@@ -3,38 +3,44 @@
 , impi
 , mcxx
 , icc
-, gitBranch ? "garlic/tampi+isend+oss+taskfor"
 , tampi ? null
+, gitBranch ? "garlic/mpi+isend+seq"
+, gitCommit ? null
+, garlicTools
 }:
 
 with stdenv.lib;
 
-stdenv.mkDerivation rec {
-  name = "lulesh";
-
-  src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/garlic/apps/lulesh.git";
-    ref = gitBranch;
+let
+  gitSource = garlicTools.fetchGarlicApp {
+    appName = "lulesh";
+    inherit gitCommit gitBranch;
+    gitTable = import ./git-table.nix;
   };
+in
+  stdenv.mkDerivation rec {
+    name = "lulesh";
 
-  dontConfigure = true;
+    inherit (gitSource) src gitBranch gitCommit;
 
-  preBuild = optionalString (tampi != null) "export TAMPI_HOME=${tampi}";
+    dontConfigure = true;
 
-  #TODO: Allow multiple MPI implementations and compilers
-  buildInputs = [
-    impi
-    icc
-    mcxx
-  ];
+    preBuild = optionalString (tampi != null) "export TAMPI_HOME=${tampi}";
 
-  enableParallelBuilding = true;
+    #TODO: Allow multiple MPI implementations and compilers
+    buildInputs = [
+      impi
+      icc
+      mcxx
+    ];
 
-  #TODO: Can we build an executable named "lulesh" in all branches?
-  installPhase = ''
-    mkdir -p $out/bin
-    find . -name 'lulesh*' -type f -executable -exec cp \{\} $out/bin/${name} \;
-  '';
-  programPath = "/bin/${name}";
+    enableParallelBuilding = true;
 
-}
+    #TODO: Can we build an executable named "lulesh" in all branches?
+    installPhase = ''
+      mkdir -p $out/bin
+      find . -name 'lulesh*' -type f -executable -exec cp \{\} $out/bin/${name} \;
+    '';
+    programPath = "/bin/${name}";
+
+  }
