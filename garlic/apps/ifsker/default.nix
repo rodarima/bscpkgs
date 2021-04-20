@@ -26,8 +26,6 @@ in
 
     buildInputs = [ tampi mpi nanos6 mcxx gfortran ];
 
-    preferLocalBuild = true;
-
     # Mercurium seems to fail when building with fortran in parallel
     enableParallelBuilding = false;
 
