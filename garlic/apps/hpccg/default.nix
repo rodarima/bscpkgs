@@ -1,44 +1,53 @@
 {
   stdenv
-, nanos6
-, mpi
-, mcxx
-, tampi
 , icc
+, mpi ? null
+, tampi ? null
+, mcxx ? null
+, gitBranch ? "garlic/mpi+isend+seq"
+, gitCommit ? null
+, garlicTools
 }:
 
+assert !(tampi != null && mcxx == null);
+
+with stdenv.lib;
+
+let
+  gitSource = garlicTools.fetchGarlicApp {
+    appName = "hpccg";
+    inherit gitCommit gitBranch;
+    gitTable = import ./git-table.nix;
+  };
+in
 stdenv.mkDerivation rec {
   name = "hpccg";
 
-  src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/mmaronas/HPCCG.git";
-    ref = "mmaronas-development";
-  };
+  inherit (gitSource) src gitBranch gitCommit;
+
+  programPath = "/bin/test_HPCCG-mpi.exe";
 
   buildInputs = [
-    nanos6
-    mpi
     icc
-    tampi
-    mcxx
-  ];
+  ]
+  ++ optional (mpi != null) mpi
+  ++ optional (tampi != null) tampi
+  ++ optional (mcxx != null) mcxx;
 
   # The hpccg app fails to compile in parallel. Makefile must be fixed before.
   enableParallelBuilding = false;
 
-  postPatch = ''
-    sed -i 's/mpic++/mpiicpc/g' Makefile
-    sed -i 's/g++/icpc/g' Makefile
-    mkdir obj
-  '';
-
-  makeFlags =  [
+  makeFlags = [
     "USE_MPI=-DUSING_MPI"
-    "TAMPI_HOME=${tampi}"
-  ];
+  ]
+  ++ optional (tampi != null) "TAMPI_HOME=${tampi}";
+
+  dontPatchShebangs = true;
 
   installPhase = ''
+    echo ${tampi}
     mkdir -p $out/bin
-    cp test_HPCCG* $out/bin
+    cp test_HPCCG-mpi.exe $out/bin
   '';
+
 }
