@@ -5,48 +5,53 @@
 , tampi ? null
 , mcxx ? null
 , cflags ? null
-, gitBranch
-, gitURL ? "ssh://git@bscpm03.bsc.es/garlic/apps/nbody.git"
+, gitBranch ? "garlic/seq"
+, gitCommit ? null
 , blocksize ? 2048
+, garlicTools
 }:
 
 assert !(tampi != null && mcxx == null);
 
 with stdenv.lib;
-stdenv.mkDerivation rec {
-  name = "nbody";
 
-  #src = ~/nbody;
-
-  src = builtins.fetchGit {
-    url = "${gitURL}";
-    ref = "${gitBranch}";
+let
+  gitSource = garlicTools.fetchGarlicApp {
+    appName = "nbody";
+    inherit gitCommit gitBranch;
+    gitTable = import ./git-table.nix;
   };
-  programPath = "/bin/nbody";
+in
+  stdenv.mkDerivation rec {
+    name = "nbody";
 
-  buildInputs = [
-    cc
-  ]
-  ++ optional (mpi != null) mpi
-  ++ optional (tampi != null) tampi
-  ++ optional (mcxx != null) mcxx;
+    inherit (gitSource) src gitBranch gitCommit;
 
-  preBuild = (if cflags != null then ''
-    makeFlagsArray+=(CFLAGS="${cflags}")
-  '' else "");
+    programPath = "/bin/nbody";
 
-  makeFlags = [
-    "CC=${cc.CC}"
-    "BS=${toString blocksize}"
-  ]
-  ++ optional (tampi != null) "TAMPI_HOME=${tampi}";
+    buildInputs = [
+      cc
+    ]
+    ++ optional (mpi != null) mpi
+    ++ optional (tampi != null) tampi
+    ++ optional (mcxx != null) mcxx;
 
-  dontPatchShebangs = true;
+    preBuild = (if cflags != null then ''
+      makeFlagsArray+=(CFLAGS="${cflags}")
+    '' else "");
 
-  installPhase = ''
-    echo ${tampi}
-    mkdir -p $out/bin
-    cp nbody* $out/bin/${name}
-  '';
+    makeFlags = [
+      "CC=${cc.CC}"
+      "BS=${toString blocksize}"
+    ]
+    ++ optional (tampi != null) "TAMPI_HOME=${tampi}";
 
-}
+    dontPatchShebangs = true;
+
+    installPhase = ''
+      echo ${tampi}
+      mkdir -p $out/bin
+      cp nbody* $out/bin/${name}
+    '';
+
+  }

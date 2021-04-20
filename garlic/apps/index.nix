@@ -7,9 +7,7 @@
 }:
 
 {
-  nbody = callPackage ./nbody/default.nix {
-    gitBranch = "garlic/seq";
-  };
+  nbody = callPackage ./nbody/default.nix { };
 
   saiph = callPackage ./saiph/default.nix {
     cc = bsc.clangOmpss2;
