@@ -5,37 +5,39 @@
 , mcxx
 , mpi
 , tampi
-, gitBranch
+, gitBranch ? "garlic/seq"
+, gitCommit ? null
+, garlicTools
 }:
 
-stdenv.mkDerivation rec {
-  name = "hpcg";
-
-  src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/rpenacob/garlic-hpcg.git";
-    ref = "${gitBranch}";
+let
+  gitSource = garlicTools.fetchGarlicApp {
+    appName = "hpcg";
+    inherit gitCommit gitBranch;
+    gitTable = import ./git-table.nix;
   };
+in
+  stdenv.mkDerivation rec {
+    name = "hpcg";
 
-  # prePatch = ''
-  #   #export NIX_DEBUG=6
-  # '';
+    inherit (gitSource) src gitBranch gitCommit;
 
-  buildInputs = [
-    cc nanos6 mcxx mpi tampi
-  ];
+    buildInputs = [
+      cc nanos6 mcxx mpi tampi
+    ];
 
-  makeFlags = [
-    "CC=${cc.CC}"
-    "CXX=${cc.CXX}"
-  ];
+    makeFlags = [
+      "CC=${cc.CC}"
+      "CXX=${cc.CXX}"
+    ];
 
-  enableParallelBuilding = true;
+    enableParallelBuilding = true;
 
-  installPhase = ''
-    mkdir -p $out/bin
-    cp bin/* $out/bin/
-  '';
+    installPhase = ''
+      mkdir -p $out/bin
+      cp bin/* $out/bin/
+    '';
 
-  programPath = "/bin/xhpcg";
+    programPath = "/bin/xhpcg";
 
-}
+  }

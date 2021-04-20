@@ -22,9 +22,7 @@
 
   creamsInput = callPackage ./creams/input.nix { };
 
-  hpcg = callPackage ./hpcg/default.nix {
-    gitBranch = "garlic/tampi+isend+oss+task";
-  };
+  hpcg = callPackage ./hpcg/default.nix { };
 
   bigsort = {
     sort = callPackage ./bigsort/default.nix {
