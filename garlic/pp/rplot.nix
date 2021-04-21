@@ -149,6 +149,11 @@ in stdenv.mkDerivation {
     ln -s $dataset input
     Rscript --vanilla ${script} ${dataset} "$out"
 
+    # HACK: replace the \minus for a \hyphen to keep the file paths intact, so
+    # they can be copied to the terminal directly. The StandardEncoding is not
+    # working (AdobeStd.enc).
+    find "$out" -name '*.pdf' | xargs -l1 sed -i 's.45/minus.45/hyphen.g'
+
     if [ "''${dataset##*.}" == gz ]; then
       gunzip --stdout $dataset
     else
