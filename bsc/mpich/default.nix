@@ -31,6 +31,7 @@ stdenv.mkDerivation  rec {
   enableParallelBuilding = true;
 
   buildInputs = [ perl gfortran openssh hwloc libfabric ];
+  hardeningDisable = [ "all" ];
 
   # doCheck = true; # Fails
 

@@ -24,6 +24,7 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
   nativeBuildInputs = [ pkgconfig ];
   buildInputs = [ glib libuuid popt elfutils python3 swig4 ncurses breakpointHook ];
+  hardeningDisable = [ "all" ];
 
   configureFlags = [
     "--enable-python-plugins"

@@ -76,6 +76,8 @@ in stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
+  hardeningDisable = [ "all" ];
+
   postInstall = ''
     rm -f $out/lib/*.la
    '';

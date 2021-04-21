@@ -93,6 +93,8 @@ let
         "--with-jemalloc-prefix=nanos6_je_"
         "--enable-stats"
       ];
+
+      hardeningDisable = [ "all" ];
     });
 
     # =================================================================

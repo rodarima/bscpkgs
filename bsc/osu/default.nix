@@ -16,6 +16,7 @@ stdenv.mkDerivation rec {
   doCheck = true;
   enableParallelBuilding = true;
   buildInputs = [ mpi ];
+  hardeningDisable = [ "all" ];
   configureFlags = [ 
       "CC=${mpi}/bin/mpicc"
       "CXX=${mpi}/bin/mpicxx"

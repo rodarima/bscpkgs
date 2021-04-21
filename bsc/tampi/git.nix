@@ -22,4 +22,5 @@ stdenv.mkDerivation rec {
     url = "ssh://git@bscpm03.bsc.es/interoperability/tampi";
     ref = "master";
   };
+  hardeningDisable = [ "all" ];
 }

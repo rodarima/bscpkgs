@@ -34,6 +34,7 @@ stdenv.mkDerivation rec {
   patches = [ ./use-command.patch ];
 
   enableParallelBuilding = true;
+  hardeningDisable = [ "all" ];
 
   nativeBuildInputs = [ installShellFiles ];
 

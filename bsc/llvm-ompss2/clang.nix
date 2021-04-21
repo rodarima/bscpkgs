@@ -49,7 +49,9 @@ stdenv.mkDerivation rec {
   # Error with -D_FORTIFY_SOURCE=2, see https://bugs.gentoo.org/636604:
   # /build/source/compiler-rt/lib/tsan/dd/dd_interceptors.cpp:225:20:
   # error: redefinition of 'realpath'
-  hardeningDisable = [ "fortify" ];
+  # Requires disabling the "fortify" set of flags, however, for performance we
+  # disable all:
+  hardeningDisable = [ "all" ];
 
   cmakeBuildType = if enableDebug then "Debug" else "Release";
 

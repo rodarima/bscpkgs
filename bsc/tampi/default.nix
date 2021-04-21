@@ -24,4 +24,6 @@ stdenv.mkDerivation rec {
     rev = "6b11368ea522cd7095cfcf163831b8285faeee7e";
     sha256 = "0519lb1rinhzkk0iy5cjjiqnk1bzhnnzhfigj9ac2c3wl0zcsrvy";
   };
+
+  hardeningDisable = [ "all" ];
 }

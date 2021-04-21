@@ -23,7 +23,7 @@ stdenv.mkDerivation rec {
     sed -i "s@/bin/rm@rm@g" $(find . -name Makefile)
   '';
 
-  hardeningDisable = [ "format" ];
+  hardeningDisable = [ "all" ];
 
   enableParallelBuilding = false;
 
