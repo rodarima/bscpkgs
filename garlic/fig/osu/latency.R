@@ -40,7 +40,7 @@ w=6
 p = ggplot(data=df, aes(x=size, y=medianLatency)) +
 	labs(x="Message size", y="Median latency (µs)",
     #title=sprintf("OSU benchmark: osu_latency", nodes, tasksPerNode, cpusPerTask), 
-    subtitle=gsub("-", "\uad", output)) +
+    subtitle=output) +
 	geom_line(aes(linetype=unitName)) +
 	geom_point(aes(shape=unitName), size=2) +
 	scale_y_log10(breaks = breaks, minor_breaks = minor_breaks) +

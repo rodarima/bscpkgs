@@ -56,7 +56,7 @@ p = ggplot(data=df, aes(x=sizeKB, y=bw)) +
   geom_vline(aes(xintercept = PSM2_MTU.val/1024), color="red") +
   labs(x="Message size (KiB)", y="Bandwidth (GB/s)",
     #title=sprintf("OSU benchmark: osu_bw --iterations %d", iterations), 
-    subtitle=gsub("-", "\uad", output)) +
+    subtitle=output) +
   geom_point(shape=21, size=2) +
   #annotate("text", x = 10.2, y = 8.5e3, label = "MTU = 10KB", color="red", hjust=0) +
   facet_wrap(vars(PSM2_MTU), nrow=3, labeller = "label_both") +
