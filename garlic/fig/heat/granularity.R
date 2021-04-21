@@ -9,6 +9,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 # Set the input dataset if given in argv[1], or use "input" as default
 if (length(args)>0) { input_file = args[1] } else { input_file = "input" }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
 
@@ -47,7 +48,7 @@ p = ggplot(df, aes(x=cbs, y=normalized.time)) +
   theme_bw() +
   labs(y="Normalized time",
        title="Heat granularity: normalized time", 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("normalized.time.png", plot=p, width=w, height=h, dpi=dpi)
@@ -60,7 +61,7 @@ p = ggplot(df, aes(x=cbs, y=time)) +
   geom_line(aes(y=median.time, group=0)) +
   theme_bw() +
   labs(y="Time (s)", title="Heat granularity: time", 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("time.png", plot=p, width=w, height=h, dpi=dpi)

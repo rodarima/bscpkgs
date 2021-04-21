@@ -9,6 +9,7 @@ args=commandArgs(trailingOnly=TRUE)
 # Read the timetable from args[1]
 input_file = "input.json"
 if (length(args)>0) { input_file = args[1] }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 # Load the dataset in NDJSON format
 dataset = jsonlite::stream_in(file(input_file)) %>%
@@ -49,7 +50,7 @@ heatmap_plot = function(df, colname, title) {
     guides(fill = guide_colorbar(barwidth=12, title.vjust=0.8)) +
     labs(x="cbs", y="rbs",
       title=sprintf("Heat granularity: %s", title), 
-      subtitle=input_file) +
+      subtitle=output) +
     theme(legend.position="bottom")
 
   k=1

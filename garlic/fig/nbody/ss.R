@@ -7,6 +7,7 @@ library(viridis, warn.conflicts = FALSE)
 # Load the arguments (argv)
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)>0) { input_file = args[1] } else { input_file = "input" }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
   jsonlite::flatten() %>%
@@ -41,7 +42,7 @@ p = ggplot(df, aes(x=nodes, y=normalized.time, color=branch)) +
   facet_wrap(~ branch) +
   theme_bw() +
   labs(x="Nodes", y="Normalized time (s)", title="NBody Scaling: Normalized Time", 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=5)) +
   theme(legend.position="bottom") +
   theme(legend.text = element_text(size=7))
@@ -56,7 +57,7 @@ p = ggplot(df, aes(x=nodes, y=time.nodes, color=branch)) +
   geom_line(aes(y=median.time.nodes, group=branch)) +
   theme_bw() +
   labs(x="Nodes", y="Time * nodes (s)", title="NBody Scaling: Time * nodes", 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=5)) +
   theme(legend.position="bottom") +
   theme(legend.text = element_text(size=7))

@@ -7,6 +7,7 @@ library(viridis, warn.conflicts = FALSE)
 args = commandArgs(trailingOnly=TRUE)
 
 if (length(args)>0) { input_file = args[1] } else { input_file = "input" }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
 
@@ -61,7 +62,7 @@ p = ggplot(df, aes(x=nodes, y=time.nodes)) +
   theme_bw() +
   labs(x="Nodes", y="Time * nodes (s)",
     title="HPCG strong scalability in Z",
-    subtitle=input_file) +
+    subtitle=output) +
   theme(plot.subtitle=element_text(size=8),
     legend.position="bottom")
 
@@ -73,7 +74,7 @@ p = ggplot(df, aes(x=nodes, y=time.sizeZ, fill=sizePerCpu.z)) +
   theme_bw() +
   labs(x="Nodes", y="Time / npcz (s)", title="HPCG strong scalability in Z",
     color="Size per CPU in Z",
-    subtitle=input_file) +
+    subtitle=output) +
   theme(plot.subtitle=element_text(size=8),
     legend.position="bottom")
 

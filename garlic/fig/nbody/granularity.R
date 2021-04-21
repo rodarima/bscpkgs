@@ -7,6 +7,7 @@ library(viridis, warn.conflicts = FALSE)
 # Load the arguments (argv)
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)>0) { input_file = args[1] } else { input_file = "input" }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
   jsonlite::flatten() %>%
@@ -38,7 +39,7 @@ p = ggplot(df, aes(x=blocksize, y=normalized.time, color=branch)) +
   facet_wrap(~ branch) +
   theme_bw() +
   labs(x="Blocksize", y="Normalized Time", title="NBody Granularity: Normalized Time", 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8)) +
   theme(legend.position="bottom") +
   theme(legend.text = element_text(size=7))
@@ -52,7 +53,7 @@ p = ggplot(df, aes(x=blocksize, y=time)) +
   geom_boxplot() +
   theme_bw() +
   labs(x="Blocksize", y="Time (s)", title="NBody Granularity: Time", 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8)) +
   theme(legend.position="bottom") +
   theme(legend.text = element_text(size=7))

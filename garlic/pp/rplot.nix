@@ -147,7 +147,7 @@ in stdenv.mkDerivation {
     dataset="${dataset}"
 
     ln -s $dataset input
-    Rscript --vanilla ${script} ${dataset}
+    Rscript --vanilla ${script} ${dataset} "$out"
 
     if [ "''${dataset##*.}" == gz ]; then
       gunzip --stdout $dataset

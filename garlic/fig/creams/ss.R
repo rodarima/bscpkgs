@@ -9,6 +9,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 # Set the input dataset if given in argv[1], or use "input" as default
 if (length(args)>0) { input_file = args[1] } else { input_file = "input" }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
 
@@ -64,7 +65,7 @@ p = ggplot(df, aes(x=nodes, y=normalized.time, fill=granul, color=iterations)) +
   facet_wrap(branch ~ .) +
   labs(x="nodes", y="Normalized time",
     title="Creams strong scaling: normalized time", 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("normalized.time.png", plot=p, width=w, height=h, dpi=dpi)
@@ -78,7 +79,7 @@ p = ggplot(df, aes(x=nodes, y=time, color=gitBranch)) +
   theme_bw() +
 #  facet_wrap(branch ~ .) +
   labs(x="nodes", y="Time (s)", title="Creams strong scaling: time", 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("time.png", plot=p, width=w, height=h, dpi=dpi)
@@ -92,7 +93,7 @@ p = ggplot(df, aes(x=nodes, y=median.time.nodes, color=branch)) +
   theme_bw() +
   #facet_wrap(branch ~ .) +
   labs(x="nodes", y="Median time * nodes (s)", title="Creams strong scaling: median time * nodes", 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("median.time.nodes.png", plot=p, width=w, height=h, dpi=dpi)
@@ -105,7 +106,7 @@ p = ggplot(df, aes(x=nodes, y=time.nodes, color=branch)) +
   theme_bw() +
   facet_wrap(branch ~ .) +
   labs(x="nodes", y="Time * nodes (s)", title="Creams strong scaling: time * nodes", 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("time.nodes.boxplot.png", plot=p, width=w, height=h, dpi=dpi)
@@ -120,7 +121,7 @@ ggsave("time.nodes.boxplot.pdf", plot=p, width=w, height=h, dpi=dpi)
 #  #facet_wrap(branch ~ .) +
 #  labs(x="nodes", y="Time * nodes / iterations (s)",
 #    title="Creams strong scaling: time * nodes / iterations", 
-#    subtitle=input_file) + 
+#    subtitle=output) + 
 #  theme(plot.subtitle=element_text(size=8))
 #
 #ggsave("time.nodes.iter.png", plot=p, width=w, height=h, dpi=dpi)

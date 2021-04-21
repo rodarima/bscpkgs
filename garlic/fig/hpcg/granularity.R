@@ -7,6 +7,7 @@ library(viridis, warn.conflicts = FALSE)
 args = commandArgs(trailingOnly=TRUE)
 
 if (length(args)>0) { input_file = args[1] } else { input_file = "input" }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
 
@@ -44,7 +45,7 @@ p = ggplot(df, aes(x=blocksPerCpu, y=normalized.time)) +
   geom_hline(yintercept=c(-0.01, 0.01), linetype="dashed", color="red") +
   theme_bw() +
   labs(x="Blocks per CPU", y="Normalized time", title="HPCG granularity: normalized time",
-    subtitle=input_file) +
+    subtitle=output) +
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("normalized.time.png", plot=p, width=w, height=h, dpi=dpi)
@@ -54,7 +55,7 @@ p = ggplot(df, aes(x=blocksPerCpu, y=time)) +
   geom_point(shape=21, size=3) +
   theme_bw() +
   labs(x="Blocks per CPU", y="Time (s)", title="HPCG granularity: time",
-    subtitle=input_file) +
+    subtitle=output) +
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("time.png", plot=p, width=w, height=h, dpi=dpi)

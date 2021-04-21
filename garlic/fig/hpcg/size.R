@@ -7,6 +7,7 @@ library(viridis, warn.conflicts = FALSE)
 args = commandArgs(trailingOnly=TRUE)
 
 if (length(args)>0) { input_file = args[1] } else { input_file = "input" }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
 
@@ -62,7 +63,7 @@ p = ggplot(df, aes(x=sizePerCpu.z, y=time.nodes.elem)) +
   theme_bw() +
   labs(x="Size per CPU in Z", y="Time * nodes / spcz (s)",
     title="HPCG size: time * nodes / spcz",
-    subtitle=input_file) +
+    subtitle=output) +
   theme(plot.subtitle=element_text(size=8),
     legend.position="bottom")
 

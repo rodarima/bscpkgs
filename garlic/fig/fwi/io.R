@@ -9,6 +9,7 @@ args=commandArgs(trailingOnly=TRUE)
 # Read the timetable from args[1]
 input_file = "input.json"
 if (length(args)>0) { input_file = args[1] }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 # Load the dataset in NDJSON format
 dataset = jsonlite::stream_in(file(input_file)) %>%
@@ -48,7 +49,7 @@ p = ggplot(df, aes(x=nodes, y=time, group=enableIO, color=enableIO)) +
   geom_line() +
   theme_bw() +
   labs(x="Nodes", y="Time (s)", title="FWI strong scaling for mpi+send+oss+task",
-    subtitle=input_file) +
+    subtitle=output) +
   theme(plot.subtitle=element_text(size=8)) +
   theme(legend.position = c(0.5, 0.88))
 
@@ -68,7 +69,7 @@ p = ggplot(df, aes(x=nodes, y=nxtime, group=enableIO, color=enableIO)) +
   geom_line() +
   theme_bw() +
   labs(x="Nodes", y="Time * Nodes (s)", title="FWI strong scaling for mpi+send+oss+task",
-    subtitle=input_file) +
+    subtitle=output) +
   theme(plot.subtitle=element_text(size=8)) +
   theme(legend.position = c(0.5, 0.88))
 
@@ -88,7 +89,7 @@ dev.off()
 #  geom_line() +
 #  theme_bw() +
 #  labs(x="Nodes", y="Median Time (s)", title="FWI strong scaling",
-#    subtitle=input_file) +
+#    subtitle=output) +
 #  theme(plot.subtitle=element_text(size=8)) +
 #  theme(legend.position = c(0.5, 0.88))
 #
@@ -108,7 +109,7 @@ dev.off()
 #  geom_line() +
 #  theme_bw() +
 #  labs(x="Nodes", y="Median Time * Nodes (s)", title="FWI strong scaling",
-#    subtitle=input_file) +
+#    subtitle=output) +
 #  theme(plot.subtitle=element_text(size=8)) +
 #  theme(legend.position = c(0.5, 0.88))
 #

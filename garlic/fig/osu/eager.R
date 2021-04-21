@@ -8,6 +8,7 @@ args=commandArgs(trailingOnly=TRUE)
 # Read the timetable from args[1]
 input_file = "input.json"
 if (length(args)>0) { input_file = args[1] }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 # Load the dataset in NDJSON format
 dataset = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
@@ -49,7 +50,7 @@ w=8
 p = ggplot(data=df, aes(x=sizeKB, y=bw)) +
   labs(x="Message size (KB)", y="Bandwidth (MB/s)",
     title=sprintf("OSU benchmark: osu_bw --iterations %d", iterations), 
-    subtitle=input_file) +
+    subtitle=output) +
   geom_point(shape=21, size=3) +
   geom_vline(aes(xintercept = PSM2_MQ_EAGER_SDMA_SZ/1024), color="blue") +
   geom_vline(xintercept = 10, color="red") +

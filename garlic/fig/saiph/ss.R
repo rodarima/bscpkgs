@@ -9,6 +9,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 # Set the input dataset if given in argv[1], or use "input" as default
 if (length(args)>0) { input_file = args[1] } else { input_file = "input" }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
 
@@ -72,7 +73,7 @@ p = ggplot(df, aes(x=nodes, y=normalized.time, fill=sizex)) +
   facet_wrap(branch ~ .) +
   labs(x="nodes", y="Normalized time",
     title=sprintf("%s: normalized time", maintitle), 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("normalized.time.png", plot=p, width=w, height=h, dpi=dpi)
@@ -87,7 +88,7 @@ p = ggplot(df, aes(x=nodes, y=time, color=sizex)) +
 #  facet_wrap(branch ~ .) +
   labs(x="nodes", y="Time (s)",
     title=sprintf("%s: time", maintitle), 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("time.png", plot=p, width=w, height=h, dpi=dpi)
@@ -102,7 +103,7 @@ p = ggplot(df, aes(x=nodes, y=time.nodes, color=sizex)) +
   #facet_wrap(branch ~ .) +
   labs(x="nodes", y="Time * nodes (s)",
     title=sprintf("%s: time * nodes", maintitle), 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8))
 
 ggsave("time.nodes.png", plot=p, width=w, height=h, dpi=dpi)

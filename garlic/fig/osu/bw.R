@@ -11,6 +11,7 @@ args=commandArgs(trailingOnly=TRUE)
 # Read the timetable from args[1]
 input_file = "input.json"
 if (length(args)>0) { input_file = args[1] }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 # Load the dataset in NDJSON format
 dataset = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
@@ -39,7 +40,7 @@ w=6
 p = ggplot(data=df, aes(x=size, y=median.bw)) +
 	labs(x="Message size", y="Bandwidth (GB/s)",
     #title=sprintf("OSU benchmark: osu_bw", nodes, tasksPerNode, cpusPerTask), 
-    subtitle=gsub("-", "\uad", input_file)) +
+    subtitle=gsub("-", "\uad", output)) +
 	geom_line(aes(linetype=unitName)) +
 	geom_point(aes(shape=unitName), size=1.5) +
   scale_shape_discrete(name = "MPI version") +
@@ -73,7 +74,7 @@ ggsave("median-lines.pdf", plot=p, width=w, height=h, dpi=ppi)
 p = ggplot(data=df, aes(x=size, y=bw)) +
 	labs(x="Message size", y="Bandwidth (MB/s)",
     #title=sprintf("OSU benchmark: osu_bw", nodes, tasksPerNode, cpusPerTask),
-    subtitle=input_file) +
+    subtitle=output) +
 	geom_line(aes(y=median.bw, linetype=unitName, group=unitName)) +
 	geom_point(aes(shape=unitName), size=2) +
   scale_shape(solid = FALSE) +

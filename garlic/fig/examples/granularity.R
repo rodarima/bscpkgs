@@ -28,6 +28,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 # Set the input dataset if given in argv[1], or use "input" as default
 if (length(args)>0) { input_file = args[1] } else { input_file = "input" }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 # Here we build of dataframe from the input dataset by chaining operations using
 # the magritte operator `%>%`, which is similar to a UNIX pipe.
@@ -94,7 +95,7 @@ p = ggplot(df, aes(x=cbs, y=median.time, color=rbs)) +
 
   # Here we add the title and the labels of the axes
   labs(x="cbs", y="Median time (s)", title="Heat granularity: median time", 
-    subtitle=input_file) + 
+    subtitle=output) + 
 
   # And set the subtitle font size a bit smaller, so it fits nicely
   theme(plot.subtitle=element_text(size=8))
@@ -126,7 +127,7 @@ p = ggplot(df, aes(x=cbs, y=normalized.time)) +
 
   # Here we add the title and the labels of the axes
   labs(x="cbs", y="Normalized time", title="Heat granularity: normalized time", 
-    subtitle=input_file) + 
+    subtitle=output) + 
 
   # And set the subtitle font size a bit smaller, so it fits nicely
   theme(plot.subtitle=element_text(size=8))
@@ -151,7 +152,7 @@ p = ggplot(df, aes(x=cbs, y=time, color=rbs)) +
 
   # Here we add the title and the labels of the axes
   labs(x="cbs", y="Time (s)", title="Heat granularity: time", 
-    subtitle=input_file) + 
+    subtitle=output) + 
 
   # And set the subtitle font size a bit smaller, so it fits nicely
   theme(plot.subtitle=element_text(size=8))
@@ -184,7 +185,7 @@ p = ggplot(df, aes(x=cbs, y=rbs, fill=median.time)) +
 
   # Here we add the title and the labels of the axes
   labs(x="cbs", y="rbs", title="Heat granularity: time", 
-    subtitle=input_file) + 
+    subtitle=output) + 
 
   # And set the subtitle font size a bit smaller, so it fits nicely
   theme(plot.subtitle=element_text(size=8))

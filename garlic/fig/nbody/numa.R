@@ -8,6 +8,7 @@ library(stringr)
 # Load the arguments (argv)
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)>0) { input_file = args[1] } else { input_file = "input" }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 df = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
   jsonlite::flatten() %>%
@@ -60,7 +61,7 @@ p = ggplot(df, aes(x=blocksize, y=normalized.time, color=interleaveMem)) +
   labs(x="Blocksize", y="Normalized time",
     title=sprintf("NBody NUMA (%s | %d Nodes): Normalized time",
       branch, nodes), 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8)) +
   theme(legend.position="bottom")
 
@@ -77,7 +78,7 @@ p = ggplot(df, aes(x=blocksize, y=time, color=interleaveMem)) +
   labs(x="Blocksize", y="Time (s)",
     title=sprintf("NBody NUMA (%s | %d Nodes): Time",
       branch, nodes), 
-    subtitle=input_file) + 
+    subtitle=output) + 
   theme(plot.subtitle=element_text(size=8)) +
   theme(legend.position="bottom")
 

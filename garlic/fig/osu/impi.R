@@ -8,6 +8,7 @@ args=commandArgs(trailingOnly=TRUE)
 # Read the timetable from args[1]
 input_file = "input.json"
 if (length(args)>0) { input_file = args[1] }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 # Load the dataset in NDJSON format
 dataset = jsonlite::stream_in(file(input_file), verbose=FALSE) %>%
@@ -36,7 +37,7 @@ p = ggplot(data=df, aes(x=size, y=bw)) +
 	labs(x="Size (bytes)", y="Bandwidth (MB/s)",
               title=sprintf("OSU bandwidth benchmark: nodes=%d tasksPerNode=%d cpusPerTask=%d",
 			    nodes, tasksPerNode, cpusPerTask), 
-              subtitle=input_file) +
+              subtitle=output) +
 	geom_boxplot(aes(color=threshold, group=interaction(threshold, sizeFactor))) +
 	scale_x_continuous(trans=log2_trans()) +
 	#scale_y_log10(breaks = breaks, minor_breaks = minor_breaks) +
@@ -53,7 +54,7 @@ p = ggplot(data=df, aes(x=size, y=medianBw)) +
 	labs(x="Size (bytes)", y="Bandwidth (MB/s)",
               title=sprintf("OSU benchmark: osu_bw",
 			    nodes, tasksPerNode, cpusPerTask), 
-              subtitle=input_file) +
+              subtitle=output) +
 	geom_line(aes(color=threshold, linetype=threshold)) +
 	geom_point(aes(color=threshold, shape=threshold)) +
   geom_hline(yintercept = 100e3 / 8, color="red") +

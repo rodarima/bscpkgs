@@ -8,6 +8,7 @@ args=commandArgs(trailingOnly=TRUE)
 # Read the timetable from args[1]
 input_file = "input.json"
 if (length(args)>0) { input_file = args[1] }
+if (length(args)>1) { output = args[2] } else { output = "?" }
 
 # Load the dataset in NDJSON format
 dataset = jsonlite::stream_in(file(input_file)) %>%
@@ -53,7 +54,7 @@ p = ggplot(data=D, aes(x=blocksPerCpuFactor, y=tnorm, color=bad)) +
 	# Labels
 	labs(x="Blocks/CPU", y="Normalized time",
               title=sprintf("Nbody normalized time. Particles=%d", particles), 
-              subtitle=input_file) +
+              subtitle=output) +
 
 
 	# Center the title
@@ -94,7 +95,7 @@ p = ggplot(D, aes(x=blocksPerCpuFactor, y=time)) +
 
 	labs(x="Blocks/CPU", y="Time (s)",
               title=sprintf("Nbody granularity. Particles=%d", particles), 
-              subtitle=input_file) +
+              subtitle=output) +
 	theme_bw() +
 	theme(plot.subtitle=element_text(size=8)) +
 	theme(legend.position = c(0.5, 0.88)) +
