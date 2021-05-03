@@ -144,10 +144,10 @@ in stdenv.mkDerivation {
 
     mkdir -p $out
     cd $out
-    dataset="${dataset}"
+    dataset=$(readlink -f ${dataset}/dataset)
 
     ln -s $dataset input
-    Rscript --vanilla ${script} ${dataset} "$out"
+    Rscript --vanilla ${script} "$dataset" "$out"
 
     # HACK: replace the \minus for a \hyphen to keep the file paths intact, so
     # they can be copied to the terminal directly. The StandardEncoding is not
