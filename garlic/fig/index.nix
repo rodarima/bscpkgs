@@ -56,6 +56,7 @@ in
   creams = with exp.creams; {
     ss = stdPlot ./creams/ss.R [ ss ];
     granularity = stdPlot ./creams/granularity.R [ granularity ];
+    size = stdPlot ./creams/size.R [ size ];
 
     # Extended version (we could use another R script for those plots
     big.ss = stdPlot ./creams/ss.R [ big.ss ];
