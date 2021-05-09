@@ -22,6 +22,7 @@
     ss = callPackage ./creams/ss.nix { };
     granularity = callPackage ./creams/granularity.nix { };
     size = callPackage ./creams/size.nix { };
+    granularity16 = callPackage ./creams/granularity16.nix { };
 
     # These experiments are the extended versions of the previous
     # ones. We split them so we can keep a reasonable execution time
