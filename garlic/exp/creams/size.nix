@@ -18,7 +18,7 @@ let
     #nodes = range2 1 16;
     nodes = [ 16 ];
     sizeFactor = range2 1 32;
-    granul = [ 16 ] ++ optionals (enableExtended) [ 8 32 ];
+    baseGranul = [ 1 ] ++ optionals (enableExtended) [ 2 4 8 ];
 
     # Max. number of iterations
     iterations = [ 20 ] ++ optionals (enableExtended) [ 10 ];
@@ -28,11 +28,11 @@ let
       "garlic/mpi+send+omp+fork"
       #"garlic/mpi+send+omp+task"
       #"garlic/mpi+send+seq"
-    ] ++ optionals (enableExtended) [
+    ] ++ (optionals (enableExtended) [
       "garlic/mpi+send+oss+task"
       "garlic/mpi+isend+omp+task"
       "garlic/mpi+isend+oss+task"
-    ];
+    ]);
   };
 
   # We use these auxiliary functions to assign different configurations
@@ -60,10 +60,10 @@ let
     inherit (targetMachine.config) hw;
 
     # Options for creams
-    inherit (c) iterations gitBranch nodes sizeFactor;
-    granul = getGranul gitBranch c.granul;
+    inherit (c) iterations gitBranch nodes sizeFactor baseGranul;
+    granul = getGranul gitBranch (max 2 (baseGranul * sizeFactor));
     nprocz = ntasksPerNode * nodes;
-    baseSizePerCpu = 4;
+    baseSizePerCpu = 2;
     baseSize = baseSizePerCpu * cpusPerTask * ntasksPerNode * nodes;
 
     nz = baseSize * sizeFactor;
