@@ -1,0 +1,63 @@
+#!/bin/bash -e
+
+function printHelp()
+{
+    >&2 echo "Usage: garlic-propagate-commit <COMMIT-ID>"
+    >&2 echo
+    cat >&2 <<EOF
+This tool uses the given commit and adds it to each branch and then pushes them
+to the remote repository. It is useful to propagate the same change to every
+branch.
+
+Ensure that you don't have changes in your working copy or the index without
+adding to a commit.
+
+Use with caution!
+EOF
+}
+
+function branchContainsCommit()
+{
+    if [[ `git branch $1 --contains $2 2>/dev/null | sed 's/^..//'` == $1 ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+
+if [ $# -lt 1 ]; then
+    printHelp
+    exit 1
+fi
+
+# Obtain all the tracked branches
+branches=(`git branch | sed 's/^..//'`)
+currentBranch=`git rev-parse --abbrev-ref HEAD`
+
+# Make sure that the commit SHA exists
+commit=$1
+if branchContainsCommit $currentBranch $commit; then
+    echo "Commit $commit exists in current branch, proceeding..."
+else
+    echo "Error: Commit $commit does not exist in the current branch"
+    exit 1
+fi
+
+# Distribute the commit for all tracked branches
+for branch in ${branches[@]};
+do
+    if [[ $branch != $currentBranch ]]; then
+        echo "Trying to add commit $commit to branch $branch"
+        if branchContainsCommit $branch $commit; then
+            echo "Branch $branch already contains commit $commit, skipping"
+        else
+            git checkout $branch
+            git cherry-pick $commit
+            git push
+        fi
+    fi
+done
+
+# Return to the original branch
+git checkout $currentBranch
