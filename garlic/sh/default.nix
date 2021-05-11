@@ -34,8 +34,8 @@ in
       chmod +x $out/bin/garlic
       mkdir -p $out/share/man/man1
       cp garlic.1 $out/share/man/man1
-      cp garlic-git-table $out/bin
-      patchShebangs garlic-propagate-commit
-      cp garlic-propagate-commit $out/bin
+
+      patchShebangs garlic-*
+      cp garlic-* $out/bin
     '';
   }

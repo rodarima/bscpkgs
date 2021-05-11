@@ -1,0 +1,49 @@
+#!/bin/bash -e
+
+if [ -z "$1" ]; then
+  cat << 'EOF'
+Usage: garlic-add-copyright <copyright file> files...
+
+This tool prepends the content of the copyright file to the list of given files.
+The word 'copyright' is used to determine if a file already has a copyright
+notice or not.
+
+Example:
+
+  Given the following HEADER file:
+
+  $ cat HEADER
+  /*
+   * This file is part of NBody and is licensed under the terms contained
+   * in the LICENSE file.
+   *
+   * Copyright (C) 2021 Barcelona Supercomputing Center (BSC)
+   */
+
+  It can be prepended to all files ending in .c or .h with:
+
+  $ garlic-add-copyright HEADER $(find * -type f | grep -Ei '\.(c|h)$')
+
+EOF
+  exit 1
+fi
+
+header_file="$1"
+shift
+
+if ! grep -qi copyright "$header_file"; then
+  >&2 echo "The header file '$header_file' doesn't contain the word 'copyright'"
+  exit 1
+fi
+
+for f in "${@}"; do
+  if grep -qi copyright "$f"; then
+    echo "$f: Contains copyright word, skipping"
+    continue
+  fi
+
+  tmp_fn="$f.copyright-being-added"
+
+  cat "$header_file" "$f" > "$tmp_fn"
+  mv "$tmp_fn" "$f"
+done
