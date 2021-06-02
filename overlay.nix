@@ -78,10 +78,12 @@ let
     nanos6 = bsc.nanos6Release;
     nanos6Release = callPackage ./bsc/nanos6/default.nix { };
     nanos6Git = callPackage ./bsc/nanos6/git.nix { };
+
     nanos6Debug = bsc.nanos6.overrideAttrs (old: {
       dontStrip = true;
       enableDebugging = true;
     });
+
     nanos6GlibcxxDebug = bsc.nanos6Debug.override {
       enableGlibcxxDebug = true;
     };

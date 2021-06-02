@@ -11,9 +11,12 @@
 , extrae
 , boost
 , autoreconfHook
-, enableJemalloc ? false
+, enableJemalloc ? true
 , jemalloc ? null
 , cachelineBytes ? 64
+, enableGlibcxxDebug ? false
+, gitUrl ? "ssh://git@bscpm03.bsc.es/nanos6/nanos6"
+, gitBranch ? "master"
 }:
 
 with stdenv.lib;
@@ -21,11 +24,10 @@ with stdenv.lib;
 stdenv.mkDerivation rec {
   pname = "nanos6";
   version = "${src.shortRev}";
-  branch = "master";
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/nanos6/nanos6";
-    ref = branch;
+    url = gitUrl;
+    ref = gitBranch;
   };
 
   prePatch = ''
@@ -37,11 +39,12 @@ stdenv.mkDerivation rec {
   preConfigure = ''
     export CACHELINE_WIDTH=${toString cachelineBytes}
     export NANOS6_GIT_VERSION=${src.rev}
-    export NANOS6_GIT_BRANCH=${branch}
+    export NANOS6_GIT_BRANCH=${gitBranch}
   '';
 
-  configureFlags = [] ++
-    optional enableJemalloc "--with-jemalloc=${jemalloc}";
+  configureFlags = []
+    ++ (optional enableJemalloc "--with-jemalloc=${jemalloc}")
+    ++ (optional enableGlibcxxDebug "CXXFLAGS=-D_GLIBCXX_DEBUG");
 
   # The "bindnow" flags are incompatible with ifunc resolution mechanism. We
   # disable all by default, which includes bindnow.
