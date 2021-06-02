@@ -68,6 +68,7 @@ let
 
     mcxx = bsc.mcxxRelease;
     mcxxRelease = callPackage ./bsc/mcxx/default.nix { };
+    mcxxGit = callPackage ./bsc/mcxx/git.nix { };
     mcxxRarias = callPackage ./bsc/mcxx/rarias.nix {
       bison = self.bison_3_5;
     };
