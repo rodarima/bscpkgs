@@ -35,6 +35,7 @@ stdenv.mkDerivation rec {
   '';
 
   enableParallelBuilding = true;
+  dontStrip = true;
 
   preConfigure = ''
     export CACHELINE_WIDTH=${toString cachelineBytes}
