@@ -1,7 +1,6 @@
 {
   stdenv
 , gcc
-, nanos6
 , iccUnwrapped
 , wrapCCWith
 , intelLicense
