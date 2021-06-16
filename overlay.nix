@@ -37,12 +37,20 @@ let
       intel-mpi = bsc.intelMpi;
     };
 
+    icc2021Unwrapped = callPackage ./bsc/intel-compiler/icc2021.nix { };
+
     # A wrapper script that puts all the flags and environment vars
     # properly and calls the intel compiler binary
-    icc = appendPasstru (callPackage ./bsc/intel-compiler/default.nix {
+    icc2020 = appendPasstru (callPackage ./bsc/intel-compiler/default.nix {
       iccUnwrapped = bsc.iccUnwrapped;
       intelLicense = bsc.intelLicense;
     }) { CC = "icc"; CXX = "icpc"; };
+
+    icc2021 = appendPasstru (callPackage ./bsc/intel-compiler/wrapper2021.nix {
+      iccUnwrapped = bsc.icc2021Unwrapped;
+    }) { CC = "icc"; CXX = "icpc"; };
+
+    icc = bsc.icc2020;
 
     # We need to set the cc.CC and cc.CXX attributes, in order to 
     # determine the name of the compiler
