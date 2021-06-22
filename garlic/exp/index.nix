@@ -100,4 +100,8 @@
   examples = {
     granularity = callPackage ./examples/granularity.nix { };
   };
+
+  cn6 = {
+    timediff = callPackage ./cn6/timediff.nix { };
+  };
 }
