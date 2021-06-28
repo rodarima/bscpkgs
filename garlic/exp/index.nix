@@ -103,5 +103,6 @@
 
   cn6 = {
     timediff = callPackage ./cn6/timediff.nix { };
+    nbody = callPackage ./cn6/nbody.nix { };
   };
 }
