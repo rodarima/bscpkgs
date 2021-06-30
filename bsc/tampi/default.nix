@@ -12,7 +12,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  version = "1.0.2+6b11368e";
+  version = "1.1";
   pname = "tampi";
   enableParallelBuilding = true;
   buildInputs = [ autoreconfHook automake autoconf libtool gnumake boost mpi gcc ];
@@ -21,8 +21,8 @@ stdenv.mkDerivation rec {
   src = fetchFromGitHub {
     owner = "bsc-pm";
     repo = "tampi";
-    rev = "6b11368ea522cd7095cfcf163831b8285faeee7e";
-    sha256 = "0519lb1rinhzkk0iy5cjjiqnk1bzhnnzhfigj9ac2c3wl0zcsrvy";
+    rev = "v${version}";
+    sha256 = "0m369l3kprginqkkdjf5znlbrwvib2vjlhdy63nbvlw6v5ys7sci";
   };
 
   hardeningDisable = [ "all" ];
