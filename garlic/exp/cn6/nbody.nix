@@ -28,7 +28,7 @@ let
     inherit (machineConfig) hw;
 
     # Parameters for nbody
-    particles = 4 * 1024 * hw.cpusPerSocket;
+    particles = 4 * 512 * hw.cpusPerSocket;
     timesteps = 2;
     blocksize = 512;
     gitBranch = "garlic/tampi+isend+oss+task";
@@ -61,8 +61,8 @@ let
 
       src = builtins.fetchGit {
         url = "git@bscpm03.bsc.es:nanos6/forks/nanos6-fixes.git";
-        ref = "distributed-instrumentation";
-        rev = "cd5169532887839515b24de6a7409dca7044f109";
+        ref = "distributed-instrumentation-fixes";
+        rev = "80058512527961fbde9bd81474b0a29141d7982c";
       };
       
       dontStrip = false;
@@ -98,8 +98,8 @@ let
       #NIX_CFLAGS = "-O0 -g";
       src = builtins.fetchGit {
         url = "ssh://git@bscpm03.bsc.es/interoperability/tampi.git";
-        ref = "instrument";
-        rev = "8cf0f7bc02a7195717f58cc6725aeabd0299f53b";
+        ref = "master";
+        rev = "f1e77e6f439a0e964e98b5e0a4738b2e95e4fd3d";
       };
     });
   });
@@ -110,7 +110,7 @@ let
       version.instrument = "ctf"
       turbo.enabled = false
       instrument.ctf.converter.enabled = true
-      instrument.ctf.converter.fast = true
+      instrument.ctf.converter.fast = false
     '';
 
   in stages.exec {
@@ -120,8 +120,11 @@ let
     env = ''
       export NANOS6_CONFIG=${nanos6ConfigFile}
 
-      # Add nanos6 binaries to the PATH
-      export PATH="$PATH:${bsc'.nanos6}/bin"
+      # Add nanos6 and babeltrace2 binaries to the PATH
+      export PATH="$PATH:${bsc'.nanos6}/bin:${bsc'.babeltrace2}/bin"
+
+      # Also add the babeltrace2 python module to python search path
+      export PYTHONPATH="$PYTHONPATH:${bsc'.babeltrace2}/lib/python3.8/site-packages"
     '';
 
     post = ''
