@@ -14,6 +14,8 @@ in wrapCCWith rec {
     echo "-B${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-cflags
     echo "-isystem ${iccUnwrapped}/include" >> $out/nix-support/cc-cflags
     echo "-isystem ${iccUnwrapped}/include/icc" >> $out/nix-support/cc-cflags
+    echo "-isystem ${gcc.cc}/include/c++/${gcc.version}" >> $out/nix-support/cc-cflags
+    echo "-isystem ${gcc.cc}/include/c++/${gcc.version}/${targetConfig}" >> $out/nix-support/cc-cflags
 
     echo "-L${iccUnwrapped}/lib" >> $out/nix-support/cc-ldflags
     echo "-L${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-ldflags

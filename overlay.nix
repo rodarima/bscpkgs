@@ -48,7 +48,7 @@ let
 
     icc2021 = appendPasstru (callPackage ./bsc/intel-compiler/wrapper2021.nix {
       iccUnwrapped = bsc.icc2021Unwrapped;
-    }) { CC = "icc"; CXX = "icpc"; };
+    }) { CC = "icx"; CXX = "icpx"; };
 
     icc = bsc.icc2020;
 
