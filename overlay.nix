@@ -135,6 +135,16 @@ let
     tampiGit = callPackage ./bsc/tampi/git.nix { };
 
     # =================================================================
+    #  GASPI
+    # =================================================================
+    gpi-2 = callPackage ./bsc/gpi-2/default.nix { };
+
+    # Use GPI-2 as the default implementation for GASPI
+    gaspi = bsc.gpi-2;
+
+    tagaspi = callPackage ./bsc/tagaspi/default.nix { };
+
+    # =================================================================
     #  Tracing
     # =================================================================
 
