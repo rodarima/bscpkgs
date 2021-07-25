@@ -1,0 +1,102 @@
+#!/bin/bash
+
+function find_garlic_conf() {
+  grep -o '^cp /nix/store/[^ ]*-garlic_config.json' "$1" | sed 's/^cp //g'
+}
+
+function show_units() {
+  exp=$1
+
+  units=$(grep '^/nix/store/.*-unit$' $exp)
+
+  nunits=$(echo "$units" | wc -l)
+  echo " Experiment: $exp"
+  echo " Units: $nunits"
+  echo
+  echo " Unit file                                         Name"
+
+  for unit in $units; do
+    gconf=$(find_garlic_conf $unit)
+    unitName=$(jq -r .unitName "$gconf")
+
+    printf " %s %s %s  %s\n" "$unit" "$present" "$unitName"
+  done
+}
+
+function query_tre() {
+  tre=$1
+  exp=$(grep "^# */nix/store/[^ ]*-experiment$" "$tre" | sed 's/# *//g')
+
+  echo
+  echo " Trebuchet: $tre"
+  show_units $exp
+  echo
+}
+
+function query_exp() {
+  exp=$1
+
+  echo
+  show_units "$exp"
+  echo
+}
+
+function query_unit() {
+  unit=$1
+
+  stages=$(grep '^# */nix/store/.*$' $unit | sed 's/^# */    /g')
+  gconf=$(find_garlic_conf $unit)
+  unitName=$(jq -r .unitName "$gconf")
+
+  echo
+  echo "  Unit: $unit"
+  echo "  Name: $unitName"
+  echo "  Stages:"
+  echo
+  echo "$stages"
+  echo
+  echo "  Config: $gconf"
+  echo
+  jq . "$gconf"
+}
+
+function query_result() {
+  tree=$1
+
+  tre=$(readlink -f $tree/trebuchet)
+  exp=$(readlink -f $tree/experiment)
+
+  echo
+  echo " Result tree: $tree"
+  echo " Trebuchet: $tre"
+  show_units $exp
+  echo
+}
+
+element=$1
+
+if [ "$1" == "--help" -o -z "$1" ]; then
+  cat <<EOF
+Retrieves information about garlic experiments
+
+Usage: garlic-query <path>
+
+The path may be a trebuchet, experiment, unit or resultTree.
+EOF
+  exit 1
+fi
+
+# Try prepending the nix store
+if [ ! -e $element ]; then
+  element=/nix/store/$element*
+fi
+
+element=$(readlink -f $element)
+
+case "$element" in
+  *-trebuchet) query_tre $element ;;
+  *-experiment) query_exp $element ;;
+  *-unit) query_unit $element ;;
+  *-resultTree) query_result $element ;;
+  *) echo "unknown: $element"; exit 1 ;;
+esac
