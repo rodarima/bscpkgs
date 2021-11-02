@@ -1,0 +1,13 @@
+--- a/docs/wxparaver	1970-01-01 01:00:01.000000000 +0100
++++ b/docs/wxparaver	2021-11-02 12:08:54.670700017 +0100
+@@ -31,5 +31,10 @@
+ 
+ @inst_LOGIN_NODE_DETECTION@
+ 
++echo "WARNING: Using paraver fast, the trace must be ordered!" >&2
++export PARAVER_FAST=1
++
++export LANG=C
++
+ LD_LIBRARY_PATH="@inst_BOOST_LIBDIR@${PARAVER_HOME}/${LIB_DIR}/paraver-kernel:@inst_WXWIDGETS_LIBDIR@@inst_WXPROPGRID_LIB_PATH@@inst_LIBSSL_LIBDIR@${PARAVER_HOME}/${LIB_DIR}/wxparaver:$LD_LIBRARY_PATH" "${PARAVER_HOME}/bin/wxparaver.bin" "$@"
+ 	

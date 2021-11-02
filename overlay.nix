@@ -140,6 +140,8 @@ let
 
     wxpropgrid = callPackage ./bsc/wxpropgrid/default.nix { };
     paraver = callPackage ./bsc/paraver/default.nix { };
+    paraverKernelFast = callPackage ./bsc/paraver/kernel-fast.nix { };
+    paraverFast = callPackage ./bsc/paraver/wxparaver-fast.nix { };
     paraverExtra = bsc.paraver.override { enableMouseLabel = true; };
     paraverDebug = bsc.paraver.overrideAttrs (old: {
       dontStrip = true;
