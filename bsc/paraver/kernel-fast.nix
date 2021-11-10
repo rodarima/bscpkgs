@@ -29,12 +29,13 @@ stdenv.mkDerivation rec {
   dontStrip = true;
 
   preConfigure = ''
-    export CFLAGS="-O3"
-    export CXXFLAGS="-std=c++17 -O3"
+    export CFLAGS="-O3 -DPARALLEL_ENABLED"
+    export CXXFLAGS="-std=c++17 -O3 -DPARALLEL_ENABLED"
   '';
 
   configureFlags = [
     "--with-boost=${boost}"
+    "--enable-openmp"
   ];
   
   buildInputs = [
