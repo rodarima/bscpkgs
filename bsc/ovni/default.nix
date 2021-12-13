@@ -4,8 +4,8 @@
 , cmake
 , mpi
 , gitBranch ? "master"
-, gitURL ? "ssh://git@gitlab-internal.bsc.es/nos-v/ovni.git"
-, gitCommit ? "9c371d8c12ae4aed333bd7f90d0468603163ad6c"
+, gitURL ? "ssh://git@bscpm03.bsc.es/rarias/ovni.git"
+, gitCommit ? null
 # By default use debug
 , enableDebug ? true
 }:
