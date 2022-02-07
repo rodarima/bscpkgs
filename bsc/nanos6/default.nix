@@ -24,13 +24,13 @@ with stdenv.lib;
 
 stdenv.mkDerivation rec {
   pname = "nanos6";
-  version = "2.6";
+  version = "2.7";
 
   src = fetchFromGitHub {
     owner = "bsc-pm";
     repo = "nanos6";
     rev = "version-${version}";
-    sha256 = "0rnbcjgsczqs4qqbm5w761f8h7fs1cw36akhjlbfazs5l92f0ac5";
+    sha256 = "1zw0pn4w450il2av50yr4n4zfh0sljw50wxp816pw6vbk6zf3yks";
   };
 
   prePatch = ''
