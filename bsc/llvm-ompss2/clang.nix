@@ -7,21 +7,21 @@
 , python3
 , perl
 , which
-, libelf
+, elfutils
 , libffi
 , pkg-config
 , enableDebug ? false
 }:
 
 stdenv.mkDerivation rec {
-  version = "2021.06";
+  version = "2021.11";
   pname = "clang-ompss2";
 
   src = fetchFromGitHub {
     owner = "bsc-pm";
     repo = "llvm";
-    rev = "github-release-${version}";
-    sha256 = "1dkqgf7jvdwi84fam7zwbvv4d6x6icw7182azxjf4mc7b97qmqwi";
+    rev = "refs/tags/github-release-${version}";
+    sha256 = "1x9scp1jpb2d5vm2pymc39r51242b7bvhx39hp9143rw5b2w3wrm";
   };
 
   enableParallelBuilding = true;
@@ -41,7 +41,7 @@ stdenv.mkDerivation rec {
     perl
     cmake
     lld
-    libelf
+    elfutils
     libffi
     pkg-config
   ];
