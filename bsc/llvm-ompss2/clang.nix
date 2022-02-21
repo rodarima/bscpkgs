@@ -70,6 +70,7 @@ stdenv.mkDerivation rec {
       "-DLLVM_ENABLE_PROJECTS=clang;openmp;compiler-rt"
       "-DLLVM_ENABLE_ASSERTIONS=${enableAssertions}"
       "-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON"
+      "-DCMAKE_INSTALL_BINDIR=bin"
     )
   '';
 
