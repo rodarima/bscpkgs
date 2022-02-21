@@ -29,5 +29,7 @@ in wrapCCWith rec {
 
     echo "# Hack to include NANOS6_HOME" >> $out/nix-support/setup-hook
     echo "export NANOS6_HOME=${nanos6}" >> $out/nix-support/setup-hook
+
+    wrap clang++  $wrapper $ccPath/clang++
   '';
 }
