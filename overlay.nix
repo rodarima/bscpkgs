@@ -61,9 +61,22 @@ let
       stdenv = bsc.llvmPackages.stdenv;
     };
 
+    clangOmpss2UnwrappedGit = bsc.clangOmpss2Unwrapped.overrideAttrs (old: rec {
+      src = builtins.fetchGit {
+        url = "ssh://git@bscpm03.bsc.es/llvm-ompss/llvm-mono.git";
+        ref = "master";
+      };
+      version = src.shortRev;
+    });
+
     clangOmpss2 = appendPasstru (
       callPackage ./bsc/llvm-ompss2/default.nix {
         clangOmpss2Unwrapped = bsc.clangOmpss2Unwrapped;
+      }) { CC = "clang"; CXX = "clang++"; };
+
+    clangOmpss2Git = appendPasstru (
+      callPackage ./bsc/llvm-ompss2/default.nix {
+        clangOmpss2Unwrapped = bsc.clangOmpss2UnwrappedGit;
       }) { CC = "clang"; CXX = "clang++"; };
 
     mcxx = bsc.mcxxRelease;
