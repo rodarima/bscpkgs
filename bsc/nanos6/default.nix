@@ -51,6 +51,9 @@ stdenv.mkDerivation rec {
   # disable all by default, which includes bindnow.
   hardeningDisable = [ "all" ];
 
+  # Keep debug symbols in the verbose variant of the library
+  dontStrip = true;
+
   buildInputs = [
     autoreconfHook
     autoconf
