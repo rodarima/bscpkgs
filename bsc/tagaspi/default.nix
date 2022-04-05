@@ -15,7 +15,7 @@
 stdenv.mkDerivation rec {
   pname = "tagaspi";
   version = src.shortRev;
-  enableParallelBuilding = false;
+  enableParallelBuilding = true;
 
   buildInputs = [
     autoreconfHook

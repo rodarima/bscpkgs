@@ -19,6 +19,8 @@ stdenv.mkDerivation rec {
     ref = "refs/tags/tagaspi-2021.11";
   };
 
+  enableParallelBuilding = true;
+
   preConfigure = ''
     patchShebangs autogen.sh
     ./autogen.sh
