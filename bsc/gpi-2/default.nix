@@ -16,7 +16,7 @@ stdenv.mkDerivation rec {
 
   src = builtins.fetchGit {
     url = "ssh://git@bscpm03.bsc.es/interoperability/GPI-2";
-    ref = "lowlevel";
+    ref = "refs/tags/tagaspi-2021.11";
   };
 
   preConfigure = ''
