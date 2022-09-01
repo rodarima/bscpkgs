@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , garlicTools
 }:
 
@@ -7,7 +8,7 @@
   units
 }:
 
-with stdenv.lib;
+with lib;
 with garlicTools;
 
 let

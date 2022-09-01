@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , mpi ? null
 , tampi ? null
 , mcxx ? null
@@ -10,7 +11,7 @@
 , garlicTools
 }:
 
-with stdenv.lib;
+with lib;
 
 assert !(tampi != null && mcxx == null);
 

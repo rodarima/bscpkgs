@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , numactl
 , slurm
 , garlicTools
@@ -26,7 +27,7 @@
 , acctgFreq ? null
 }:
 
-with stdenv.lib;
+with lib;
 with garlicTools;
 
 # sbatch fails silently if we pass garbage, so we assert the types here to avoid

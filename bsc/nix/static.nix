@@ -146,9 +146,9 @@ common =
           environments.
         '';
         homepage = "https://nixos.org/";
-        license = stdenv.lib.licenses.lgpl2Plus;
-        maintainers = [ stdenv.lib.maintainers.eelco ];
-        platforms = stdenv.lib.platforms.unix;
+        license = lib.licenses.lgpl2Plus;
+        maintainers = [ lib.maintainers.eelco ];
+        platforms = lib.platforms.unix;
         outputsToInstall = [ "out" "man" ];
       };
 
@@ -191,7 +191,7 @@ in rec {
     };
 
     inherit storeDir stateDir confDir boehmgc;
-  } // stdenv.lib.optionalAttrs stdenv.cc.isClang {
+  } // lib.optionalAttrs stdenv.cc.isClang {
     stdenv = llvmPackages_6.stdenv;
   });
 

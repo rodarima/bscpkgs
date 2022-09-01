@@ -1,4 +1,5 @@
 { stdenv
+, lib
 , fetchFromGitHub
 , boost
 , libdwarf
@@ -50,9 +51,9 @@ stdenv.mkDerivation rec {
     xml2
     which
     libxml2.dev
-    python37Packages.sphinx
+    #python37Packages.sphinx
   ]
-  ++ stdenv.lib.optional stdenv.cc.isClang llvmPackages.openmp;
+  ++ lib.optional stdenv.cc.isClang llvmPackages.openmp;
     
   preConfigure = ''
     configureFlagsArray=(
@@ -79,13 +80,15 @@ stdenv.mkDerivation rec {
 
   # Install the manuals only by hand, as we don't want to pull the complete
   # LaTeX world
-  postBuild = ''
-    make -C docs man
-  '';
 
-  postInstall = ''
-    installManPage docs/builds/man/*/*
-  '';
+  # FIXME: sphinx is broken
+  #postBuild = ''
+  #  make -C docs man
+  #'';
+  #
+  #postInstall = ''
+  #  installManPage docs/builds/man/*/*
+  #'';
 
 #  ++ (
 #    if (openmp)

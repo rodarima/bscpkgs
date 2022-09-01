@@ -216,6 +216,18 @@ let
     #  Patched from upstream
     # =================================================================
 
+    #libdwarf_insecure = super.libdwarf.overrideAttrs (old: {
+    #  knownVulnerabilities = null;
+    #});
+    libdwarf = super.symlinkJoin {
+      name = "libdwarf";
+      paths = [
+        self.libdwarf.dev
+        self.libdwarf.lib
+        self.libdwarf.out
+      ];
+    };
+
     groff = callPackage ./bsc/groff/default.nix { };
     fftw = callPackage ./bsc/fftw/default.nix { };
     vtk = callPackage ./bsc/vtk/default.nix {

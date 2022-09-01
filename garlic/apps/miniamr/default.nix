@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , tampi
 , clangOmpss2
 , mpi
@@ -8,7 +9,7 @@
 , variant
 }:
 
-with stdenv.lib;
+with lib;
 
 assert (assertOneOf "variant" variant [ "openmp" "openmp-tasks" "ompss-2" ]);
 

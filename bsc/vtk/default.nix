@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , fetchurl
 , cmake
 , libGLU
@@ -13,10 +14,10 @@
 , mpi ? null
 }:
 
-with stdenv.lib;
+with lib;
 
 let
-  os = stdenv.lib.optionalString;
+  os = lib.optionalString;
   majorVersion = "8.2";
   minorVersion = "0";
   version = "${majorVersion}.${minorVersion}";
@@ -69,8 +70,8 @@ stdenv.mkDerivation rec {
   meta = {
     description = "Open source libraries for 3D computer graphics, image processing and visualization";
     homepage = "https://www.vtk.org/";
-    license = stdenv.lib.licenses.bsd3;
-    maintainers = with stdenv.lib.maintainers; [ knedlsepp ];
-    platforms = with stdenv.lib.platforms; unix;
+    license = lib.licenses.bsd3;
+    maintainers = with lib.maintainers; [ knedlsepp ];
+    platforms = with lib.platforms; unix;
   };
 }

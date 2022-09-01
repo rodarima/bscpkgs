@@ -6,6 +6,7 @@
 # following keys:
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , targetMachine
@@ -13,11 +14,11 @@
 , garlicTools
 }:
 
-# We import in the scope the content of the `stdenv.lib` attribute, which
+# We import in the scope the content of the `lib` attribute, which
 # contain useful functions like `toString`, which will be used later. This is
-# handy to avoid writting `stdenv.lib.tostring`.
+# handy to avoid writting `lib.tostring`.
 
-with stdenv.lib;
+with lib;
 
 # We also have some functions specific to the garlic benchmark which we import
 # as well. Take a look at the garlic/tools.nix file for more details.

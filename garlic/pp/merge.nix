@@ -1,10 +1,11 @@
 {
   stdenv
+, lib
 }:
 
 datasets:
 
-with stdenv.lib;
+with lib;
 
 stdenv.mkDerivation {
   name = "merged-dataset";

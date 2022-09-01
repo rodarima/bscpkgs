@@ -43,7 +43,7 @@ in stdenv.mkDerivation {
 
   enableParallelBuilding = true;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "File live sync daemon based on inotify/kqueue/bsm (Linux, FreeBSD), written in GNU C";
     homepage = "https://github.com/clsync/clsync";
     license = licenses.gpl3Plus;

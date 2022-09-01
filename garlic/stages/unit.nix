@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , bash
 , writeText
 }:
@@ -9,7 +10,7 @@
 , conf
 }:
 
-with stdenv.lib;
+with lib;
 with builtins;
 
 let

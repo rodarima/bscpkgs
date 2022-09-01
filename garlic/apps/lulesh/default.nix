@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , impi
 , mcxx
 , icc
@@ -9,7 +10,7 @@
 , garlicTools
 }:
 
-with stdenv.lib;
+with lib;
 
 let
   gitSource = garlicTools.fetchGarlicApp {

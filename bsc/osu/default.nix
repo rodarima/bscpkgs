@@ -34,6 +34,6 @@ stdenv.mkDerivation rec {
     description = "OSU Micro-Benchmarks";
     homepage = http://mvapich.cse.ohio-state.edu/benchmarks/;
     maintainers = [ ];
-    platforms = stdenv.lib.platforms.all;
+    platforms = lib.platforms.all;
   };
 }

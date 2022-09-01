@@ -26,6 +26,7 @@
 # Common packages, tools and options
 { 
   stdenv
+, lib
 , stdexp
 , bsc
 , targetMachine
@@ -33,7 +34,7 @@
 , garlicTools
 }:
 
-with stdenv.lib;
+with lib;
 with garlicTools;
 
 let

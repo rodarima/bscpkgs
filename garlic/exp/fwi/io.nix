@@ -7,6 +7,7 @@
 
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , targetMachine
@@ -15,7 +16,7 @@
 , enableExtended ? false
 }:
 
-with stdenv.lib;
+with lib;
 
 let
   common = callPackage ./common.nix {};

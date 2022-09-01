@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , babeltrace2
 , pkg-config
 , uthash
@@ -9,7 +10,7 @@
 , tampi ? null
 }:
 
-with stdenv.lib;
+with lib;
 
 assert (enableTest -> (mpi != null));
 assert (enableTest -> (clangOmpss2 != null));

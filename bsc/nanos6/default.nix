@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , fetchFromGitHub
 , automake
 , autoconf
@@ -20,7 +21,7 @@
 
 assert enableJemalloc -> (jemalloc != null);
 
-with stdenv.lib;
+with lib;
 
 stdenv.mkDerivation rec {
   pname = "nanos6";

@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , cc
 , nanos6 ? null
 , mcxx ? null
@@ -7,7 +8,7 @@
 , gitBranch
 }:
 
-with stdenv.lib;
+with lib;
 stdenv.mkDerivation rec {
   name = "bigsort";
 

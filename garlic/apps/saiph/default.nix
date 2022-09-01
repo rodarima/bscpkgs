@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , nanos6
 , mpi
 , tampi
@@ -33,8 +34,8 @@ assert enableManualDist -> (nbgx != null);
 assert enableManualDist -> (nbgy != null);
 assert enableManualDist -> (nbgz != null);
 
-with stdenv.lib;
-with stdenv.lib.versions;
+with lib;
+with lib.versions;
 
 let
   gitSource = garlicTools.fetchGarlicApp {

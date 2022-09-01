@@ -1,12 +1,13 @@
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , stages
 , callPackage
 }:
 
-with stdenv.lib;
+with lib;
 
 rec {
 

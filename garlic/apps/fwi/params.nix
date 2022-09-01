@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , nz ? 200
 , nx ? 200
 , ny ? 500
@@ -8,7 +9,7 @@
 , garlicTools
 }:
 
-with stdenv.lib;
+with lib;
 with builtins;
 
 let

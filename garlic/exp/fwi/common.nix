@@ -1,11 +1,12 @@
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , stages
 }:
 
-with stdenv.lib;
+with lib;
 
 # Common definitions used by fwi experiments
 rec {

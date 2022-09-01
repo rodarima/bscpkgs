@@ -1,12 +1,13 @@
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , targetMachine
 , stages
 }:
 
-with stdenv.lib;
+with lib;
 
 let
   # Initial variable configuration

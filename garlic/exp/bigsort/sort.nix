@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , targetMachine
@@ -9,7 +10,7 @@
 , inputTre
 }:
 
-with stdenv.lib;
+with lib;
 
 let
   varConf = { }; # Not used

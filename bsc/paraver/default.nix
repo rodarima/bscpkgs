@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , fetchFromGitHub
 , boost
 , libxml2
@@ -13,7 +14,7 @@
 , enableMouseLabel ? false
 }:
 
-with stdenv.lib;
+with lib;
 
 let
   wx = wxGTK28;

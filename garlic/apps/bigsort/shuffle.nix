@@ -1,10 +1,11 @@
 {
   stdenv
+, lib
 , cc
 , mpi
 }:
 
-with stdenv.lib;
+with lib;
 stdenv.mkDerivation rec {
   name = "shuffle";
 

@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , targetMachine
@@ -11,7 +12,7 @@
 , resultFromTrebuchet
 }:
 
-with stdenv.lib;
+with lib;
 with garlicTools;
 
 let

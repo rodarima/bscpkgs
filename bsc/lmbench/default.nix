@@ -35,6 +35,6 @@ stdenv.mkDerivation rec {
     description = "lmbench";
     homepage = "http://www.bitmover.com/lmbench/";
     maintainers = [ ];
-    platforms = stdenv.lib.platforms.all;
+    platforms = lib.platforms.all;
   };
 }

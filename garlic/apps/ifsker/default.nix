@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , mpi
 , gfortran
 , tampi
@@ -10,7 +11,7 @@
 , garlicTools
 }:
 
-with stdenv.lib;
+with lib;
 
 let
   gitSource = garlicTools.fetchGarlicApp {

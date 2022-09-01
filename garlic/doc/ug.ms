@@ -1076,7 +1076,7 @@ produce the execution pipeline when built. The experiment file describes
 a function (which is typical in nix) and takes as argument an
 attribute set with some common packages, tools and options:
 .CS
-{ stdenv, bsc, stdexp, targetMachine, stages, garlicTools }:
+{ stdenv, lib, bsc, stdexp, targetMachine, stages, garlicTools }:
 .CE
 The
 .I bsc
@@ -1344,8 +1344,8 @@ stdexp.genExperiment { inherit configs pipeline; }
 .CE
 The complete example experiment can be shown here:
 .CS
-{ stdenv, stdexp, bsc, targetMachine, stages }:
-with stdenv.lib;
+{ stdenv, lib, stdexp, bsc, targetMachine, stages }:
+with lib;
 let
   # Initial variable configuration
   varConf = {

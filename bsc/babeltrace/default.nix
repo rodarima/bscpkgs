@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, pkgconfig, glib, libuuid, popt, elfutils, swig4, python3 }:
+{ stdenv, lib, fetchurl, pkgconfig, glib, libuuid, popt, elfutils, swig4, python3 }:
 
 stdenv.mkDerivation rec {
   name = "babeltrace-1.5.8";
@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ pkgconfig ];
   buildInputs = [ glib libuuid popt elfutils swig4 python3 ];
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Command-line tool and library to read and convert LTTng tracefiles";
     homepage = "https://www.efficios.com/babeltrace";
     license = licenses.mit;

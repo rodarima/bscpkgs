@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , stages
@@ -7,7 +8,7 @@
 , garlicTools
 }:
 
-with stdenv.lib;
+with lib;
 with garlicTools;
 
 rec {

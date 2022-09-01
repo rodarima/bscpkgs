@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , icc
 , mpi ? null
 , tampi ? null
@@ -11,7 +12,7 @@
 
 assert !(tampi != null && mcxx == null);
 
-with stdenv.lib;
+with lib;
 
 let
   gitSource = garlicTools.fetchGarlicApp {

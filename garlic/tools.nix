@@ -1,8 +1,9 @@
 {
   stdenv
+, lib
 }:
 
-with stdenv.lib;
+with lib;
 
 let
   gen = rec {

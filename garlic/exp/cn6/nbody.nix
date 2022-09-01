@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , pkgs
@@ -10,7 +11,7 @@
 , enableHWC ? false
 }:
 
-with stdenv.lib;
+with lib;
 with garlicTools;
 
 let

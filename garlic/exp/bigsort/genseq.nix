@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , targetMachine
@@ -9,7 +10,7 @@
 , strace
 }:
 
-with stdenv.lib;
+with lib;
 
 # Ensure the arguments are strings, to avoid problems with large numbers
 assert (isString n);

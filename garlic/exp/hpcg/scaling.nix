@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , targetMachine
@@ -10,7 +11,7 @@
 , enableStrong ? true
 }:
 
-with stdenv.lib;
+with lib;
 with garlicTools;
 
 let

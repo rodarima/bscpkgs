@@ -1,4 +1,4 @@
-{ stdenv, fetchFromGitHub, cmake, pkgconfig, docutils
+{ stdenv, lib, fetchFromGitHub, cmake, pkgconfig, docutils
 , pandoc, ethtool, iproute, libnl, udev, python, perl
 , makeWrapper
 } :
@@ -48,7 +48,7 @@ in stdenv.mkDerivation {
     rm -rf $out/sbin
   '';
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "RDMA Core Userspace Libraries and Daemons";
     homepage = "https://github.com/linux-rdma/rdma-core";
     license = licenses.gpl2;

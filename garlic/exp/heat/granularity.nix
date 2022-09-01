@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , stdexp
 , bsc
 , targetMachine
@@ -15,7 +16,7 @@
 # TODO: Finish HWC first
 assert (enableHWC == false);
 
-with stdenv.lib;
+with lib;
 with garlicTools;
 
 let

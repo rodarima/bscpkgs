@@ -1,4 +1,4 @@
-{ stdenv, fetchFromGitHub, pkgconfig, libtool, curl
+{ stdenv, lib, fetchFromGitHub, pkgconfig, libtool, curl
 , python, munge, perl, pam, openssl
 , ncurses, libmysqlclient, gtk2, lua, hwloc, numactl
 , readline, freeipmi, libssh2, xorg
@@ -23,7 +23,7 @@ stdenv.mkDerivation rec {
 
   outputs = [ "out" "dev" ];
 
-  prePatch = stdenv.lib.optional enableX11 ''
+  prePatch = lib.optional enableX11 ''
     substituteInPlace src/common/x11_util.c \
         --replace '"/usr/bin/xauth"' '"${xorg.xauth}/bin/xauth"'
   '';
@@ -39,9 +39,9 @@ stdenv.mkDerivation rec {
       libmysqlclient ncurses gtk2
       lua hwloc numactl readline freeipmi
       pmix
-  ] ++ stdenv.lib.optionals enableX11 [ libssh2 xorg.xauth ];
+  ] ++ lib.optionals enableX11 [ libssh2 xorg.xauth ];
 
-  configureFlags = with stdenv.lib;
+  configureFlags = with lib;
     [ "--with-munge=${munge}"
       "--with-ssl=${openssl.dev}"
       "--with-hwloc=${hwloc.dev}"
@@ -70,7 +70,7 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     homepage = http://www.schedmd.com/;
     description = "Simple Linux Utility for Resource Management";
     platforms = platforms.linux;

@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , config
 , stages
 , targetMachine
@@ -11,7 +12,7 @@
 , pp
 }:
 
-with stdenv.lib;
+with lib;
 with garlicTools;
 
 let

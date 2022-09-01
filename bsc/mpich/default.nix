@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , fetchurl
 , perl
 , gfortran
@@ -9,7 +10,7 @@
 , enableDebug ? false
 }:
 
-with stdenv.lib;
+with lib;
 
 stdenv.mkDerivation  rec {
   pname = "mpich";
@@ -41,7 +42,7 @@ stdenv.mkDerivation  rec {
     sed -i 's:CXX="g++":CXX=${stdenv.cc}/bin/g++:' $out/bin/mpicxx
     sed -i 's:FC="gfortran":FC=${gfortran}/bin/gfortran:' $out/bin/mpifort
   ''
-  + stdenv.lib.optionalString (!stdenv.isDarwin) ''
+  + lib.optionalString (!stdenv.isDarwin) ''
     # /tmp/nix-build... ends up in the RPATH, fix it manually
     for entry in $out/bin/mpichversion $out/bin/mpivars; do
       echo "fix rpath: $entry"
@@ -49,7 +50,7 @@ stdenv.mkDerivation  rec {
     done
     '';
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Implementation of the Message Passing Interface (MPI) standard";
 
     longDescription = ''

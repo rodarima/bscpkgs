@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , rWrapper
 , rPackages
 , fontconfig
@@ -22,7 +23,7 @@
 , extraRPackages ? []
 }:
 
-with stdenv.lib;
+with lib;
 
 let
   scalesPatched = with rPackages; buildRPackage {
