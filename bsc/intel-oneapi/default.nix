@@ -1,6 +1,7 @@
 {
   stdenv
 , gcc
+, nanos6
 , iccUnwrapped
 , wrapCCWith
 , intelLicense
@@ -25,16 +26,8 @@ in wrapCCWith rec {
       >> $out/nix-support/setup-hook
 
     # Create the wrappers for icc and icpc
-    if [ -e $ccPath/icc ]; then
-      wrap icc  $wrapper $ccPath/icc
-    fi
-
-    if [ -e $ccPath/icpc ]; then
-      wrap icpc $wrapper $ccPath/icpc
-    fi
-
-    if [ -e $ccPath/ifort ]; then
-      wrap ifort $wrapper $ccPath/ifort
-    fi
+    wrap icc  $wrapper $ccPath/icc
+    wrap icpc $wrapper $ccPath/icpc
+    wrap ifort $wrapper $ccPath/ifort
   '';
 }

@@ -39,6 +39,14 @@ let
 
     icc2021Unwrapped = callPackage ./bsc/intel-compiler/icc2021.nix { };
 
+    #icc2022Unwrapped = callPackage ./bsc/intel-oneapi/2022.3.1.nix { };
+
+    intel-oneapi = callPackage ./bsc/intel-oneapi/ifort.nix { };
+    ifort2022Unwrapped = bsc.intel-oneapi.intel-compiler-fortran;
+    icc2022Unwrapped = bsc.intel-oneapi.intel-compiler-classic;
+
+    #oneapi2022 = callPackage ./bsc/intel-oneapi/oneapi.nix { };
+
     # A wrapper script that puts all the flags and environment vars
     # properly and calls the intel compiler binary
     icc2020 = appendPasstru (callPackage ./bsc/intel-compiler/default.nix {
@@ -50,7 +58,17 @@ let
       iccUnwrapped = bsc.icc2021Unwrapped;
     }) { CC = "icx"; CXX = "icpx"; };
 
-    icc = bsc.icc2020;
+    ifort2022 = callPackage ./bsc/intel-compiler/default.nix {
+      iccUnwrapped = bsc.ifort2022Unwrapped;
+      intelLicense = bsc.intelLicense;
+    };
+
+    ifort = bsc.ifort2022;
+
+    icc2022 = bsc.intel-oneapi.intel-compiler-classic-wrapper;
+
+
+    icc = bsc.icc2022;
 
     # We need to set the cc.CC and cc.CXX attributes, in order to 
     # determine the name of the compiler
@@ -248,6 +266,7 @@ let
     dummy = callPackage ./bsc/dummy/default.nix { };
     mpptest = callPackage ./bsc/mpptest/default.nix { };
     cpuid = callPackage ./bsc/cpuid/default.nix { };
+    alya = callPackage ./bsc/alya/default.nix { };
 
     # =================================================================
     #  Garlic benchmark

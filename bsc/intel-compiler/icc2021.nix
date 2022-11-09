@@ -114,7 +114,7 @@ in
     '';
 
     # FIXME: Some dependencies are missing
-    autoPatchelfIgnoreMissingDeps=true;
+    autoPatchelfIgnoreMissingDeps = true;
     #autoPatchelfIgnoreMissingDeps = [ "*" ];
 
     # Compiler
