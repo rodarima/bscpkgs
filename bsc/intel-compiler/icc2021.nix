@@ -100,9 +100,11 @@ in
       libxml2
       hwloc
       autoPatchelfHook
+      stdenv.cc.cc.lib
     ];
 
     dontBuild = true;
+    dontStrip = true;
 
     # The gcc package is required for building other programs
     #propagatedBuildInputs = [ gcc ];
@@ -113,6 +115,7 @@ in
 
     # FIXME: Some dependencies are missing
     autoPatchelfIgnoreMissingDeps=true;
+    #autoPatchelfIgnoreMissingDeps = [ "*" ];
 
     # Compiler
     installPhase = ''
