@@ -6,10 +6,10 @@
 , libxml2
 , xml2
 , fetchurl
-, wxGTK28
+, wxGTK32
 , autoconf
 , automake
-, wxpropgrid
+, openssl # For boost
 # Custom patches :)
 , enableMouseLabel ? false
 }:
@@ -17,15 +17,15 @@
 with lib;
 
 let
-  wx = wxGTK28;
+  wx = wxGTK32;
 in
 stdenv.mkDerivation rec {
   pname = "wxparaver";
-  version = "4.8.2";
+  version = "4.10.6";
 
   src = fetchurl {
     url = "https://ftp.tools.bsc.es/wxparaver/wxparaver-${version}-src.tar.bz2";
-    sha256 = "0b8rrhnf7h8j72pj6nrxkrbskgg9b5w60nxi47nxg6275qvfq8hd";
+    sha256 = "a7L15viCXtQS9vAsdFzCFlUavUzl4Y0yOYmVSCrdWBU=";
   };
 
   patches = []
@@ -37,17 +37,16 @@ stdenv.mkDerivation rec {
   # https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=wxparaver
   postPatch = ''
     pushd src/wxparaver
-      sed -i 's|-lparaver-kernel -lparaver-api|-L../../paraver-kernel/src/.libs -L../../paraver-kernel/api/.libs -lparaver-kernel -lparaver-api|g' src/Makefile.am
-      sed -i 's|^wxparaver_bin_CXXFLAGS =.*|& -I../../paraver-kernel -I../../paraver-kernel/api|' src/Makefile.am
+      sed -i \
+	  -e 's|-lparaver-api -lparaver-kernel|-L../../paraver-kernel/src/.libs -L../../paraver-kernel/api/.libs -lparaver-api -lparaver-kernel -lssl -lcrypto -ldl|g' \
+	  -e '$awxparaver_bin_CXXFLAGS = @CXXFLAGS@ -I../../paraver-kernel -I../../paraver-kernel/api' \
+	  src/Makefile.am
+
       sed -i 's| -L$PARAVER_LIBDIR||g' configure.ac
     popd
 
     # Patch shebang as /usr/bin/env is missing in nix
     sed -i '1c#!/bin/sh' src/paraver-cfgs/install.sh
-
-    #sed -i '1524d' src/wxparaver/src/gtimeline.cpp
-    #sed -i '806d' src/wxparaver/src/gtimeline.cpp
-    #sed -i '142d' src/wxparaver/src/paravermain.cpp
   '';
   #TODO: Move the sed commands to proper patches (and maybe send them upstream?)
 
@@ -60,7 +59,6 @@ stdenv.mkDerivation rec {
   configureFlags = [
     "--with-boost=${boost}"
     "--with-wx-config=${wx}/bin/wx-config"
-    "--with-wxpropgrid-dir=${wxpropgrid}"
   ];
 
   buildInputs = [
@@ -70,6 +68,7 @@ stdenv.mkDerivation rec {
     wx
     autoconf
     automake
+    openssl.dev
   ];
 
 }
