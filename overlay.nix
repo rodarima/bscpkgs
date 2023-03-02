@@ -265,6 +265,10 @@ let
 #      hwloc = callPackage ./test/bugs/hwloc.nix { };
       sigsegv = callPackage ./test/reproducers/sigsegv.nix { };
     };
+
+    ci = import ./test/ci.nix {
+      inherit self super bsc callPackage;
+    };
   });
 
 in
