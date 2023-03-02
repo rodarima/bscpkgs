@@ -11,7 +11,21 @@ stdenv.mkDerivation rec {
 
   # Just build some packages
   buildInputs = with bsc; [
+    # Compilers
+    icc
+    clangOmpss2
+    mcxx
+    # MPI
+    impi
+    mpich
+    openmpi
+    tampi
+    # Tools
+    ovni
     extrae
+    paraver
+    # Runtimes
+    nanos6
   ];
 
   buildPhase = ''
