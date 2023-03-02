@@ -3,4 +3,5 @@ build:bsc.ci:
   tags:
     - nix
   script:
+    - export NIXPKGS_ALLOW_INSECURE=1
     - nix build -v -L --tarball-ttl 0 --file default.nix bsc.ci
