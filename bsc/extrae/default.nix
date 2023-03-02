@@ -38,10 +38,14 @@ stdenv.mkDerivation rec {
     sha256 = "SlMYxNQXJ0Xg90HmpnotUR3tEPVVBXhk1NtEBJwGBR4=";
   };
 
-  # FIXME: Waiting for German to merge this patch. Still not in master, merged
-  # on 2023-03-01 in devel branch (after 3 years), see:
-  # https://github.com/bsc-performance-tools/extrae/pull/45
-  patches = [ ./use-command.patch ];
+  patches = [
+    # FIXME: Waiting for German to merge this patch. Still not in master, merged
+    # on 2023-03-01 in devel branch (after 3 years), see:
+    # https://github.com/bsc-performance-tools/extrae/pull/45
+    ./use-command.patch
+    # https://github.com/bsc-performance-tools/extrae/issues/71
+    ./PTR.patch
+  ];
 
   enableParallelBuilding = true;
   hardeningDisable = [ "all" ];

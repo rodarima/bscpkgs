@@ -1,0 +1,13 @@
+diff --git a/src/merger/common/bfd_manager.c b/src/merger/common/bfd_manager.c
+index 5f9dacf9..5231e3eb 100644
+--- a/src/merger/common/bfd_manager.c
++++ b/src/merger/common/bfd_manager.c
+@@ -225,7 +225,7 @@ asymbol **BFDmanager_getDefaultSymbols (void)
+  *
+  * @return No return value.
+  */
+-static void BFDmanager_findAddressInSection (bfd * abfd, asection * section, PTR data)
++static void BFDmanager_findAddressInSection (bfd * abfd, asection * section, void * data)
+ {
+ #if HAVE_BFD_GET_SECTION_SIZE || HAVE_BFD_SECTION_SIZE || HAVE_BFD_GET_SECTION_SIZE_BEFORE_RELOC
+ 	bfd_size_type size;
