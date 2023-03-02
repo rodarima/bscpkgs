@@ -1,0 +1,120 @@
+commit c2fa29f7f1bbde86f41417b198610253fff93667
+Author: Rodrigo Arias <rodarima@gmail.com>
+Date:   Thu Mar 2 13:14:56 2023 +0100
+
+    Add the PCF option DONT_EXPAND_COLORS
+    
+    Allows the user to specify the complete palette in the PCF, preventing
+    Paraver from expanding the colors.
+
+diff --git a/api/semanticcolor.cpp b/api/semanticcolor.cpp
+index 9f86960..22859eb 100644
+--- a/api/semanticcolor.cpp
++++ b/api/semanticcolor.cpp
+@@ -232,8 +232,9 @@ rgb CodeColor::getColor( PRV_UINT32 pos ) const
+ {
+   if( pos == 0 && ParaverConfig::getInstance()->getColorsTimelineUseZero() )
+     return ParaverConfig::getInstance()->getColorsTimelineColorZero();
+-  pos = pos % colors.size();
+-  return colors[ pos ];
++  // Skip the black at 0
++  pos = pos % (colors.size() - 1);
++  return colors[ pos + 1 ];
+ }
+ 
+ void CodeColor::setColor( PRV_UINT32 whichPos, rgb whichColor )
+@@ -250,6 +251,12 @@ void CodeColor::setColor( PRV_UINT32 whichPos, rgb whichColor )
+   colors[ whichPos ] = whichColor;
+ }
+ 
++void CodeColor::cutAfter( PRV_UINT32 pos )
++{
++  if ( pos < colors.size() )
++    colors.erase( colors.begin() + pos, colors.end() );
++}
++
+ void CodeColor::setCustomColor( TSemanticValue whichValue, rgb color ) 
+ {
+   customPalette[ whichValue ] = color;
+diff --git a/api/semanticcolor.h b/api/semanticcolor.h
+index a079556..bddf3d8 100644
+--- a/api/semanticcolor.h
++++ b/api/semanticcolor.h
+@@ -98,6 +98,7 @@ class CodeColor: public SemanticColor
+ 
+     PRV_UINT32 getNumColors() const;
+     void setColor( PRV_UINT32 pos, rgb color );
++    void cutAfter( PRV_UINT32 pos );
+     void setCustomColor( TSemanticValue whichValue, rgb color );
+     bool existCustomColors() const;
+     const std::map<TSemanticValue, rgb>& getCustomPalette() const;
+diff --git a/api/trace.cpp b/api/trace.cpp
+index b0d2050..ee2ab69 100644
+--- a/api/trace.cpp
++++ b/api/trace.cpp
+@@ -461,12 +461,21 @@ void TraceProxy::parsePCF( const string& whichFile )
+ 
+   rgb tmpColor;
+   const std::map< uint32_t, PCFFileParser<>::rgb >& semanticColors = pcfParser.getSemanticColors();
++  uint32_t maxValue = 0;
++
+   for ( auto it : semanticColors )
+   {
+     std::tie( tmpColor.red, tmpColor.green, tmpColor.blue ) = it.second;
+     myCodeColor.setColor( it.first, tmpColor );
++	if (it.first > maxValue)
++      maxValue = it.first;
+   }
+ 
++  // Cut the palette after the highest defined value, so there are no
++  // extra expanded values
++  if ( !pcfParser.expandColors )
++	myCodeColor.cutAfter(maxValue);
++
+   myEventLabels = EventLabels( pcfParser );
+   myStateLabels = StateLabels( pcfParser );
+ 
+diff --git a/utils/traceparser/pcffileparser.cpp b/utils/traceparser/pcffileparser.cpp
+index 9245955..3a1aecb 100644
+--- a/utils/traceparser/pcffileparser.cpp
++++ b/utils/traceparser/pcffileparser.cpp
+@@ -286,6 +286,7 @@ constexpr char PCF_LABEL_SPEED[]               = "SPEED";
+ constexpr char PCF_LABEL_FLAG_ICONS[]          = "FLAG_ICONS";
+ constexpr char PCF_LABEL_NUM_OF_STATE_COLORS[] = "NUM_OF_STATE_COLORS";
+ constexpr char PCF_LABEL_YMAX_SCALE[]          = "YMAX_SCALE";
++constexpr char PCF_LABEL_DONT_EXPAND_COLORS[]  = "DONT_EXPAND_COLORS";
+ 
+ template< typename dummyParser = std::nullptr_t >
+ class DefaultOptionsParser : public PCFFileParser<>::SectionParser<>
+@@ -293,12 +294,13 @@ class DefaultOptionsParser : public PCFFileParser<>::SectionParser<>
+   public:
+     DefaultOptionsParser( PCFFileParser<> *whichMainParser ) : PCFFileParser<>::SectionParser<>( whichMainParser ) 
+     {
+-      parameterSetter[ PCF_LABEL_LEVEL ]      = [this]( std::string line ) { mainParser->level = line; };
+-      parameterSetter[ PCF_LABEL_UNITS ]      = [this]( std::string line ) { mainParser->units = line; };
+-      parameterSetter[ PCF_LABEL_LOOK_BACK ]  = [this]( std::string line ) { mainParser->lookBack = line; };
+-      parameterSetter[ PCF_LABEL_SPEED ]      = [this]( std::string line ) { mainParser->speed = line; };
+-      parameterSetter[ PCF_LABEL_FLAG_ICONS ] = [this]( std::string line ) { mainParser->flagIcons = line; };
+-      parameterSetter[ PCF_LABEL_YMAX_SCALE ] = [this]( std::string line ) { mainParser->ymaxScale = line; };
++      parameterSetter[ PCF_LABEL_LEVEL ]              = [this]( std::string line ) { mainParser->level = line; };
++      parameterSetter[ PCF_LABEL_UNITS ]              = [this]( std::string line ) { mainParser->units = line; };
++      parameterSetter[ PCF_LABEL_LOOK_BACK ]          = [this]( std::string line ) { mainParser->lookBack = line; };
++      parameterSetter[ PCF_LABEL_SPEED ]              = [this]( std::string line ) { mainParser->speed = line; };
++      parameterSetter[ PCF_LABEL_FLAG_ICONS ]         = [this]( std::string line ) { mainParser->flagIcons = line; };
++      parameterSetter[ PCF_LABEL_YMAX_SCALE ]         = [this]( std::string line ) { mainParser->ymaxScale = line; };
++      parameterSetter[ PCF_LABEL_DONT_EXPAND_COLORS ] = [this]( std::string line ) { mainParser->expandColors = false; };
+     }
+ 
+     virtual ~DefaultOptionsParser() = default;
+diff --git a/utils/traceparser/pcffileparser.h b/utils/traceparser/pcffileparser.h
+index 5fe2634..c12ecc8 100644
+--- a/utils/traceparser/pcffileparser.h
++++ b/utils/traceparser/pcffileparser.h
+@@ -100,6 +100,7 @@ class PCFFileParser
+     void setEventLabel( TEventType eventType, const std::string& label );
+     void setEventValues( TEventType eventType, const std::map< TEventValue, std::string >& values );
+     void setEventValueLabel( TEventType eventType, TEventValue eventValue, const std::string& label );
++    bool expandColors = true;
+ 
+   private:
+     struct EventTypeData

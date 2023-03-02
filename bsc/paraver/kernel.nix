@@ -1,35 +1,53 @@
-{ stdenv
-, fetchFromGitHub
+{
+  stdenv
+, autoreconfHook
 , boost
 , libxml2
 , xml2
-, fetchurl
-, symlinkJoin
+, wxGTK30
+, autoconf
+, automake
 }:
 
+let
+  wx = wxGTK30;
+in
 stdenv.mkDerivation rec {
   pname = "paraver-kernel";
-  version = "4.8.2";
+  version = "${src.shortRev}";
 
-  src = fetchurl {
-    url = "https://ftp.tools.bsc.es/wxparaver/wxparaver-${version}-src.tar.bz2";
-    sha256 = "0b8rrhnf7h8j72pj6nrxkrbskgg9b5w60nxi47nxg6275qvfq8hd";
+  src = builtins.fetchGit {
+    url = "https://github.com/bsc-performance-tools/paraver-kernel.git";
+    rev = "3f89ec68da8e53ee227c57a2024bf789fa68ba98"; # master (missing tag)
+    ref = "master";
   };
 
-  postUnpack = "sourceRoot=$sourceRoot/src/paraver-kernel";
-
-  enableParallelBuilding = true;
-
-  preConfigure = ''
-    configureFlagsArray=(
-      "--with-boost=${boost}"
-    )
-  '';
-
-  buildInputs = [
-    boost
-    xml2
-    libxml2.dev
+  patches = [
+    # https://github.com/bsc-performance-tools/paraver-kernel/pull/11
+    ./dont-expand-colors.patch
   ];
 
+  hardeningDisable = [ "all" ];
+  enableParallelBuilding = true;
+
+  dontStrip = true;
+
+  preConfigure = ''
+    export CFLAGS="-O3 -DPARALLEL_ENABLED"
+    export CXXFLAGS="-O3 -DPARALLEL_ENABLED"
+  '';
+
+  configureFlags = [
+    "--with-boost=${boost}"
+    "--enable-openmp"
+  ];
+
+  buildInputs = [
+    autoreconfHook
+    boost
+    libxml2.dev
+    xml2
+    autoconf
+    automake
+  ];
 }

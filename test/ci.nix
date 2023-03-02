@@ -23,7 +23,7 @@ stdenv.mkDerivation rec {
     # Tools
     ovni
     extrae
-    paraver
+    wxparaver
     # Runtimes
     nanos6
   ];

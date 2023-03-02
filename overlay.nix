@@ -169,14 +169,12 @@ let
     #  Tracing
     # =================================================================
 
-    paraver = callPackage ./bsc/paraver/default.nix { };
+    paraverKernel = callPackage ./bsc/paraver/kernel.nix { };
+    wxparaver = callPackage ./bsc/paraver/default.nix { };
+
+    # We should maintain these...
     paraverKernelFast = callPackage ./bsc/paraver/kernel-fast.nix { };
-    paraverFast = callPackage ./bsc/paraver/wxparaver-fast.nix { };
-    paraverExtra = bsc.paraver.override { enableMouseLabel = true; };
-    paraverDebug = bsc.paraver.overrideAttrs (old: {
-      dontStrip = true;
-      enableDebugging = true;
-    });
+    wxparaverFast = callPackage ./bsc/paraver/wxparaver-fast.nix { };
 
     extrae = callPackage ./bsc/extrae/default.nix {
       libdwarf = super.libdwarf_20210528;

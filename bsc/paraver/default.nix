@@ -1,74 +1,73 @@
 {
   stdenv
-, lib
-, fetchFromGitHub
+, autoreconfHook
 , boost
 , libxml2
 , xml2
-, fetchurl
-, wxGTK32
+, wxGTK30
 , autoconf
 , automake
-, openssl # For boost
-# Custom patches :)
-, enableMouseLabel ? false
+, paraverKernel
+, openssl
+, glibcLocales
 }:
 
-with lib;
-
 let
-  wx = wxGTK32;
+  wx = wxGTK30;
 in
 stdenv.mkDerivation rec {
   pname = "wxparaver";
   version = "4.10.6";
 
-  src = fetchurl {
-    url = "https://ftp.tools.bsc.es/wxparaver/wxparaver-${version}-src.tar.bz2";
-    sha256 = "a7L15viCXtQS9vAsdFzCFlUavUzl4Y0yOYmVSCrdWBU=";
+  src = builtins.fetchGit {
+    url = "https://github.com/bsc-performance-tools/wxparaver.git";
+    rev = "fe55c724ab59a5b0e60718919297bdf95582badb"; # v4.10.6 (missing tag)
+    ref = "master";
   };
 
-  patches = []
-    ++ optional (enableMouseLabel) ./mouse-label.patch;
+  hardeningDisable = [ "all" ];
 
+  # Fix the PARAVER_HOME variable
+  postPatch = ''
+    sed -i 's@^PARAVER_HOME=.*$@PARAVER_HOME='$out'@g' docs/wxparaver
+    sed -i '1aexport LOCALE_ARCHIVE="${glibcLocales}/lib/locale/locale-archive"' docs/wxparaver
+  '';
+
+  dontStrip = true;
   enableParallelBuilding = true;
 
-  # What would we do without the great gamezelda:
-  # https://aur.archlinux.org/cgit/aur.git/tree/PKGBUILD?h=wxparaver
-  postPatch = ''
-    pushd src/wxparaver
-      sed -i \
-	  -e 's|-lparaver-api -lparaver-kernel|-L../../paraver-kernel/src/.libs -L../../paraver-kernel/api/.libs -lparaver-api -lparaver-kernel -lssl -lcrypto -ldl|g' \
-	  -e '$awxparaver_bin_CXXFLAGS = @CXXFLAGS@ -I../../paraver-kernel -I../../paraver-kernel/api' \
-	  src/Makefile.am
-
-      sed -i 's| -L$PARAVER_LIBDIR||g' configure.ac
-    popd
-
-    # Patch shebang as /usr/bin/env is missing in nix
-    sed -i '1c#!/bin/sh' src/paraver-cfgs/install.sh
-  '';
-  #TODO: Move the sed commands to proper patches (and maybe send them upstream?)
-
   preConfigure = ''
-    pushd src/wxparaver
-      autoreconf -i -f
-    popd
+    export CFLAGS="-O3"
+    export CXXFLAGS="-O3"
   '';
 
   configureFlags = [
     "--with-boost=${boost}"
     "--with-wx-config=${wx}/bin/wx-config"
+    "--with-paraver=${paraverKernel}"
+    "--with-openssl=${openssl.dev}"
   ];
 
   buildInputs = [
+    autoreconfHook
     boost
-    xml2
     libxml2.dev
+    xml2
     wx
     autoconf
     automake
+    paraverKernel
     openssl.dev
+    paraverKernel
   ];
 
+  postInstall = ''
+    mkdir -p $out/include
+    mkdir -p $out/lib/paraver-kernel
+    mkdir -p $out/share/filters-config
+    cp -p ${paraverKernel}/bin/* $out/bin
+    # cp -p ${paraverKernel}/include/* $out/include
+    cp -a ${paraverKernel}/lib/paraver-kernel $out/lib/paraver-kernel
+    cp -p ${paraverKernel}/share/filters-config/* $out/share/filters-config
+  '';
 }
