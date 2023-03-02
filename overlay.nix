@@ -171,7 +171,9 @@ let
       enableDebugging = true;
     });
 
-    extrae = callPackage ./bsc/extrae/default.nix { };
+    extrae = callPackage ./bsc/extrae/default.nix {
+      libdwarf = super.libdwarf_20210528;
+    };
     otf = callPackage ./bsc/otf/default.nix { };
     vite = self.qt5.callPackage ./bsc/vite/default.nix { };
     babeltrace = callPackage ./bsc/babeltrace/default.nix { };
@@ -215,18 +217,6 @@ let
     # =================================================================
     #  Patched from upstream
     # =================================================================
-
-    #libdwarf_insecure = super.libdwarf.overrideAttrs (old: {
-    #  knownVulnerabilities = null;
-    #});
-    libdwarf = super.symlinkJoin {
-      name = "libdwarf";
-      paths = [
-        self.libdwarf.dev
-        self.libdwarf.lib
-        self.libdwarf.out
-      ];
-    };
 
     groff = callPackage ./bsc/groff/default.nix { };
     fftw = callPackage ./bsc/fftw/default.nix { };

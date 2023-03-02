@@ -18,20 +18,29 @@
 , autoreconfHook
 , python37Packages
 , installShellFiles
+, symlinkJoin
 }:
+
+let
+  libdwarfBundle = symlinkJoin {
+    name = "libdwarfBundle";
+    paths = [ libdwarf.dev libdwarf.lib libdwarf.out ];
+  };
+in
 
 stdenv.mkDerivation rec {
   pname = "extrae";
-  version = "3.8.3";
-
+  version = "4.0.1";
   src = fetchFromGitHub {
     owner = "bsc-performance-tools";
     repo = "extrae";
     rev = "${version}";
-    sha256 = "08ghd14zb3bgqb1smb824d621pqqww4q01n3pyws0vp3xi0kavf4";
+    sha256 = "SlMYxNQXJ0Xg90HmpnotUR3tEPVVBXhk1NtEBJwGBR4=";
   };
 
-  # FIXME: Waiting for German to merge this patch
+  # FIXME: Waiting for German to merge this patch. Still not in master, merged
+  # on 2023-03-01 in devel branch (after 3 years), see:
+  # https://github.com/bsc-performance-tools/extrae/pull/45
   patches = [ ./use-command.patch ];
 
   enableParallelBuilding = true;
@@ -59,7 +68,7 @@ stdenv.mkDerivation rec {
     configureFlagsArray=(
       --enable-posix-clock
       --with-binutils="${binutils-unwrapped} ${libiberty}"
-      --with-dwarf=${libdwarf}
+      --with-dwarf=${libdwarfBundle}
       --with-elf=${libelf}
       --with-boost=${boost.dev}
       --enable-instrument-io
