@@ -15,7 +15,7 @@
 
 stdenv.mkDerivation rec {
   pname = "mcxx";
-  version = "2021.11";
+  version = "2022.11";
 
   passthru = {
     CC = "mcc";
@@ -27,7 +27,7 @@ stdenv.mkDerivation rec {
     owner = "bsc-pm";
     repo = pname;
     rev = "github-release-${version}";
-    sha256 = "0g9y93x7aqy3cpnw7l7k3b3lqqss6ri6ahwk1pbfkc2bpgylwfcx";
+    sha256 = "DMT5UPwsjVo2d0r2wgQvYhcrAacOe+BkiXjAvFA0zGo=";
   };
 
   enableParallelBuilding = true;
