@@ -13,6 +13,7 @@
 , extrae
 , boost
 , babeltrace2
+, ovni
 , enableJemalloc ? true
 , jemalloc ? null
 , cachelineBytes ? 64
@@ -25,13 +26,13 @@ with lib;
 
 stdenv.mkDerivation rec {
   pname = "nanos6";
-  version = "2.7";
+  version = "2.8";
 
   src = fetchFromGitHub {
     owner = "bsc-pm";
     repo = "nanos6";
     rev = "version-${version}";
-    sha256 = "1zw0pn4w450il2av50yr4n4zfh0sljw50wxp816pw6vbk6zf3yks";
+    sha256 = "YGj/cubqXaNt4lR2CnSU+nXvi+SdB56EXLhfN/ufjHs=";
   };
 
   prePatch = ''
@@ -44,7 +45,10 @@ stdenv.mkDerivation rec {
     export CACHELINE_WIDTH=${toString cachelineBytes}
   '';
 
-  configureFlags = [ "--with-babeltrace2=${babeltrace2}" ] ++
+  configureFlags = [
+    "--with-babeltrace2=${babeltrace2}"
+    "--with-ovni=${ovni}"
+  ] ++
     (optional enableJemalloc "--with-jemalloc=${jemalloc}") ++
     (optional enableGlibcxxDebug "CXXFLAGS=-D_GLIBCXX_DEBUG");
 
@@ -66,6 +70,7 @@ stdenv.mkDerivation rec {
     hwloc
     papi
     babeltrace2
+    ovni
   ] ++ (if (extrae != null) then [extrae] else []);
 
 }
