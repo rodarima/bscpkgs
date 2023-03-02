@@ -126,8 +126,16 @@ let
     psmpi = callPackage ./bsc/parastation/psmpi.nix { };
 
     # MPICH
-    mpich = callPackage ./bsc/mpich/default.nix { };
-    mpichDebug = bsc.mpich.override { enableDebug = true; };
+    #mpich_3 = callPackage ./bsc/mpich/default.nix { };
+    #mpichDebug_3 = bsc.mpich.override { enableDebug = true; };
+    mpich = super.mpich.overrideAttrs (old: {
+      buildInputs = old.buildInputs ++ [ self.libfabric ];
+      configureFlags = old.configureFlags ++ [
+        "--with-device=ch4:ofi"
+        "--with-libfabric=${self.libfabric}"
+      ];
+      hardeningDisable = [ "all" ];
+    });
 
     # Default Intel MPI version is 2019 (the last one)
     impi = bsc.intelMpi;
