@@ -1,0 +1,6 @@
+build:bsc.ci:
+  stage: build
+  tags:
+    - nix
+  script:
+    - nix build -L --tarball-ttl 0 --file default.nix bsc.ci
