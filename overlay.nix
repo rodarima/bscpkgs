@@ -39,13 +39,24 @@ let
 
     icc2021Unwrapped = callPackage ./bsc/intel-compiler/icc2021.nix { };
 
-    #icc2022Unwrapped = callPackage ./bsc/intel-oneapi/2022.3.1.nix { };
+    intel-oneapi-2023 = callPackage ./bsc/intel-oneapi/2023.nix {
+      libffi = self.libffi_3_3;
+    };
 
-    intel-oneapi = callPackage ./bsc/intel-oneapi/ifort.nix { };
-    ifort2022Unwrapped = bsc.intel-oneapi.intel-compiler-fortran;
-    icc2022Unwrapped = bsc.intel-oneapi.intel-compiler-classic;
+    intel2023 = {
+      inherit (bsc.intel-oneapi-2023)
+        stdenv icx stdenv-ifort ifort
+        # Deprecated in mid 2023
+        stdenv-icc icc;
+    };
 
-    #oneapi2022 = callPackage ./bsc/intel-oneapi/oneapi.nix { };
+    intel2022 = {
+      icc = bsc.icc2021;
+    };
+
+    intel2021 = {
+      icc = bsc.icc2021;
+    };
 
     # A wrapper script that puts all the flags and environment vars
     # properly and calls the intel compiler binary
@@ -63,12 +74,9 @@ let
       intelLicense = bsc.intelLicense;
     };
 
-    ifort = bsc.ifort2022;
-
-    icc2022 = bsc.intel-oneapi.intel-compiler-classic-wrapper;
-
-
-    icc = bsc.icc2022;
+    icx = bsc.intel2023.icx;
+    icc = bsc.intel2023.icc;
+    ifort = bsc.intel2023.ifort;
 
     # We need to set the cc.CC and cc.CXX attributes, in order to 
     # determine the name of the compiler
@@ -118,6 +126,12 @@ let
     nanos6 = bsc.nanos6Release;
     nanos6Release = callPackage ./bsc/nanos6/default.nix { };
     nanos6Git = callPackage ./bsc/nanos6/git.nix { };
+    nanos6-icx = bsc.nanos6.override {
+      stdenv = bsc.intel2023.stdenv;
+    };
+    nanos6-icc = bsc.nanos6.override {
+      stdenv = bsc.intel2023.stdenv-icc;
+    };
 
     nanos6Debug = bsc.nanos6.overrideAttrs (old: {
       dontStrip = true;
@@ -283,10 +297,36 @@ let
       inherit self super bsc callPackage;
     };
 
-    test = {
+    test = rec {
 #      hwloc = callPackage ./test/bugs/hwloc.nix { };
       sigsegv = callPackage ./test/reproducers/sigsegv.nix { };
+      compilers.hello-c = callPackage ./test/compilers/hello-c.nix { };
+      compilers.hello-cpp = callPackage ./test/compilers/hello-cpp.nix { };
+      compilers.hello-f = callPackage ./test/compilers/hello-f.nix { };
+      compilers.intel2023.icx.c = compilers.hello-c.override {
+        stdenv = bsc.intel2023.stdenv;
+      };
+      compilers.intel2023.icc.c = compilers.hello-c.override {
+        stdenv = bsc.intel2023.stdenv-icc;
+      };
+      compilers.intel2023.icx.cpp = compilers.hello-cpp.override {
+        stdenv = bsc.intel2023.stdenv;
+      };
+      compilers.intel2023.icc.cpp = compilers.hello-cpp.override {
+        stdenv = bsc.intel2023.stdenv-icc;
+      };
+      compilers.intel2023.ifort = compilers.hello-f.override {
+        stdenv = bsc.intel2023.stdenv-ifort;
+      };
     };
+
+    testAll = with bsc.test; [
+      compilers.intel2023.icx.c
+      compilers.intel2023.icc.c
+      compilers.intel2023.icx.cpp
+      compilers.intel2023.icc.cpp
+      compilers.intel2023.ifort
+    ];
 
     ci = import ./test/ci.nix {
       inherit self super bsc callPackage;

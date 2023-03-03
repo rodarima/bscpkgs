@@ -13,7 +13,9 @@
 , symlinkJoin
 , libfabric
 , gcc
+, gcc7
 , wrapCCWith
+, linuxHeaders
 }:
 
 # The distribution of intel packages is a mess. We are doing the installation
@@ -28,25 +30,24 @@
 
 let
 
-  # As of 2022-11-10 this is the last release for hpckit and all other
-  # components
   v = {
-    hpckit   = "2022.3.0";
-    compiler = "2022.2.0";
-    tbb      = "2021.7.1";
-    mpi      = "2021.7.0";
+    hpckit   = "2023.0.0";
+    compiler = "2023.0.0";
+    tbb      = "2021.8.0";
+    mpi      = "2021.8.0";
   };
 
   aptPackageIndex = stdenv.mkDerivation {
     name = "intel-oneapi-packages";
     srcs = [
+      # Set the hashes to "" to fetch them
       (fetchurl {
         url = "https://apt.repos.intel.com/oneapi/dists/all/main/binary-amd64/Packages";
-        sha256 = "sha256-swUGn097D5o1giK2l+3H4xFcUXSAUYtavQsPyiJlr2A=";
+        sha256 = "sha256-u0fKJRNkG19xlO3h5+uJgfeAArk+gMATOQQST2RM5pg=";
       })
       (fetchurl {
         url = "https://apt.repos.intel.com/oneapi/dists/all/main/binary-all/Packages";
-        sha256 = "sha256-Ewpy0l0fXiJDG0FkAGykqizW1bm+/lcvI2OREyqzOLM=";
+        sha256 = "sha256-m3UCjGzq1piHc2Qh/ejM4qBsqDQOVjm3U8E4USi5MwY=";
       })
     ];
     phases = [ "installPhase" ];
@@ -75,9 +76,9 @@ let
   getUrl = pkgList: name:
   let
     matches = lib.filter (x: name == x.Package) pkgList;
-    match = assert lib.length matches == 1; lib.elemAt matches 0;
-    #n = lib.length matches;
-    #match = builtins.trace (name + " -- ${builtins.toString n}") (lib.elemAt matches 0);
+    #match = assert lib.length matches == 1; lib.elemAt matches 0;
+    n = lib.length matches;
+    match = builtins.trace (name + " -- n=${builtins.toString n}") (lib.elemAt matches 0);
   in
     apthost + match.Filename;
 
@@ -202,7 +203,7 @@ let
     phases = [ "installPhase" "fixupPhase" ];
     dontStrip = true;
 
-    autoPatchelfIgnoreMissingDeps = [ "libsycl.so.5" ];
+    autoPatchelfIgnoreMissingDeps = [ "libsycl.so.6" ];
 
     installPhase = ''
       mkdir -p $out/{bin,lib,include}
@@ -219,6 +220,7 @@ let
 
           # Libraries
           rsync -a lib/ $out/lib/
+          rsync -a lib/x64/ $out/lib/
           rsync -a compiler/lib/intel64_lin/ $out/lib/
           chmod +w $out/lib
           cp bin/intel64/libcilkrts.so.5 $out/lib/
@@ -245,6 +247,8 @@ let
       #"intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-runtime-${version}"
     ];
 
+    langFortran = true;
+
     buildInputs = [
       intel-mpi
       intel-compiler-shared
@@ -257,9 +261,6 @@ let
     ];
 
     nativeBuildInputs = [ autoPatchelfHook ];
-
-    # The gcc package is required for building other programs
-    propagatedBuildInputs = [ stdenv.cc intel-compiler-shared ];
 
     phases = [ "installPhase" "fixupPhase" ];
 
@@ -295,17 +296,41 @@ let
     '';
   };
 
-
-  intel-compiler-classic = stdenv.mkDerivation rec {
+  intel-compiler = stdenv.mkDerivation rec {
     version = v.compiler;
-    pname = "intel-compiler-classic";
+    pname = "intel-compiler";
     src = joinDebs pname [
+      # C/C++
+      "intel-oneapi-dpcpp-cpp-${version}"
+      "intel-oneapi-compiler-dpcpp-cpp-${version}"
+      "intel-oneapi-compiler-dpcpp-cpp-common-${version}"
+      "intel-oneapi-compiler-dpcpp-cpp-runtime-${version}"
       "intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-${version}"
+      "intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-common-${version}"
       "intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-runtime-${version}"
       "intel-oneapi-compiler-dpcpp-cpp-classic-fortran-shared-runtime-${version}"
-      "intel-oneapi-dpcpp-cpp-${version}"
-      "intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-common-${version}"
     ];
+    # From https://aur.archlinux.org/packages/intel-oneapi-compiler:
+    # - intel-oneapi-compiler-cpp-eclipse-cfg-2023.0.0-25370_all.deb
+    # + intel-oneapi-compiler-dpcpp-cpp-2023.0.0-2023.0.0-25370_amd64.deb
+    # x intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.0.0-2023.0.0-25370_amd64.deb (empty)
+    # + intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-2023.0.0-25370_amd64.deb
+    # + intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-common-2023.0.0-2023.0.0-25370_all.deb
+    # + intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-runtime-2023.0.0-2023.0.0-25370_amd64.deb
+    # + intel-oneapi-compiler-dpcpp-cpp-classic-fortran-shared-runtime-2023.0.0-2023.0.0-25370_amd64.deb
+    # + intel-oneapi-compiler-dpcpp-cpp-common-2023.0.0-2023.0.0-25370_all.deb
+    # + intel-oneapi-compiler-dpcpp-cpp-runtime-2023.0.0-2023.0.0-25370_amd64.deb
+    # - intel-oneapi-compiler-dpcpp-eclipse-cfg-2023.0.0-25370_all.deb
+    # - intel-oneapi-compiler-fortran-2023.0.0-2023.0.0-25370_amd64.deb
+    # - intel-oneapi-compiler-fortran-common-2023.0.0-2023.0.0-25370_all.deb
+    # - intel-oneapi-compiler-fortran-runtime-2023.0.0-2023.0.0-25370_amd64.deb
+    # - intel-oneapi-compiler-fortran-runtime-2023.0.0-25370_amd64.deb
+    # - intel-oneapi-compiler-shared-2023.0.0-2023.0.0-25370_amd64.deb
+    # - intel-oneapi-compiler-shared-common-2023.0.0-2023.0.0-25370_all.deb
+    # - intel-oneapi-compiler-shared-runtime-2023.0.0-2023.0.0-25370_amd64.deb
+    # - intel-oneapi-dpcpp-cpp-2023.0.0-2023.0.0-25370_amd64.deb
+    # - intel-oneapi-openmp-2023.0.0-2023.0.0-25370_amd64.deb
+    # - intel-oneapi-openmp-common-2023.0.0-2023.0.0-25370_all.deb
 
     buildInputs = [
       intel-compiler-shared
@@ -318,9 +343,7 @@ let
     ];
 
     nativeBuildInputs = [ autoPatchelfHook ];
-
-    # The gcc package is required for building other programs
-    propagatedBuildInputs = [ stdenv.cc intel-compiler-shared ];
+    autoPatchelfIgnoreMissingDeps = [ "libtbb.so.12" "libtbbmalloc.so.2" "libze_loader.so.1" ];
 
     phases = [ "installPhase" "fixupPhase" ];
 
@@ -337,10 +360,18 @@ let
         pushd linux
           # Binaries
           rsync -a bin/ $out/bin/
+          rsync -a bin-llvm/ $out/bin/
           rsync -a bin/intel64/ $out/bin/
 
           # Libraries
           rsync -a --exclude oclfpga lib/ $out/lib/
+          rsync -a compiler/lib/intel64_lin/ $out/lib/
+
+          # Headers
+          rsync -a compiler/include/ $out/include/ # Intrinsics for icc
+          rsync -a include/ $out/include/
+          chmod +w $out/include
+          ln -s $out/lib/clang/16.0.0/include/ $out/include/icx # For icx
         popd
 
         # Manuals
@@ -349,35 +380,97 @@ let
     '';
   };
 
-  intel-compiler-classic-wrapper = 
+  wrapIntel = { cc, mygcc, extraBuild ? "", extraInstall ? "" }:
     let
       targetConfig = stdenv.targetPlatform.config;
-      inherit gcc;
-    in wrapCCWith rec {
-      cc = intel-compiler-classic;
+    in (wrapCCWith {
+      cc = cc;
       extraBuildCommands = ''
-        echo "-B${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-cflags
         echo "-isystem ${cc}/include" >> $out/nix-support/cc-cflags
         echo "-isystem ${cc}/include/intel64" >> $out/nix-support/cc-cflags
-        echo "-L${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-ldflags
-        echo "-L${gcc.cc.lib}/lib" >> $out/nix-support/cc-ldflags
+
+        echo "-L${mygcc.cc}/lib/gcc/${targetConfig}/${mygcc.version}" >> $out/nix-support/cc-ldflags
+        echo "-L${mygcc.cc.lib}/lib" >> $out/nix-support/cc-ldflags
         echo "-L${intel-compiler-shared}/lib" >> $out/nix-support/cc-ldflags
+        echo "-L${cc}/lib" >> $out/nix-support/cc-ldflags
 
-        cat "${cc}/nix-support/propagated-build-inputs" >> \
-          $out/nix-support/propagated-build-inputs
+        # Need the gcc in the path
+        echo 'export "PATH=${mygcc}/bin:$PATH"' >> $out/nix-support/cc-wrapper-hook
 
-        # Create the wrappers for icc and icpc
-        wrap icc  $wrapper $ccPath/icc
-        wrap icpc $wrapper $ccPath/icpc
-        wrap mcpcom $wrapper $ccPath/mcpcom
-      '';
-    };
+        # Disable hardening by default
+        echo "" > $out/nix-support/add-hardening.sh
+      '' + extraBuild;
+    }).overrideAttrs (old: {
+      installPhase = old.installPhase + extraInstall;
+    });
+
+  icx-wrapper = wrapIntel rec {
+    cc = intel-compiler;
+    mygcc = gcc;
+    extraBuild = ''
+      wrap icx  $wrapper $ccPath/icx
+      wrap icpx $wrapper $ccPath/icpx
+      echo "-isystem ${cc}/include/icx" >> $out/nix-support/cc-cflags
+      echo "--gcc-toolchain=${mygcc.cc}" >> $out/nix-support/cc-cflags
+    '';
+    extraInstall = ''
+      export named_cc="icx"
+      export named_cxx="icpx"
+    '';
+  };
+
+  # Legacy
+  icc-wrapper = wrapIntel rec {
+    cc = intel-compiler;
+    # Intel icc classic compiler tries to behave like the gcc found in $PATH.
+    # EVEN if it doesn't support some of the features. See:
+    # https://community.intel.com/t5/Intel-C-Compiler/builtin-shuffle-GCC-compatibility-and-has-builtin/td-p/1143619
+    mygcc = gcc;
+    extraBuild = ''
+      wrap icc  $wrapper $ccPath/icc
+      wrap icpc $wrapper $ccPath/icpc
+      echo "-isystem ${cc}/include/icc" >> $out/nix-support/cc-cflags
+    '';
+    extraInstall = ''
+      export named_cc="icc"
+      export named_cxx="icpc"
+    '';
+  };
+
+  ifort-wrapper = wrapIntel rec {
+    cc = intel-compiler-fortran;
+    mygcc = gcc;
+    extraBuild = ''
+      wrap ifort  $wrapper $ccPath/ifort
+    '';
+    extraInstall = ''
+      export named_fc="ifort"
+    '';
+  };
+
+  stdenv-icc = stdenv.override {
+    cc = icc-wrapper;
+    allowedRequisites = null;
+  };
+
+  stdenv-icx = stdenv.override {
+    cc = icx-wrapper;
+    allowedRequisites = null;
+  };
+
+  stdenv-ifort = stdenv.override {
+    cc = ifort-wrapper;
+    allowedRequisites = null;
+  };
 
 in
   {
-    inherit
-      intel-compiler-classic
-      intel-compiler-classic-wrapper
-      intel-compiler-fortran
-      intel-compiler-shared;
+    inherit aptPackages;
+    icx = icx-wrapper;
+    icc = icc-wrapper;
+    ifort = ifort-wrapper;
+
+    stdenv = stdenv-icx;
+    stdenv-icc = stdenv-icc;
+    stdenv-ifort = stdenv-ifort;
   }

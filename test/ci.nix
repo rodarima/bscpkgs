@@ -26,7 +26,7 @@ stdenv.mkDerivation rec {
     wxparaver
     # Runtimes
     nanos6
-  ];
+  ] ++ bsc.testAll;
 
   buildPhase = ''
     if [ -e /boot ]; then
