@@ -4,14 +4,27 @@
 , nanos6
 , clangOmpss2Unwrapped
 , wrapCCWith
+, llvmPackages
 }:
 
 
 let
+
+  # We need to replace the lld linker from bintools with our linker just built,
+  # otherwise we run into incompatibility issues when mixing compiler and linker
+  # versions.
+  bintools-unwrapped = llvmPackages.tools.bintools-unwrapped.override {
+    lld = clangOmpss2Unwrapped;
+  };
+  bintools = llvmPackages.tools.bintools.override {
+    bintools = bintools-unwrapped;
+  };
+
   targetConfig = stdenv.targetPlatform.config;
   inherit gcc nanos6;
-in wrapCCWith rec {
   cc = clangOmpss2Unwrapped;
+in wrapCCWith {
+  inherit cc bintools;
   extraBuildCommands = ''
     echo "-target ${targetConfig}" >> $out/nix-support/cc-cflags
     echo "-B${gcc.cc}/lib/gcc/${targetConfig}/${gcc.version}" >> $out/nix-support/cc-cflags

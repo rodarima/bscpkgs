@@ -105,6 +105,7 @@ let
 
     clangOmpss2 = appendPasstru (
       callPackage ./bsc/llvm-ompss2/default.nix {
+        llvmPackages = self.llvmPackages_latest;
         clangOmpss2Unwrapped = bsc.clangOmpss2Unwrapped;
       }) { CC = "clang"; CXX = "clang++"; };
 
@@ -112,6 +113,11 @@ let
       callPackage ./bsc/llvm-ompss2/default.nix {
         clangOmpss2Unwrapped = bsc.clangOmpss2UnwrappedGit;
       }) { CC = "clang"; CXX = "clang++"; };
+
+    stdenvClangOmpss2 = self.stdenv.override {
+      cc = bsc.clangOmpss2;
+      allowedRequisites = null;
+    };
 
     mcxx = bsc.mcxxRelease;
     mcxxRelease = callPackage ./bsc/mcxx/default.nix { };
@@ -302,6 +308,7 @@ let
       compilers.hello-c = callPackage ./test/compilers/hello-c.nix { };
       compilers.hello-cpp = callPackage ./test/compilers/hello-cpp.nix { };
       compilers.hello-f = callPackage ./test/compilers/hello-f.nix { };
+      compilers.lto = callPackage ./test/compilers/lto.nix { };
       compilers.intel2023.icx.c = compilers.hello-c.override {
         stdenv = bsc.intel2023.stdenv;
       };
@@ -317,6 +324,9 @@ let
       compilers.intel2023.ifort = compilers.hello-f.override {
         stdenv = bsc.intel2023.stdenv-ifort;
       };
+      compilers.clangOmpss2.lto = compilers.lto.override {
+        stdenv = bsc.stdenvClangOmpss2;
+      };
     };
 
     testAll = with bsc.test; [
@@ -325,6 +335,7 @@ let
       compilers.intel2023.icx.cpp
       compilers.intel2023.icc.cpp
       compilers.intel2023.ifort
+      compilers.clangOmpss2.lto
     ];
 
     ci = import ./test/ci.nix {
