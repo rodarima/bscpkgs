@@ -37,6 +37,9 @@ stdenv.mkDerivation rec {
     fi
 
     echo "OK: Build is under chroot"
+
+    echo "buildInputs:"
+    printf -- "- %s\n" $buildInputs
   '';
 
   installPhase = ''
