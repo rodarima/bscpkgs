@@ -35,6 +35,8 @@ stdenv.mkDerivation rec {
     sha256 = "YGj/cubqXaNt4lR2CnSU+nXvi+SdB56EXLhfN/ufjHs=";
   };
 
+  patches = [ ./fpic.patch ];
+
   prePatch = ''
     patchShebangs scripts/generate_config.sh
   '';
