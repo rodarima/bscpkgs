@@ -119,6 +119,14 @@ let
       allowedRequisites = null;
     };
 
+    clangNodes = bsc.clangOmpss2.override {
+      nanos6 = bsc.nodes;
+    };
+    stdenvClangNodes = self.stdenv.override {
+      cc = bsc.clangNodes;
+      allowedRequisites = null;
+    };
+
     mcxx = bsc.mcxxRelease;
     mcxxRelease = callPackage ./bsc/mcxx/default.nix { };
     mcxxGit = callPackage ./bsc/mcxx/git.nix { };
@@ -158,6 +166,9 @@ let
 
       hardeningDisable = [ "all" ];
     });
+
+    nodes = callPackage ./bsc/nodes/git.nix { };
+    nodesWithOvni = bsc.nodes.override { enableOvni = true; };
 
     # =================================================================
     #  nosv
@@ -335,6 +346,9 @@ let
       compilers.clangOmpss2.task = callPackage ./test/compilers/ompss2.nix {
         stdenv = bsc.stdenvClangOmpss2;
       };
+      compilers.clangNodes.task = callPackage ./test/compilers/ompss2.nix {
+        stdenv = bsc.stdenvClangNodes;
+      };
     };
 
     testAll = with bsc.test; [
@@ -345,6 +359,7 @@ let
       compilers.intel2023.ifort
       compilers.clangOmpss2.lto
       compilers.clangOmpss2.task
+      compilers.clangNodes.task
     ];
 
     ci = import ./test/ci.nix {

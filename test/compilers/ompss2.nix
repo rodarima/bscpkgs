@@ -1,4 +1,4 @@
-{ stdenv, writeText, which, strace }:
+{ stdenv, writeText, which, strace, gdb }:
 
 let
   task_c = writeText "task.c" ''
@@ -24,6 +24,8 @@ stdenv.mkDerivation rec {
   dontConfigure = true;
   hardeningDisable = [ "all" ];
   NIX_DEBUG = 1;
+  buildInputs = [ strace gdb ];
+  __noChroot = true; # Required for NODES
   buildPhase = ''
     set -x
     echo CC=$CC
@@ -32,7 +34,9 @@ stdenv.mkDerivation rec {
     cp ${task_c} task.c
     cat task.c
     $CC -v -fompss-2 task.c -o task
-    ./task
+    #strace -ff -e trace=open,openat -s9999999 ./task
+    LD_DEBUG=libs ./task
+    #gdb -batch -ex "run" -ex "bt" ./task
 
     set +x
   '';
