@@ -327,6 +327,9 @@ let
       compilers.clangOmpss2.lto = compilers.lto.override {
         stdenv = bsc.stdenvClangOmpss2;
       };
+      compilers.clangOmpss2.task = callPackage ./test/compilers/ompss2.nix {
+        stdenv = bsc.stdenvClangOmpss2;
+      };
     };
 
     testAll = with bsc.test; [
@@ -336,6 +339,7 @@ let
       compilers.intel2023.icc.cpp
       compilers.intel2023.ifort
       compilers.clangOmpss2.lto
+      compilers.clangOmpss2.task
     ];
 
     ci = import ./test/ci.nix {
