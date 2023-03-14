@@ -25,7 +25,9 @@ stdenv.mkDerivation rec {
   hardeningDisable = [ "all" ];
   NIX_DEBUG = 1;
   buildInputs = [ strace gdb ];
-  __noChroot = true; # Required for NODES
+  # NODES requires access to /sys/devices to request NUMA information. It will
+  # fail to run otherwise, so we disable the sandbox for this test.
+  __noChroot = true;
   buildPhase = ''
     set -x
     echo CC=$CC
