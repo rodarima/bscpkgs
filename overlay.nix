@@ -272,6 +272,13 @@ let
     slurm17-libpmi2 = callPackage ./bsc/slurm/pmi2.nix {
       pmix = bsc.pmix2;
     };
+
+    slurm-16-05-8-1 = callPackage ./bsc/slurm/16.05.8.1/default.nix {
+      hwloc = bsc.hwloc-1-11-6;
+    };
+
+    hwloc-1-11-6 = callPackage ./bsc/hwloc/1.11.6/default.nix {};
+
     # Use a slurm compatible with MN4
     slurm = bsc.slurm17;
     # We need the unstable branch to get the fallocate problem fixed, as it is

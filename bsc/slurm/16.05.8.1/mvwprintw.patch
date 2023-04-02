@@ -1,0 +1,11 @@
+--- a/src/smap/partition_functions.c	2023-04-02 21:07:54.505816546 +0200
++++ b/src/smap/partition_functions.c	2023-04-02 21:07:43.512816197 +0200
+@@ -588,7 +588,7 @@
+ 				else
+ 					tmp_state = "unk";
+ 				mvwprintw(text_win, main_ycord, main_xcord,
+-					  tmp_state);
++					  "%s", tmp_state);
+ 				main_xcord += 7;
+ 
+ 				if (part_ptr->max_time == INFINITE)

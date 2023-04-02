@@ -1,0 +1,10 @@
+--- a/src/plugins/task/cgroup/task_cgroup_devices.c	1970-01-01 01:00:01.000000000 +0100
++++ b/src/plugins/task/cgroup/task_cgroup_devices.c	1970-01-01 01:00:01.000000000 +0100
+@@ -43,6 +43,7 @@
+ #include <glob.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <sys/sysmacros.h>
+ #include <slurm/slurm.h>
+ #include <slurm/slurm_errno.h>
+ #include "src/common/xstring.h"
