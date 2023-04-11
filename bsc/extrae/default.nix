@@ -12,11 +12,12 @@
 , gfortran
 , xml2
 , which
+, libbfd
 , mpi ? null
 , cuda ? null
 , llvmPackages
 , autoreconfHook
-, python37Packages
+#, python3Packages
 , installShellFiles
 , symlinkJoin
 }:
@@ -64,7 +65,8 @@ stdenv.mkDerivation rec {
     xml2
     which
     libxml2.dev
-    #python37Packages.sphinx
+    libbfd
+    #python3Packages.sphinx
   ]
   ++ lib.optional stdenv.cc.isClang llvmPackages.openmp;
     

@@ -10,9 +10,7 @@
 , numactl
 , hwloc
 , papi
-, extrae
 , boost
-, babeltrace2
 , ovni
 , enableJemalloc ? true
 , jemalloc ? null
@@ -48,7 +46,6 @@ stdenv.mkDerivation rec {
   '';
 
   configureFlags = [
-    "--with-babeltrace2=${babeltrace2}"
     "--with-ovni=${ovni}"
   ] ++
     (optional enableJemalloc "--with-jemalloc=${jemalloc}") ++
@@ -71,8 +68,7 @@ stdenv.mkDerivation rec {
     numactl
     hwloc
     papi
-    babeltrace2
     ovni
-  ] ++ (if (extrae != null) then [extrae] else []);
+  ];
 
 }

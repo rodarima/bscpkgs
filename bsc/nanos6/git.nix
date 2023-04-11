@@ -9,7 +9,6 @@
 , numactl
 , hwloc
 , papi
-, extrae
 , boost
 , autoreconfHook
 , enableJemalloc ? true
@@ -61,6 +60,5 @@ stdenv.mkDerivation rec {
     boost
     numactl
     hwloc
-    papi ]
-    ++ (if (extrae != null) then [extrae] else []);
+    papi ];
 }
