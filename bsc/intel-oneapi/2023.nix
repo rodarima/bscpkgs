@@ -43,11 +43,11 @@ let
       # Set the hashes to "" to fetch them
       (fetchurl {
         url = "https://apt.repos.intel.com/oneapi/dists/all/main/binary-amd64/Packages";
-        sha256 = "sha256-u0fKJRNkG19xlO3h5+uJgfeAArk+gMATOQQST2RM5pg=";
+        sha256 = "sha256-HkjbKzEDsXaBjZk2NdrGRMZsLkhT5YFJrjEgh2MN2zo=";
       })
       (fetchurl {
         url = "https://apt.repos.intel.com/oneapi/dists/all/main/binary-all/Packages";
-        sha256 = "sha256-m3UCjGzq1piHc2Qh/ejM4qBsqDQOVjm3U8E4USi5MwY=";
+        sha256 = "sha256-fLRjnmxaabQAi3XcMcyNKdQcaQy2yvupDj4PAZ8MUlU=";
       })
     ];
     phases = [ "installPhase" ];
