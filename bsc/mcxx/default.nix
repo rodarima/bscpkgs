@@ -4,7 +4,7 @@
 , autoreconfHook
 , nanos6
 , gperf
-, python
+, python3
 , gfortran
 , pkg-config
 , sqlite
@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
     autoreconfHook
     nanos6
     gperf
-    python
+    python3
     gfortran
     pkg-config
     sqlite.dev

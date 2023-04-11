@@ -1,5 +1,5 @@
 { stdenv, lib, fetchFromGitHub, pkgconfig, libtool, curl
-, python, munge, perl, pam, openssl
+, python3, munge, perl, pam, openssl
 , ncurses, libmysqlclient, gtk2, lua, hwloc, numactl
 , readline, freeipmi, libssh2, xorg
 , pmix
@@ -35,7 +35,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ pkgconfig libtool ];
   buildInputs = [
-    curl python munge perl pam openssl
+    curl python3 munge perl pam openssl
       libmysqlclient ncurses gtk2
       lua hwloc numactl readline freeipmi
       pmix
