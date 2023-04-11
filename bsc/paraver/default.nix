@@ -4,7 +4,7 @@
 , boost
 , libxml2
 , xml2
-, wxGTK30
+, wxGTK32
 , autoconf
 , automake
 , paraverKernel
@@ -13,7 +13,7 @@
 }:
 
 let
-  wx = wxGTK30;
+  wx = wxGTK32;
 in
 stdenv.mkDerivation rec {
   pname = "wxparaver";
