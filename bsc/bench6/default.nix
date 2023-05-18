@@ -1,6 +1,10 @@
 {
   stdenv
-, clangOmpss2
+, clangOmpss2Git
+, nanos6Git
+, nodes
+, mpi
+, tampiGit
 , gitBranch ? "master"
 , gitURL ? "ssh://git@bscpm03.bsc.es/rarias/bench6.git"
 }:
@@ -14,11 +18,7 @@ stdenv.mkDerivation rec {
     ref = gitBranch;
   };
 
-  buildInputs = [ clangOmpss2 ];
-
-  preInstall = ''
-    export DESTDIR=$out
-  '';
+  buildInputs = [ clangOmpss2Git nanos6Git nodes mpi tampiGit ];
 
   hardeningDisable = [ "all" ];
   dontStrip = true;
