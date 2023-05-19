@@ -10,7 +10,6 @@
 , hwloc
 , papi
 , boost
-, autoreconfHook
 , enableJemalloc ? true
 , jemalloc ? null
 , cachelineBytes ? 64
@@ -32,6 +31,7 @@ stdenv.mkDerivation rec {
 
   prePatch = ''
     patchShebangs scripts/generate_config.sh
+    patchShebangs autogen.sh
   '';
 
   enableParallelBuilding = true;
@@ -41,9 +41,10 @@ stdenv.mkDerivation rec {
     export CACHELINE_WIDTH=${toString cachelineBytes}
     export NANOS6_GIT_VERSION=${src.rev}
     export NANOS6_GIT_BRANCH=${gitBranch}
+    ./autogen.sh
   '';
 
-  configureFlags = []
+  configureFlags = [ "--with-hwloc=${hwloc}" ]
     ++ (optional enableJemalloc "--with-jemalloc=${jemalloc}")
     ++ (optional enableGlibcxxDebug "CXXFLAGS=-D_GLIBCXX_DEBUG");
 
@@ -52,7 +53,6 @@ stdenv.mkDerivation rec {
   hardeningDisable = [ "all" ];
 
   buildInputs = [
-    autoreconfHook
     autoconf
     automake
     libtool
