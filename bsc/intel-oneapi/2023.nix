@@ -31,10 +31,10 @@
 let
 
   v = {
-    hpckit   = "2023.0.0";
-    compiler = "2023.0.0";
-    tbb      = "2021.8.0";
-    mpi      = "2021.8.0";
+    hpckit   = "2023.1.0";
+    compiler = "2023.1.0";
+    tbb      = "2021.9.0";
+    mpi      = "2021.9.0";
   };
 
   aptPackageIndex = stdenv.mkDerivation {
@@ -43,11 +43,11 @@ let
       # Set the hashes to "" to fetch them
       (fetchurl {
         url = "https://apt.repos.intel.com/oneapi/dists/all/main/binary-amd64/Packages";
-        sha256 = "sha256-HkjbKzEDsXaBjZk2NdrGRMZsLkhT5YFJrjEgh2MN2zo=";
+        sha256 = "sha256-ZaXaicvmuyRB84LYK1mDYWwpdNW+ZHQCV072SuH4EFA=";
       })
       (fetchurl {
         url = "https://apt.repos.intel.com/oneapi/dists/all/main/binary-all/Packages";
-        sha256 = "sha256-fLRjnmxaabQAi3XcMcyNKdQcaQy2yvupDj4PAZ8MUlU=";
+        sha256 = "sha256-6vuioA0Hl34/AUuBbRYGu3lt+rccqJdpipXQWZ4Nfp8=";
       })
     ];
     phases = [ "installPhase" ];
@@ -465,7 +465,7 @@ let
 
 in
   {
-    inherit aptPackages;
+    inherit aptPackages aptPackageIndex;
     icx = icx-wrapper;
     icc = icc-wrapper;
     ifort = ifort-wrapper;
