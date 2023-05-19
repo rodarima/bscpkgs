@@ -83,8 +83,8 @@ let
     gcc = appendPasstru self.gcc { CC = "gcc"; CXX = "g++"; };
 
     # Last llvm release by default
-    llvmPackages = self.llvmPackages_11 // {
-      clang = appendPasstru self.llvmPackages_11.clang {
+    llvmPackages = self.llvmPackages_latest // {
+      clang = appendPasstru self.llvmPackages_latest.clang {
         CC = "clang"; CXX = "clang++";
       };
     };
@@ -105,12 +105,13 @@ let
 
     clangOmpss2 = appendPasstru (
       callPackage ./bsc/llvm-ompss2/default.nix {
-        llvmPackages = self.llvmPackages_latest;
+        llvmPackages = bsc.llvmPackages;
         clangOmpss2Unwrapped = bsc.clangOmpss2Unwrapped;
       }) { CC = "clang"; CXX = "clang++"; };
 
     clangOmpss2Git = appendPasstru (
       callPackage ./bsc/llvm-ompss2/default.nix {
+        llvmPackages = bsc.llvmPackages;
         clangOmpss2Unwrapped = bsc.clangOmpss2UnwrappedGit;
       }) { CC = "clang"; CXX = "clang++"; };
 
