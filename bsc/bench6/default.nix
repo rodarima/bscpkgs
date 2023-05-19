@@ -1,5 +1,6 @@
 {
   stdenv
+, cmake
 , clangOmpss2Git
 , nanos6Git
 , nodes
@@ -18,8 +19,13 @@ stdenv.mkDerivation rec {
     ref = gitBranch;
   };
 
-  buildInputs = [ clangOmpss2Git nanos6Git nodes mpi tampiGit ];
+  buildInputs = [ cmake clangOmpss2Git nanos6Git nodes mpi tampiGit ];
 
+  enableParallelBuilding = false;
+  cmakeFlags = [
+    "-DCMAKE_C_COMPILER=clang"
+    "-DCMAKE_CXX_COMPILER=clang++"
+  ];
   hardeningDisable = [ "all" ];
   dontStrip = true;
 }
