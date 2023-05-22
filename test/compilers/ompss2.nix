@@ -29,7 +29,7 @@ stdenv.mkDerivation rec {
   # fail to run otherwise, so we disable the sandbox for this test.
   __noChroot = true;
   buildPhase = ''
-    #set -x
+    set -x
     #$CC -v
 
     cp ${task_c} task.c
