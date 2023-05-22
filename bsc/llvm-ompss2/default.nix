@@ -20,11 +20,8 @@ let
     bintools = bintools-unwrapped;
   };
 
-  homevar = if rt.pname == "nanos6"
-    then
-      "NANOS6_HOME"
-    else
-      "NODES_HOME";
+  homevar = if rt.pname == "nanos6" then "NANOS6_HOME" else "NODES_HOME";
+  rtname = if rt.pname == "nanos6" then "libnanos6" else "libnodes";
 
   targetConfig = stdenv.targetPlatform.config;
   inherit gcc;
@@ -48,6 +45,7 @@ in wrapCCWith {
 
     # Setup NANOS6_HOME or NODES_HOME, based on the runtime.
     echo "export ${homevar}=${rt}" >> $out/nix-support/setup-hook
+    echo "export OMPSS2_RUNTIME=${rtname}" >> $out/nix-support/setup-hook
 
     wrap clang++  $wrapper $ccPath/clang++
   '';
