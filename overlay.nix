@@ -118,11 +118,11 @@ let
       }) { CC = "clang"; CXX = "clang++"; };
 
     stdenvClangOmpss2 = self.stdenv.override {
-      cc = bsc.clangOmpss2;
+      cc = bsc.clangOmpss2Git;
       allowedRequisites = null;
     };
 
-    clangNodes = bsc.clangOmpss2.override {
+    clangNodes = bsc.clangOmpss2Git.override {
       rt = bsc.nodes;
     };
     stdenvClangNodes = self.stdenv.override {
