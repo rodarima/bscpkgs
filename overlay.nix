@@ -105,12 +105,14 @@ let
 
     clangOmpss2 = appendPasstru (
       callPackage ./bsc/llvm-ompss2/default.nix {
+        rt = bsc.nanos6;
         llvmPackages = bsc.llvmPackages;
         clangOmpss2Unwrapped = bsc.clangOmpss2Unwrapped;
       }) { CC = "clang"; CXX = "clang++"; };
 
     clangOmpss2Git = appendPasstru (
       callPackage ./bsc/llvm-ompss2/default.nix {
+        rt = bsc.nanos6;
         llvmPackages = bsc.llvmPackages;
         clangOmpss2Unwrapped = bsc.clangOmpss2UnwrappedGit;
       }) { CC = "clang"; CXX = "clang++"; };
@@ -121,7 +123,7 @@ let
     };
 
     clangNodes = bsc.clangOmpss2.override {
-      nanos6 = bsc.nodes;
+      rt = bsc.nodes;
     };
     stdenvClangNodes = self.stdenv.override {
       cc = bsc.clangNodes;

@@ -1,7 +1,7 @@
 {
   stdenv
 , gcc
-, nanos6
+, rt
 , clangOmpss2Unwrapped
 , wrapCCWith
 , llvmPackages
@@ -20,8 +20,14 @@ let
     bintools = bintools-unwrapped;
   };
 
+  homevar = if rt.pname == "nanos6"
+    then
+      "NANOS6_HOME"
+    else
+      "NODES_HOME";
+
   targetConfig = stdenv.targetPlatform.config;
-  inherit gcc nanos6;
+  inherit gcc;
   cc = clangOmpss2Unwrapped;
 in wrapCCWith {
   inherit cc bintools;
@@ -40,8 +46,8 @@ in wrapCCWith {
 
     echo "--gcc-toolchain=${gcc}" >> $out/nix-support/cc-cflags
 
-    echo "# Hack to include NANOS6_HOME" >> $out/nix-support/setup-hook
-    echo "export NANOS6_HOME=${nanos6}" >> $out/nix-support/setup-hook
+    # Setup NANOS6_HOME or NODES_HOME, based on the runtime.
+    echo "export ${homevar}=${rt}" >> $out/nix-support/setup-hook
 
     wrap clang++  $wrapper $ccPath/clang++
   '';
