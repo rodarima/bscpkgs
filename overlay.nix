@@ -122,7 +122,7 @@ let
       allowedRequisites = null;
     };
 
-    clangNodes = bsc.clangOmpss2Git.override {
+    clangNodes = bsc.clangOmpss2.override {
       rt = bsc.nodes;
     };
 
@@ -171,7 +171,9 @@ let
       hardeningDisable = [ "all" ];
     });
 
-    nodes = callPackage ./bsc/nodes/git.nix { };
+    nodes = bsc.nodesRelease;
+    nodesRelease = callPackage ./bsc/nodes/default.nix { };
+    nodesGit = callPackage ./bsc/nodes/default.nix { useGit = true; };
     nodesWithOvni = bsc.nodes.override { enableOvni = true; };
 
     # =================================================================
