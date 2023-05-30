@@ -260,10 +260,6 @@ let
 
     cn6 = callPackage ./bsc/cn6/default.nix { };
     ovni = callPackage ./bsc/ovni/default.nix { };
-    ovniKernel = callPackage ./bsc/ovni/default.nix {
-      gitBranch = "kernel-context-switch";
-      gitCommit = null;
-    };
 
     # =================================================================
     #  MN4 specific
