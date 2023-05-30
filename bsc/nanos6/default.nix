@@ -4,7 +4,6 @@
 , fetchFromGitHub
 , automake
 , autoconf
-, autoreconfHook
 , libtool
 , pkg-config
 , numactl
@@ -24,28 +23,31 @@ with lib;
 
 stdenv.mkDerivation rec {
   pname = "nanos6";
-  version = "2.8";
+  version = "3.0";
 
   src = fetchFromGitHub {
     owner = "bsc-pm";
     repo = "nanos6";
     rev = "version-${version}";
-    sha256 = "YGj/cubqXaNt4lR2CnSU+nXvi+SdB56EXLhfN/ufjHs=";
+    sha256 = "sha256-XEG8/8yQv5/OdSyK9Kig8xuWe6mTZ1eQKhXx3fXlQ1Y=";
   };
-
-  patches = [ ./fpic.patch ];
 
   prePatch = ''
     patchShebangs scripts/generate_config.sh
+    patchShebangs autogen.sh
   '';
 
   enableParallelBuilding = true;
 
   preConfigure = ''
     export CACHELINE_WIDTH=${toString cachelineBytes}
+    ./autogen.sh
   '';
 
   configureFlags = [
+    "--with-hwloc=${hwloc}"
+    "--disable-all-instrumentations"
+    "--enable-ovni-instrumentation"
     "--with-ovni=${ovni}"
   ] ++
     (optional enableJemalloc "--with-jemalloc=${jemalloc}") ++
@@ -59,7 +61,6 @@ stdenv.mkDerivation rec {
   dontStrip = true;
 
   buildInputs = [
-    autoreconfHook
     autoconf
     automake
     libtool
