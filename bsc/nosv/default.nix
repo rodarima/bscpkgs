@@ -2,39 +2,53 @@
   stdenv
 , lib
 , autoreconfHook
+, fetchFromGitHub
 , pkgconfig
 , numactl
 , hwloc
 , ovni ? null
-, enableOvni ? false
+, useGit ? false
 , gitURL ? "git@gitlab-internal.bsc.es:nos-v/nos-v.git"
 , gitBranch ? "master"
-, gitCommit ? null
+, gitCommit ? "0edc81d065f20d3d2f8acf94df1d2640dc430d5e"
 }:
 
 with lib;
 
-stdenv.mkDerivation rec {
-  pname = "nosv";
-  version = "${src.shortRev}";
+let
+  release = rec {
+    version = "1.0.0";
+    src = fetchFromGitHub {
+      owner = "bsc-pm";
+      repo = "nos-v";
+      rev = "${version}";
+      sha256 = "sha256-1Dsxd7OQYxnPvFnpGgCTlG9wbxV8vQpzvSy+cdPD8ro=";
+    };
+  };
 
-  inherit gitURL gitCommit gitBranch;
-  
-  src = builtins.fetchGit ({
-      url = gitURL;
+  git = rec {
+    version = src.shortRev;
+    src = builtins.fetchGit {
+      url = gitUrl;
       ref = gitBranch;
-    } // (optionalAttrs (gitCommit != null) { rev = gitCommit; })
-  );
+      rev = gitCommit;
+    };
+  };
 
-  hardeningDisable = [ "all" ];
-  dontStrip = true;
-
-  configureFlags = optional (enableOvni) "--with-ovni=${ovni}";
-  
-  buildInputs = [
-    autoreconfHook
-    pkgconfig
-    numactl
-    hwloc
-  ] ++ (optional (enableOvni) ovni);
-}
+  source = if (useGit) then git else release;
+in
+  stdenv.mkDerivation rec {
+    pname = "nosv";
+    inherit (source) src version;
+    inherit gitURL gitCommit gitBranch;
+    hardeningDisable = [ "all" ];
+    dontStrip = true;
+    configureFlags = [ "--with-ovni=${ovni}" ];
+    buildInputs = [
+      autoreconfHook
+      pkgconfig
+      numactl
+      hwloc
+      ovni
+    ];
+  }
