@@ -13,8 +13,7 @@
 , boost
 , autoreconfHook
 , jemalloc
-, enableOvni ? false
-, ovni ? null
+, ovni
 , nosv
 , useGit ? false
 , gitUrl ? "ssh://git@gitlab-internal.bsc.es/nos-v/nodes.git"
@@ -56,8 +55,8 @@ in
     configureFlags = [
       "--with-jemalloc=${jemalloc}"
       "--with-nosv=${nosv}"
-    ] ++
-      (optional enableOvni "--with-ovni=${ovni}");
+      "--with-ovni=${ovni}"
+    ];
 
     # The "bindnow" flags are incompatible with ifunc resolution mechanism. We
     # disable all by default, which includes bindnow.
@@ -75,6 +74,6 @@ in
       papi
       jemalloc
       nosv
-    ] ++
-      (optional enableOvni ovni);
+      ovni
+    ];
   }
