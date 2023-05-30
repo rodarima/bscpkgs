@@ -40,7 +40,6 @@ in
   stdenv.mkDerivation rec {
     pname = "nosv";
     inherit (source) src version;
-    inherit gitURL gitCommit gitBranch;
     hardeningDisable = [ "all" ];
     dontStrip = true;
     configureFlags = [ "--with-ovni=${ovni}" ];
