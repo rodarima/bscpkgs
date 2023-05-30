@@ -15,61 +15,82 @@
 , jemalloc ? null
 , cachelineBytes ? 64
 , enableGlibcxxDebug ? false
+, useGit ? false
+, gitUrl ? "ssh://git@bscpm03.bsc.es/nanos6/nanos6"
+, gitBranch ? "master"
+, gitCommit ? "58712e669ac02f721fb841247361ea54f53a6a47"
 }:
 
 assert enableJemalloc -> (jemalloc != null);
 
 with lib;
 
-stdenv.mkDerivation rec {
-  pname = "nanos6";
-  version = "3.0";
-
-  src = fetchFromGitHub {
-    owner = "bsc-pm";
-    repo = "nanos6";
-    rev = "version-${version}";
-    sha256 = "sha256-XEG8/8yQv5/OdSyK9Kig8xuWe6mTZ1eQKhXx3fXlQ1Y=";
+let
+  release = rec {
+    version = "3.0";
+    src = fetchFromGitHub {
+      owner = "bsc-pm";
+      repo = "nanos6";
+      rev = "version-${version}";
+      sha256 = "sha256-XEG8/8yQv5/OdSyK9Kig8xuWe6mTZ1eQKhXx3fXlQ1Y=";
+    };
   };
 
-  prePatch = ''
-    patchShebangs scripts/generate_config.sh
-    patchShebangs autogen.sh
-  '';
+  git = rec {
+    version = src.shortRev;
+    src = builtins.fetchGit {
+      url = gitUrl;
+      ref = gitBranch;
+      rev = gitCommit;
+    };
+  };
 
-  enableParallelBuilding = true;
+  source = if (useGit) then git else release;
+in
+  stdenv.mkDerivation rec {
+    pname = "nanos6";
+    inherit (source) src version;
 
-  preConfigure = ''
-    export CACHELINE_WIDTH=${toString cachelineBytes}
-    ./autogen.sh
-  '';
+    prePatch = ''
+      patchShebangs scripts/generate_config.sh
+      patchShebangs autogen.sh
+    '';
 
-  configureFlags = [
-    "--with-hwloc=${hwloc}"
-    "--disable-all-instrumentations"
-    "--enable-ovni-instrumentation"
-    "--with-ovni=${ovni}"
-  ] ++
-    (optional enableJemalloc "--with-jemalloc=${jemalloc}") ++
-    (optional enableGlibcxxDebug "CXXFLAGS=-D_GLIBCXX_DEBUG");
+    enableParallelBuilding = true;
 
-  # The "bindnow" flags are incompatible with ifunc resolution mechanism. We
-  # disable all by default, which includes bindnow.
-  hardeningDisable = [ "all" ];
+    preConfigure = ''
+      export CACHELINE_WIDTH=${toString cachelineBytes}
+      ./autogen.sh
+    '' + lib.optionalString (useGit) ''
+      export NANOS6_GIT_VERSION=${src.rev}
+      export NANOS6_GIT_BRANCH=${gitBranch}
+    '';
 
-  # Keep debug symbols in the verbose variant of the library
-  dontStrip = true;
+    configureFlags = [
+      "--with-hwloc=${hwloc}"
+      "--disable-all-instrumentations"
+      "--enable-ovni-instrumentation"
+      "--with-ovni=${ovni}"
+    ] ++
+      (optional enableJemalloc "--with-jemalloc=${jemalloc}") ++
+      (optional enableGlibcxxDebug "CXXFLAGS=-D_GLIBCXX_DEBUG");
 
-  buildInputs = [
-    autoconf
-    automake
-    libtool
-    pkg-config
-    boost
-    numactl
-    hwloc
-    papi
-    ovni
-  ];
+    # The "bindnow" flags are incompatible with ifunc resolution mechanism. We
+    # disable all by default, which includes bindnow.
+    hardeningDisable = [ "all" ];
 
-}
+    # Keep debug symbols in the verbose variant of the library
+    dontStrip = true;
+
+    buildInputs = [
+      autoconf
+      automake
+      libtool
+      pkg-config
+      boost
+      numactl
+      hwloc
+      papi
+      ovni
+    ];
+  }

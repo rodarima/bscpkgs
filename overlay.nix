@@ -118,13 +118,14 @@ let
       }) { CC = "clang"; CXX = "clang++"; };
 
     stdenvClangOmpss2 = self.stdenv.override {
-      cc = bsc.clangOmpss2Git;
+      cc = bsc.clangOmpss2;
       allowedRequisites = null;
     };
 
     clangNodes = bsc.clangOmpss2Git.override {
       rt = bsc.nodes;
     };
+
     stdenvClangNodes = self.stdenv.override {
       cc = bsc.clangNodes;
       allowedRequisites = null;
@@ -142,7 +143,7 @@ let
     # =================================================================
     nanos6 = bsc.nanos6Release;
     nanos6Release = callPackage ./bsc/nanos6/default.nix { };
-    nanos6Git = callPackage ./bsc/nanos6/git.nix { };
+    nanos6Git = callPackage ./bsc/nanos6/default.nix { useGit = true; };
     nanos6-icx = bsc.nanos6.override {
       stdenv = bsc.intel2023.stdenv;
     };
