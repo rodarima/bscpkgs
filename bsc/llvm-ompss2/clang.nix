@@ -14,14 +14,14 @@
 }:
 
 stdenv.mkDerivation rec {
-  version = "2022.11";
+  version = "2023.05";
   pname = "clang-ompss2";
 
   src = fetchFromGitHub {
     owner = "bsc-pm";
     repo = "llvm";
     rev = "refs/tags/github-release-${version}";
-    sha256 = "i1+ewQ3Xe+27I/s294TGaEQC1McjMtywZ7vO64eGnus=";
+    sha256 = "sha256-AWkIfF3ZuYqbwkXt5L5cs+obl7aXuyYGVOVHMauD4Wk=";
   };
 
   enableParallelBuilding = true;
@@ -67,7 +67,7 @@ stdenv.mkDerivation rec {
       "-DCMAKE_CXX_FLAGS_DEBUG=-g -ggnu-pubnames"
       "-DCMAKE_EXE_LINKER_FLAGS_DEBUG=-Wl,-gdb-index"
       "-DLLVM_LIT_ARGS=-sv --xunit-xml-output=xunit.xml"
-      "-DLLVM_ENABLE_PROJECTS=clang;openmp;compiler-rt;flang;lld"
+      "-DLLVM_ENABLE_PROJECTS=clang;openmp;compiler-rt;lld"
       "-DLLVM_ENABLE_ASSERTIONS=${enableAssertions}"
       "-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON"
       "-DCMAKE_INSTALL_BINDIR=bin"
