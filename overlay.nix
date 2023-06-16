@@ -205,10 +205,11 @@ let
       hardeningDisable = [ "all" ];
     });
 
-    # Default Intel MPI version is 2019 (the last one)
-    impi = bsc.intelMpi;
-    intelMpi = bsc.intelMpi2019;
-    intelMpi2019 = callPackage ./bsc/intel-mpi/default.nix { };
+    impi = bsc.intel-mpi;
+    # The version of MPI for 2023 is labeled 2021.9 ...
+    intel-mpi = bsc.intel-oneapi-2023.intel-mpi;
+    # Old releases
+    intel-mpi-2019 = callPackage ./bsc/intel-mpi/default.nix { };
 
     # OpenMPI
     openmpi = bsc.openmpi-mn4;
