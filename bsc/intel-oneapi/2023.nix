@@ -141,6 +141,12 @@ let
         rsync -a --exclude IMB-MPI1-GPU bin/ $out/bin/
       popd
     '';
+    preFixup = ''
+      for i in $out/bin/mpi* ; do
+        echo "Fixing paths in $i"
+        sed -i "s:I_MPI_SUBSTITUTE_INSTALLDIR:$out:g" "$i"
+      done
+    '';
   };
 
   intel-tbb = stdenv.mkDerivation rec {
