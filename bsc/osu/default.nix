@@ -6,12 +6,12 @@
 }:
 
 stdenv.mkDerivation rec {
-  version = "5.7";
+  version = "7.1-1";
   name = "osu-micro-benchmarks-${version}";
 
   src = fetchurl {
-    url = "http://mvapich.cse.ohio-state.edu/download/mvapich/osu-micro-benchmarks-${version}.tar.gz";
-    sha256 = "1425ygxpk3kyy6ilh4f6qjsjdyx0gjjzs7ic1cb7zjmn1vhfnw0l";
+    url = "https://mvapich.cse.ohio-state.edu/download/mvapich/osu-micro-benchmarks-${version}.tar.gz";
+    sha256 = "sha256-hfTdi+HfMSVeIyhSdprluC6HpfsUvi+Ouhrp3o/+ORo=";
   };
 
   doCheck = true;
@@ -25,10 +25,9 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     mkdir -p $out/bin
-    cp $out/libexec/osu-micro-benchmarks/mpi/one-sided/* $out/bin/
-    cp $out/libexec/osu-micro-benchmarks/mpi/collective/* $out/bin/
-    cp $out/libexec/osu-micro-benchmarks/mpi/pt2pt/* $out/bin/
-    cp $out/libexec/osu-micro-benchmarks/mpi/startup/* $out/bin/
+    for f in $(find $out -executable -type f); do
+      ln -s "$f" $out/bin/$(basename "$f")
+    done
   '';
 
   meta = {
