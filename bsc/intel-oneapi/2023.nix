@@ -136,7 +136,9 @@ let
         rsync -a man/ $out/share/man/
         rsync -a etc/ $out/etc/
         rsync -a include/ $out/include/
-        rsync -a lib/ $out/lib/
+        cp -a lib/lib* $out/lib/
+        # Copy the actual libmpi.so from release
+        cp -a lib/release/lib* $out/lib
         # Broken due missing libze_loader.so.1
         rsync -a --exclude IMB-MPI1-GPU bin/ $out/bin/
       popd
