@@ -276,6 +276,29 @@ let
       pmix = bsc.pmix2;
     };
 
+    pmix4 =
+      let
+        libevent-all = with final; symlinkJoin {
+          name = "${libevent.name}-all";
+          paths = [ libevent.dev libevent.out ];
+        };
+      in
+    prev.pmix.overrideAttrs (old: rec {
+      version = "4.2.3";
+      # Don't use fetchFromGitHub as is not a release!
+      src = builtins.fetchTarball {
+        url = "https://github.com/openpmix/openpmix/releases/download/v${version}/pmix-${version}.tar.gz";
+        sha256 = "sha256:1iakrjkgydjz2f17if4cpyk1ldjff2790x4z787zdbbdnisxhdz2";
+      };
+      configureFlags = [
+        "--with-munge=${self.munge}"
+        "--with-hwloc=${self.hwloc.dev}"
+      ];
+      # libevent is not working, so use libev
+      buildInputs = old.buildInputs ++ [ self.python3 libevent-all ];
+      nativeBuildInputs = old.nativeBuildInputs ++ [ self.pkgconfig ];
+    });
+
     slurm-16-05-8-1 = callPackage ./bsc/slurm/16.05.8.1/default.nix {
       hwloc = bsc.hwloc-1-11-6;
     };
