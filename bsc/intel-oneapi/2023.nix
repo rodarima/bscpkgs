@@ -471,7 +471,7 @@ let
 
 in
   {
-    inherit aptPackages aptPackageIndex;
+    inherit aptPackages aptPackageIndex intel-mpi;
     icx = icx-wrapper;
     icc = icc-wrapper;
     ifort = ifort-wrapper;
