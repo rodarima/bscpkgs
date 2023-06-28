@@ -9,6 +9,7 @@
 , which
 , elfutils
 , libffi
+, zlib
 , pkg-config
 , enableDebug ? false
 }:
@@ -34,6 +35,8 @@ stdenv.mkDerivation rec {
 
   isClangWithOmpss = true;
 
+  nativeBuildInputs = [ zlib ];
+
   buildInputs = [
     which
     bash
@@ -44,6 +47,7 @@ stdenv.mkDerivation rec {
     elfutils
     libffi
     pkg-config
+    zlib
   ];
 
   # Error with -D_FORTIFY_SOURCE=2, see https://bugs.gentoo.org/636604:
@@ -71,7 +75,15 @@ stdenv.mkDerivation rec {
       "-DLLVM_ENABLE_ASSERTIONS=${enableAssertions}"
       "-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON"
       "-DCMAKE_INSTALL_BINDIR=bin"
+      "-DLLVM_ENABLE_ZLIB=FORCE_ON"
+      "-DLLVM_ENABLE_LIBXML2=OFF"
     )
+
+  '';
+
+  # Workaround the problem with llvm-tblgen and missing zlib.so.1
+  preBuild = ''
+    export LD_LIBRARY_PATH=${zlib}/lib
   '';
 
   # Remove support for GNU and Intel Openmp
