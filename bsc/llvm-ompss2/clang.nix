@@ -77,13 +77,13 @@ stdenv.mkDerivation rec {
       "-DCMAKE_INSTALL_BINDIR=bin"
       "-DLLVM_ENABLE_ZLIB=FORCE_ON"
       "-DLLVM_ENABLE_LIBXML2=OFF"
+      # Set the rpath to include external libraries (zlib) both on build and
+      # install
+      "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON"
+      "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON"
+      "-DCMAKE_INSTALL_RPATH=${zlib}/lib"
     )
 
-  '';
-
-  # Workaround the problem with llvm-tblgen and missing zlib.so.1
-  preBuild = ''
-    export LD_LIBRARY_PATH=${zlib}/lib
   '';
 
   # Remove support for GNU and Intel Openmp
