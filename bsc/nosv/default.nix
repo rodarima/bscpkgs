@@ -8,7 +8,7 @@
 , hwloc
 , ovni ? null
 , useGit ? false
-, gitURL ? "git@gitlab-internal.bsc.es:nos-v/nos-v.git"
+, gitUrl ? "git@gitlab-internal.bsc.es:nos-v/nos-v.git"
 , gitBranch ? "master"
 , gitCommit ? "0edc81d065f20d3d2f8acf94df1d2640dc430d5e"
 }:
