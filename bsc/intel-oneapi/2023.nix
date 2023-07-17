@@ -93,7 +93,7 @@ let
   let
     urls = builtins.map (x: getUrl aptPackages x) names;
     sums = builtins.map (x: getSum aptPackages x) names;
-    getsrc = url: sha256: fetchurl { inherit url sha256; };
+    getsrc = url: sha256: builtins.fetchurl { inherit url sha256; };
     debs = lib.zipListsWith getsrc urls sums;
   in
     uncompressDebs debs "${name}-source";
