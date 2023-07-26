@@ -15,12 +15,12 @@ with lib;
 
 let
   release = rec {
-    version = "1.2.0";
+    version = "1.2.2";
     src = fetchFromGitHub {
       owner = "bsc-pm";
       repo = "ovni";
       rev = "${version}";
-      sha256 = "sha256-J6eC62RT/0CHN7IXJuIw1c9GBkjvVEyh0HjIF7uG0FM=";
+      sha256 = "sha256-Hf6aeUN/uElfA9Lzzrejffb8RA6lcZQytqBdmIiBBJk=";
     };
   };
 
