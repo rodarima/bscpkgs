@@ -25,12 +25,12 @@ with lib;
 
 let
   release = rec {
-    version = "1.0";
+    version = "1.0.1";
     src = fetchFromGitHub {
       owner = "bsc-pm";
       repo = "nodes";
       rev = "version-${version}";
-      sha256 = "sha256-UqqvbAqF512qsHsEE24WNSxnV1wCGAXuzc7FkzQxu10=";
+      sha256 = "sha256-+gnFSjScxq+AB0FJxqxk388chayyDiQ+wBpCMKnX6m4=";
     };
   };
 
