@@ -1,7 +1,7 @@
 let
   bscOverlay = import ./overlay.nix;
 
-  commit = "d6b863fd9b7bb962e6f9fdf292419a775e772891";
+  commit = "d680ded26da5cf104dd2735a51e88d2d8f487b4d";
 
   # Pin the nixpkgs
   nixpkgsPath = builtins.fetchTarball {
@@ -9,7 +9,7 @@ let
     name = "nixpkgs-${commit}";
     url = "https://github.com/nixos/nixpkgs/archive/${commit}.tar.gz";
     # Hash obtained using `nix-prefetch-url --unpack <url>`
-    sha256 = "02rd1n6d453rdp2978bvnp99nyfa26jxgbsg78yb9mmdxvha3hnr";
+    sha256 = "0xczslr40zy1wlg0ir8mwyyn5gz22i2f9dfd0vmgnk1664v4chky";
   };
 
   pkgs = import nixpkgsPath {
