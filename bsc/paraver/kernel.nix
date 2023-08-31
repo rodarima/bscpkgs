@@ -7,6 +7,7 @@
 , wxGTK30
 , autoconf
 , automake
+, pkg-config
 }:
 
 let
@@ -49,5 +50,6 @@ stdenv.mkDerivation rec {
     xml2
     autoconf
     automake
+    pkg-config
   ];
 }
