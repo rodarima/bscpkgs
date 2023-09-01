@@ -10,7 +10,7 @@ stdenv.mkDerivation rec {
     #export NIX_DEBUG=6
     clang -fompss-2 hello.c -o hello
     ./hello
-    clang -fompss-2 hello.cc -o hello
+    clang++ -fompss-2 hello.cc -o hello
     ./hello
   '';
 
