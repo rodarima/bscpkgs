@@ -359,6 +359,7 @@ let
       compilers.hello-cpp = callPackage ./test/compilers/hello-cpp.nix { };
       compilers.hello-f = callPackage ./test/compilers/hello-f.nix { };
       compilers.lto = callPackage ./test/compilers/lto.nix { };
+      compilers.asan = callPackage ./test/compilers/asan.nix { };
       compilers.intel2023.icx.c = compilers.hello-c.override {
         stdenv = bsc.intel2023.stdenv;
       };
@@ -377,6 +378,9 @@ let
       compilers.clangOmpss2.lto = compilers.lto.override {
         stdenv = bsc.stdenvClangOmpss2;
       };
+      compilers.clangOmpss2.asan = compilers.asan.override {
+        stdenv = bsc.stdenvClangOmpss2;
+      };
       compilers.clangOmpss2.task = callPackage ./test/compilers/ompss2.nix {
         stdenv = bsc.stdenvClangOmpss2;
       };
@@ -393,6 +397,7 @@ let
       compilers.intel2023.ifort
       compilers.clangOmpss2.lto
       compilers.clangOmpss2.task
+      compilers.clangOmpss2.asan
       compilers.clangNodes.task
     ];
 
