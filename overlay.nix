@@ -340,6 +340,8 @@ let
     cpuid = callPackage ./bsc/cpuid/default.nix { };
     bench6 = callPackage ./bsc/bench6/default.nix { };
 
+    nix-wrap = callPackage ./bsc/nix-wrap/default.nix { };
+
     # =================================================================
     #  Garlic benchmark
     # =================================================================
