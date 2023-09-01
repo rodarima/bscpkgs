@@ -62,11 +62,14 @@ stdenv.mkDerivation rec {
   dontUseCmakeBuildDir = true;
   enableAssertions = if enableDebug then "ON" else "OFF";
 
+  # Fix the host triple, as it has changed in a newer config.guess:
+  # https://git.savannah.gnu.org/gitweb/?p=config.git;a=commitdiff;h=ca9bfb8cc75a2be1819d89c664a867785c96c9ba
   preConfigure = ''
     mkdir -p build
     cd build
     cmakeDir="../llvm"
     cmakeFlagsArray=(
+      "-DLLVM_HOST_TRIPLE=${stdenv.targetPlatform.config}"
       "-DLLVM_ENABLE_LLD=ON"
       "-DCMAKE_CXX_FLAGS_DEBUG=-g -ggnu-pubnames"
       "-DCMAKE_EXE_LINKER_FLAGS_DEBUG=-Wl,-gdb-index"
