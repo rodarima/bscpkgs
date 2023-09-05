@@ -70,6 +70,7 @@ stdenv.mkDerivation rec {
     cmakeDir="../llvm"
     cmakeFlagsArray=(
       "-DLLVM_HOST_TRIPLE=${stdenv.targetPlatform.config}"
+      "-DLLVM_TARGETS_TO_BUILD=host"
       "-DLLVM_ENABLE_LLD=ON"
       "-DCMAKE_CXX_FLAGS_DEBUG=-g -ggnu-pubnames"
       "-DCMAKE_EXE_LINKER_FLAGS_DEBUG=-Wl,-gdb-index"
