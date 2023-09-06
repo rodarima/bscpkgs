@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
   src = builtins.fetchGit {
     url = "ssh://git@bscpm03.bsc.es/ovni/sonar";
     ref = "main";
-    rev = "1ab3d99d57e1da785bc1addac620b3358c8bbb16";
+    rev = "1299731b56addc18f530f7327f62267624c4363a";
   };
   hardeningDisable = [ "all" ];
   dontStrip = true;
