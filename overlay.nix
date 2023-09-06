@@ -224,6 +224,9 @@ let
     tampiRelease = callPackage ./bsc/tampi/default.nix { };
     tampiGit = callPackage ./bsc/tampi/git.nix { };
 
+    # Sonar
+    sonar = callPackage ./bsc/sonar/default.nix { };
+
     # =================================================================
     #  GASPI
     # =================================================================
