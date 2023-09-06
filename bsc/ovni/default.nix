@@ -6,7 +6,7 @@
 , fetchFromGitHub
 , useGit ? false
 , gitBranch ? "master"
-, gitURL ? "ssh://git@bscpm03.bsc.es/rarias/ovni.git"
+, gitUrl ? "ssh://git@bscpm03.bsc.es/rarias/ovni.git"
 , gitCommit ? "d0a47783f20f8b177a48418966dae45454193a6a"
 , enableDebug ? false
 }:
