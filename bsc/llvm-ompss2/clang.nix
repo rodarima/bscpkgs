@@ -71,6 +71,10 @@ stdenv.mkDerivation rec {
     cmakeFlagsArray=(
       "-DLLVM_HOST_TRIPLE=${stdenv.targetPlatform.config}"
       "-DLLVM_TARGETS_TO_BUILD=host"
+      "-DLLVM_BUILD_LLVM_DYLIB=ON"
+      "-DLLVM_LINK_LLVM_DYLIB=ON"
+      # Required to run clang-ast-dump and clang-tblgen during build
+      "-DCMAKE_BUILD_RPATH=$PWD/lib:${zlib}/lib"
       "-DLLVM_ENABLE_LLD=ON"
       "-DCMAKE_CXX_FLAGS_DEBUG=-g -ggnu-pubnames"
       "-DCMAKE_EXE_LINKER_FLAGS_DEBUG=-Wl,-gdb-index"
@@ -83,7 +87,6 @@ stdenv.mkDerivation rec {
       "-DLLVM_ENABLE_LIBXML2=OFF"
       # Set the rpath to include external libraries (zlib) both on build and
       # install
-      "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON"
       "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON"
       "-DCMAKE_INSTALL_RPATH=${zlib}/lib"
     )
