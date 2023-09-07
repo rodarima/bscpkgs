@@ -75,6 +75,7 @@ stdenv.mkDerivation rec {
   dontUnpack = true;
   dontConfigure = true;
   dontBuild = true;
+  dontPatchShebangs = true;
   NIX_DEBUG = 0;
 
   installPhase = ''
