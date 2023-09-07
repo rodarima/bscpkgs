@@ -1,11 +1,11 @@
 {
   stdenv
 , cmake
-, clangOmpss2Git
-, nanos6Git
+, clangOmpss2
+, nanos6
 , nodes
 , mpi
-, tampiGit
+, tampi
 , gitBranch ? "master"
 , gitURL ? "ssh://git@bscpm03.bsc.es/rarias/bench6.git"
 , gitCommit ? "1e6ce2aa8ad7b4eef38df1581d7ec48a8815f85d"
@@ -21,7 +21,7 @@ stdenv.mkDerivation rec {
     rev = gitCommit;
   };
 
-  buildInputs = [ cmake clangOmpss2Git nanos6Git nodes mpi tampiGit ];
+  buildInputs = [ cmake clangOmpss2 nanos6 nodes mpi tampi ];
 
   enableParallelBuilding = false;
   cmakeFlags = [
