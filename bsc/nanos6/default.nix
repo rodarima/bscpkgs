@@ -11,6 +11,7 @@
 , papi
 , boost
 , ovni
+, enableDebug ? false
 , enableJemalloc ? true
 , jemalloc ? null
 , cachelineBytes ? 64
@@ -75,12 +76,17 @@ in
       (optional enableJemalloc "--with-jemalloc=${jemalloc}") ++
       (optional enableGlibcxxDebug "CXXFLAGS=-D_GLIBCXX_DEBUG");
 
+    postConfigure = lib.optionalString (!enableDebug) ''
+      # Disable debug
+      sed -i 's/\([a-zA-Z0-9_]*nanos6_debug[a-zA-Z0-9_]*\)\s*[+]\?=.*/\1 =/g' Makefile.am
+    '';
+
     # The "bindnow" flags are incompatible with ifunc resolution mechanism. We
     # disable all by default, which includes bindnow.
     hardeningDisable = [ "all" ];
 
-    # Keep debug symbols in the verbose variant of the library
-    dontStrip = true;
+    # Keep debug symbols in the debug variant of the library
+    dontStrip = enableDebug;
 
     buildInputs = [
       autoconf
