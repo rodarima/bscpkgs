@@ -13,7 +13,7 @@
 , ovni
 , enableDebug ? false
 , enableJemalloc ? true
-, jemalloc ? null
+, jemallocNanos6 ? null
 , cachelineBytes ? 64
 , enableGlibcxxDebug ? false
 , useGit ? false
@@ -22,7 +22,7 @@
 , gitCommit ? "58712e669ac02f721fb841247361ea54f53a6a47"
 }:
 
-assert enableJemalloc -> (jemalloc != null);
+assert enableJemalloc -> (jemallocNanos6 != null);
 
 with lib;
 
@@ -73,7 +73,7 @@ in
       "--enable-ovni-instrumentation"
       "--with-ovni=${ovni}"
     ] ++
-      (optional enableJemalloc "--with-jemalloc=${jemalloc}") ++
+      (optional enableJemalloc "--with-jemalloc=${jemallocNanos6}") ++
       (optional enableGlibcxxDebug "CXXFLAGS=-D_GLIBCXX_DEBUG");
 
     postConfigure = lib.optionalString (!enableDebug) ''
@@ -99,4 +99,10 @@ in
       papi
       ovni
     ];
+
+    # Create a script that sets NANOS6_HOME
+    postInstall = ''
+      mkdir -p $out/nix-support
+      echo "export NANOS6_HOME=$out" >> $out/nix-support/setup-hook
+    ''; 
   }

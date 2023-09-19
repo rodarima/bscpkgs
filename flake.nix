@@ -1,7 +1,5 @@
 {
-  inputs = {
-    nixpkgs.url = "nixpkgs";
-  };
+  inputs.nixpkgs.url = "nixpkgs";
 
   outputs = { self, nixpkgs, ...}:
   let
@@ -14,6 +12,6 @@
     {
       bscOverlay = import ./overlay.nix;
       overlays.default = self.bscOverlay;
-      packages.x86_64-linux = pkgs;
+      legacyPackages.x86_64-linux = pkgs;
     };
 }

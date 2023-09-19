@@ -21,7 +21,7 @@ let
       repo = "ovni";
       rev = "${version}";
       sha256 = "sha256-4ulohGnbQwAZ/qnm5bmceoMhTuAHlCfLAWEodZ9YMP0=";
-    };
+    } // { shortRev = "b6903bc4"; };
   };
 
   git = rec {
@@ -40,5 +40,6 @@ in
     inherit (source) src version;
     buildInputs = [ cmake mpi ];
     cmakeBuildType = if (enableDebug) then "Debug" else "Release";
+    cmakeFlags = [ "-DOVNI_GIT_COMMIT=${src.shortRev}" ];
     dontStrip = true;
   }

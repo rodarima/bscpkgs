@@ -1,8 +1,7 @@
 {
-  stdenv
+  llvmPackages_latest
 , fetchFromGitHub
 , cmake
-, lld
 , bash
 , python3
 , perl
@@ -14,7 +13,9 @@
 , enableDebug ? false
 }:
 
-stdenv.mkDerivation rec {
+let
+  stdenv = llvmPackages_latest.stdenv;
+in stdenv.mkDerivation rec {
   version = "2023.05.1";
   pname = "clang-ompss2";
 
@@ -43,7 +44,7 @@ stdenv.mkDerivation rec {
     python3
     perl
     cmake
-    lld
+    llvmPackages_latest.lld
     elfutils
     libffi
     pkg-config

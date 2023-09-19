@@ -1,4 +1,4 @@
-{ self, super, bsc, callPackage }:
+{ self, super, bsc, testPkgs }:
 
 let
   stdenv = self.stdenv;
@@ -10,23 +10,7 @@ stdenv.mkDerivation rec {
   dontUnpack = true;
 
   # Just build some packages
-  buildInputs = with bsc; [
-    # Compilers
-    icc
-    clangOmpss2
-    mcxx
-    # MPI
-    impi
-    mpich
-    openmpi
-    tampi
-    # Tools
-    ovni
-    # extrae # Broken
-    wxparaver
-    # Runtimes
-    nanos6
-  ] ++ bsc.testAll;
+  buildInputs = testPkgs;
 
   buildPhase = ''
     if [ -e /boot ]; then
