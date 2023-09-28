@@ -1,13 +1,17 @@
 {
   stdenv
+, lib
 , gcc
 , clangOmpss2Unwrapped
 , wrapCCWith
 , llvmPackages_latest
+, ompss2rt ? null
 }:
 
 
 let
+  homevar = if ompss2rt.pname == "nanos6" then "NANOS6_HOME" else "NODES_HOME";
+  rtname  = if ompss2rt.pname == "nanos6" then "libnanos6" else "libnodes";
 
   # We need to replace the lld linker from bintools with our linker just built,
   # otherwise we run into incompatibility issues when mixing compiler and linker
@@ -39,5 +43,8 @@ in wrapCCWith {
     echo "--gcc-toolchain=${gcc}" >> $out/nix-support/cc-cflags
 
     wrap clang++  $wrapper $ccPath/clang++
+  '' + lib.optionalString (ompss2rt != null) ''
+    echo "export OMPSS2_RUNTIME=${rtname}" >> $out/nix-support/cc-wrapper-hook
+    echo "export ${homevar}=${ompss2rt}"   >> $out/nix-support/cc-wrapper-hook
   '';
 }
