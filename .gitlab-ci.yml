@@ -1,7 +1,6 @@
-build:bsc.ci:
+build:bsc-ci.all:
   stage: build
   tags:
     - nix
   script:
-    - export NIXPKGS_ALLOW_INSECURE=1
-    - nix build -v -L --tarball-ttl 0 --file default.nix bsc.ci
+    - nix build -v -L ".#bsc-ci.all"
