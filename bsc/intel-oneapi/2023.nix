@@ -71,7 +71,9 @@ let
     matches = lib.filter (x: name == x.Package) pkgList;
     #match = assert lib.length matches == 1; lib.elemAt matches 0;
     n = lib.length matches;
-    match = builtins.trace (name + " -- n=${builtins.toString n}") (lib.elemAt matches 0);
+    match =
+      #builtins.trace (name + " -- n=${builtins.toString n}")
+      (lib.elemAt matches 0);
   in
     apthost + match.Filename;
 
