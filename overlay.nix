@@ -356,6 +356,9 @@ let
   callPackage = super.callPackage;
 
 in {
+  # Prevent accidental usage of bsc attribute
+  bsc = throw "the bsc attribute is deprecated, packages are now in the root";
+
   ovni = callPackage ./bsc/ovni/default.nix { };
   ovniGit = self.ovni.override { useGit = true; };
   nanos6 = callPackage ./bsc/nanos6/default.nix { };
@@ -378,9 +381,24 @@ in {
   sonar = callPackage ./bsc/sonar/default.nix { };
   clangOmpss2Unwrapped = callPackage ./bsc/llvm-ompss2/clang.nix { };
   clangOmpss2 = callPackage ./bsc/llvm-ompss2/default.nix { };
-  stdenvClangOmpss2 = self.stdenv.override {
-    cc = self.clangOmpss2;
+  clangOmpss2Nanos6 = callPackage ./bsc/llvm-ompss2/default.nix {
+    ompss2rt = self.nanos6;
+  };
+  clangOmpss2Nodes = callPackage ./bsc/llvm-ompss2/default.nix {
+    ompss2rt = self.nodes;
+  };
+  stdenvClangOmpss2Nanos6 = self.stdenv.override {
+    cc = self.clangOmpss2Nanos6;
     allowedRequisites = null;
+  };
+  stdenvClangOmpss2Nodes = self.stdenv.override {
+    cc = self.clangOmpss2Nodes;
+    allowedRequisites = null;
+  };
+
+  # Intel packages
+  intelPackages_2023 = callPackage ./bsc/intel-oneapi/2023.nix {
+    libffi = self.libffi_3_3;
   };
 
   # Internal for our tests
@@ -388,47 +406,35 @@ in {
     pkgs = super.runCommand "ci-pkgs" {
       buildInputs = with self; [
         ovni nanos6 nosv nodes nix-wrap osumb wxparaver tampi sonar
-        clangOmpss2 bench6
+        clangOmpss2Nanos6 bench6 intelPackages_2023.icx
       ];
     } "printf '%s\n' $buildInputs > $out";
 
     test = rec {
       hello-c = callPackage ./test/compilers/hello-c.nix { };
       hello-cpp = callPackage ./test/compilers/hello-cpp.nix { };
-      hello-f = callPackage ./test/compilers/hello-f.nix { };
       lto = callPackage ./test/compilers/lto.nix { };
       asan = callPackage ./test/compilers/asan.nix { };
-      #intel2023.icx.c = hello-c.override {
-      #  stdenv = bsc.intel2023.stdenv;
-      #};
-      #intel2023.icc.c = hello-c.override {
-      #  stdenv = bsc.intel2023.stdenv-icc;
-      #};
-      #intel2023.icx.cpp = hello-cpp.override {
-      #  stdenv = bsc.intel2023.stdenv;
-      #};
-      #intel2023.icc.cpp = hello-cpp.override {
-      #  stdenv = bsc.intel2023.stdenv-icc;
-      #};
-      #intel2023.ifort = hello-f.override {
-      #  stdenv = bsc.intel2023.stdenv-ifort;
-      #};
-      clangOmpss2.lto = lto.override { stdenv = self.stdenvClangOmpss2; };
-      clangOmpss2.asan = asan.override { stdenv = self.stdenvClangOmpss2; };
-      clangOmpss2.task = callPackage ./test/compilers/ompss2.nix {
-        stdenv = self.stdenvClangOmpss2;
+      intel2023-icx-c   = hello-c.override   { stdenv = self.intelPackages_2023.stdenv; };
+      intel2023-icc-c   = hello-c.override   { stdenv = self.intelPackages_2023.stdenv-icc; };
+      intel2023-icx-cpp = hello-cpp.override { stdenv = self.intelPackages_2023.stdenv; };
+      intel2023-icc-cpp = hello-cpp.override { stdenv = self.intelPackages_2023.stdenv-icc; };
+      intel2023-ifort   = callPackage ./test/compilers/hello-f.nix {
+        stdenv = self.intelPackages_2023.stdenv-ifort;
       };
-      #clangNodes.task = callPackage ./test/compilers/ompss2.nix {
-      #  stdenv = bsc.stdenvClangNodes;
-      #};
+      clangOmpss2-lto   = lto.override       { stdenv = self.stdenvClangOmpss2Nanos6; };
+      clangOmpss2-asan  = asan.override      { stdenv = self.stdenvClangOmpss2Nanos6; };
+      clangOmpss2-task  = callPackage ./test/compilers/ompss2.nix {
+        stdenv = self.stdenvClangOmpss2Nanos6;
+      };
+      clangNodes-task = callPackage ./test/compilers/ompss2.nix {
+        stdenv = self.stdenvClangOmpss2Nodes;
+      };
     };
 
     all = super.runCommand "ci-all" {
-      buildInputs = with self.bsc-ci.test; [
-        clangOmpss2.lto
-        clangOmpss2.task
-        clangOmpss2.asan
-      ];
+      buildInputs = self.bsc-ci.pkgs.buildInputs ++
+        (attrValues self.bsc-ci.test);
     } "printf '%s\n' $buildInputs > $out";
   };
 }
