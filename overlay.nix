@@ -405,8 +405,12 @@ in {
   bsc-ci = {
     pkgs = super.runCommand "ci-pkgs" {
       buildInputs = with self; [
-        ovni nanos6 nosv nodes nix-wrap osumb wxparaver tampi sonar
-        clangOmpss2Nanos6 bench6 intelPackages_2023.icx
+        ovni nanos6 nosv nodes
+        osumb wxparaver tampi
+        clangOmpss2Nanos6
+        intelPackages_2023.icx
+        # depend on pm.bsc.es/gitlab
+        #bench6 sonar nix-wrap 
       ];
     } "printf '%s\n' $buildInputs > $out";
 
