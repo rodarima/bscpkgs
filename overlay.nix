@@ -10,37 +10,37 @@ let
     "printf '%s\n' ${toString (collect (x: x ? outPath) pkgs)} > $out";
 
   bscPkgs = {
-    #bench6 = callPackage ./pkgs/bench6/default.nix { };
+    #bench6 = callPackage ./pkgs/bench6/default.nix { }; # FIXME: PM gitlab broken
     clangOmpss2 = callPackage ./pkgs/llvm-ompss2/default.nix { };
     clangOmpss2Nanos6 = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nanos6; };
     clangOmpss2Nodes = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nodes; };
     clangOmpss2Unwrapped = callPackage ./pkgs/llvm-ompss2/clang.nix { };
     #extrae = callPackage ./pkgs/extrae/default.nix { }; # Broken and outdated
-    #gpi-2 = callPackage ./pkgs/gpi-2/default.nix { };
+    #gpi-2 = callPackage ./pkgs/gpi-2/default.nix { }; # FIXME: PM gitlab broken
     intelPackages_2023 = callPackage ./pkgs/intel-oneapi/2023.nix { };
     jemallocNanos6 = callPackage ./pkgs/nanos6/jemalloc.nix { };
-    #lmbench = callPackage ./pkgs/lmbench/default.nix { };
+    #lmbench = callPackage ./pkgs/lmbench/default.nix { }; # Broken
     mcxx = callPackage ./pkgs/mcxx/default.nix { };
     nanos6 = callPackage ./pkgs/nanos6/default.nix { };
     nanos6Debug = final.nanos6.override { enableDebug = true; };
-    #nixtools = callPackage ./pkgs/nixtools/default.nix { };
-    #nix-wrap = callPackage ./pkgs/nix-wrap/default.nix { };
+    #nixtools = callPackage ./pkgs/nixtools/default.nix { }; # FIXME: PM gitlab broken
+    #nix-wrap = callPackage ./pkgs/nix-wrap/default.nix { }; # FIXME: PM gitlab broken
     nodes = callPackage ./pkgs/nodes/default.nix { };
     nosv = callPackage ./pkgs/nosv/default.nix { };
     osumb = callPackage ./pkgs/osu/default.nix { };
     ovni = callPackage ./pkgs/ovni/default.nix { };
     ovniGit = final.ovni.override { useGit = true; };
     paraverKernel = callPackage ./pkgs/paraver/kernel.nix { };
-    #paraverKernelFast = callPackage ./pkgs/paraver/kernel-fast.nix { };
-    #pscom = callPackage ./pkgs/parastation/pscom.nix { };
-    #psmpi = callPackage ./pkgs/parastation/psmpi.nix { };
-    #sonar = callPackage ./pkgs/sonar/default.nix { };
+    #paraverKernelFast = callPackage ./pkgs/paraver/kernel-fast.nix { }; # Outdated + PM gitlab broken
+    #pscom = callPackage ./pkgs/parastation/pscom.nix { }; # Unmaintaned
+    #psmpi = callPackage ./pkgs/parastation/psmpi.nix { }; # Unmaintaned
+    #sonar = callPackage ./pkgs/sonar/default.nix { }; # FIXME: PM gitlab broken
     stdenvClangOmpss2Nanos6 = final.stdenv.override { cc = final.clangOmpss2Nanos6; allowedRequisites = null; };
     stdenvClangOmpss2Nodes = final.stdenv.override { cc = final.clangOmpss2Nodes; allowedRequisites = null; };
-    #tagaspi = callPackage ./pkgs/tagaspi/default.nix { };
+    #tagaspi = callPackage ./pkgs/tagaspi/default.nix { }; # FIXME: PM gitlab broken
     tampi = callPackage ./pkgs/tampi/default.nix { };
     wxparaver = callPackage ./pkgs/paraver/default.nix { };
-    #wxparaverFast = callPackage ./pkgs/paraver/wxparaver-fast.nix { };
+    #wxparaverFast = callPackage ./pkgs/paraver/wxparaver-fast.nix { }; # Outdated + PM gitlab broken
   };
 
 in bscPkgs // {
@@ -50,7 +50,7 @@ in bscPkgs // {
   # Internal for our CI tests
   bsc-ci = {
     test = rec {
-      #hwloc = callPackage ./test/bugs/hwloc.nix { };
+      #hwloc = callPackage ./test/bugs/hwloc.nix { }; # Broken, no /sys
       #sigsegv = callPackage ./test/reproducers/sigsegv.nix { };
       hello-c = callPackage ./test/compilers/hello-c.nix { };
       hello-cpp = callPackage ./test/compilers/hello-cpp.nix { };
