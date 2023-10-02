@@ -4,7 +4,7 @@
 , lib
 , dpkg
 , rsync
-, libffi
+, libffi_3_3
 , libelf
 , libxml2
 , hwloc
@@ -157,7 +157,7 @@ let
     buildInputs = [
       intel-mpi
       rsync
-      libffi
+      libffi_3_3
       libelf
       libxml2
       hwloc
@@ -195,7 +195,7 @@ let
       intel-mpi
       intel-tbb
       rsync
-      libffi
+      libffi_3_3
       libelf
       libxml2
       hwloc
@@ -256,7 +256,7 @@ let
       intel-mpi
       intel-compiler-shared
       rsync
-      libffi
+      libffi_3_3
       libelf
       libxml2
       hwloc
@@ -338,7 +338,7 @@ let
     buildInputs = [
       intel-compiler-shared
       rsync
-      libffi
+      libffi_3_3
       libelf
       libxml2
       hwloc
@@ -468,7 +468,7 @@ let
 
 in
   {
-    inherit aptPackages aptPackageIndex intel-mpi;
+    inherit intel-mpi;
     icx = icx-wrapper;
     icc = icc-wrapper;
     ifort = ifort-wrapper;

@@ -5,7 +5,7 @@
 , libtool
 , mpi
 , autoreconfHook
-, gaspi
+, gpi-2
 , boost
 , numactl
 , rdma-core
@@ -32,7 +32,7 @@ stdenv.mkDerivation rec {
   dontDisableStatic = true;
 
   configureFlags = [
-    "--with-gaspi=${gaspi}"
+    "--with-gaspi=${gpi-2}"
     "CFLAGS=-fPIC"
     "CXXFLAGS=-fPIC"
   ];
