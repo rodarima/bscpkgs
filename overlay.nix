@@ -80,6 +80,10 @@ in bscPkgs // {
       "printf '%s\n' ${toString (collect isDerivation final.bsc-ci.test)} > $out";
 
     all = final.runCommand "ci-all" { }
-      "printf '%s\n' ${toString [ final.bsc-ci.pkgs final.bsc-ci.tests ]} > $out";
+    ''
+      deps="${toString [ final.bsc-ci.pkgs final.bsc-ci.tests ]}"
+      cat $deps
+      printf '%s\n' $deps > $out
+    '';
   };
 }
