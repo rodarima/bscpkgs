@@ -6,4 +6,7 @@ jemalloc.overrideAttrs (old: {
     "--enable-stats"
   ];
   hardeningDisable = [ "all" ];
+  meta = old.meta // {
+    description = old.meta.description + " (for Nanos6)";
+  };
 })

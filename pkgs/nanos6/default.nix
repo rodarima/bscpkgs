@@ -105,4 +105,12 @@ in
       mkdir -p $out/nix-support
       echo "export NANOS6_HOME=$out" >> $out/nix-support/setup-hook
     ''; 
+
+    meta = with lib; {
+      homepage = "https://github.com/bsc-pm/nanos6";
+      description = "Nanos6 runtime for OmpSs-2" +
+        optionalString (enableDebug) " (with debug symbols)";
+      platforms = platforms.linux;
+      license = licenses.gpl3;
+    };
   }
