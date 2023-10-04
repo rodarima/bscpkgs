@@ -35,6 +35,7 @@ let
     #pscom = callPackage ./pkgs/parastation/pscom.nix { }; # Unmaintaned
     #psmpi = callPackage ./pkgs/parastation/psmpi.nix { }; # Unmaintaned
     #sonar = callPackage ./pkgs/sonar/default.nix { }; # FIXME: PM gitlab broken
+    stdenvClangOmpss2 = final.stdenv.override { cc = final.clangOmpss2; allowedRequisites = null; };
     stdenvClangOmpss2Nanos6 = final.stdenv.override { cc = final.clangOmpss2Nanos6; allowedRequisites = null; };
     stdenvClangOmpss2Nodes = final.stdenv.override { cc = final.clangOmpss2Nodes; allowedRequisites = null; };
     #tagaspi = callPackage ./pkgs/tagaspi/default.nix { }; # FIXME: PM gitlab broken
