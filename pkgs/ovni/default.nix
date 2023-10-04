@@ -42,4 +42,7 @@ in
     cmakeBuildType = if (enableDebug) then "Debug" else "Release";
     cmakeFlags = [ "-DOVNI_GIT_COMMIT=${src.shortRev}" ];
     dontStrip = true;
+    doCheck = true;
+    checkTarget = "test";
+    hardeningDisable = [ "all" ];
   }
