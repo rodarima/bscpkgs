@@ -38,6 +38,9 @@ in
   stdenv.mkDerivation rec {
     pname = "ovni";
     inherit (source) src version;
+    postPatch = ''
+      patchShebangs --build test/
+    '';
     buildInputs = [ cmake mpi ];
     cmakeBuildType = if (enableDebug) then "Debug" else "Release";
     cmakeFlags = [ "-DOVNI_GIT_COMMIT=${src.shortRev}" ];
