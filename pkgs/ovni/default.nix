@@ -44,7 +44,6 @@ in
     buildInputs = [ cmake mpi ];
     cmakeBuildType = if (enableDebug) then "Debug" else "Release";
     cmakeFlags = [ "-DOVNI_GIT_COMMIT=${src.shortRev}" ];
-    buildFlags = [ "VERBOSE=1" ];
     preCheck = ''
       export CTEST_OUTPUT_ON_FAILURE=1
     '';
