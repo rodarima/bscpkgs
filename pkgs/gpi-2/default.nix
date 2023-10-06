@@ -17,6 +17,7 @@ stdenv.mkDerivation rec {
   src = builtins.fetchGit {
     url = "ssh://git@bscpm03.bsc.es/interoperability/GPI-2";
     ref = "refs/tags/tagaspi-2021.11";
+    rev = "9082fe7770fa9f6acba1b1ac938ad209a3d09477";
   };
 
   enableParallelBuilding = true;

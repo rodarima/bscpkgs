@@ -39,7 +39,8 @@ stdenv.mkDerivation rec {
 
   src = builtins.fetchGit {
     url = "ssh://git@bscpm03.bsc.es/interoperability/tagaspi";
-    ref = "master";
+    ref = "refs/tags/2021.11";
+    rev = "5aabb1849de2e512cc8729f32783051ecd4cab97";
   };
 
   hardeningDisable = [ "all" ];
