@@ -3,4 +3,4 @@ build:bsc-ci.all:
   tags:
     - nix
   script:
-    - nix build -L "jungle#bsc-ci.all" --override-input bscpkgs .
+    - nix build -L "jungle#bsc-ci.all" --override-input bscpkgs . -v --show-trace
