@@ -1,17 +1,19 @@
 {
   stdenv
 , autoreconfHook
+, fetchFromGitHub
 , ovni
 , mpi
 }:
 
 stdenv.mkDerivation rec {
   pname = "sonar";
-  version = "0.1.0";
-  src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/ovni/sonar";
-    ref = "refs/tags/${version}";
-    rev = "1299731b56addc18f530f7327f62267624c4363a";
+  version = "0.2.0";
+  src = fetchFromGitHub {
+    owner = "bsc-pm";
+    repo = "sonar";
+    rev = "${version}";
+    sha256 = "sha256-iQSw4PbFk0EALXPHpLBPPQ7U8Ed8fkez1uG9MuF6PJo=";
   };
   hardeningDisable = [ "all" ];
   dontStrip = true;
