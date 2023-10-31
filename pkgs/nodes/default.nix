@@ -15,6 +15,7 @@
 , jemalloc
 , ovni
 , nosv
+, clangOmpss2
 , useGit ? false
 , gitUrl ? "ssh://git@gitlab-internal.bsc.es/nos-v/nodes.git"
 , gitBranch ? "master"
@@ -56,6 +57,13 @@ in
       "--with-jemalloc=${jemalloc}"
       "--with-nosv=${nosv}"
       "--with-ovni=${ovni}"
+    ] ++ lib.optionals doCheck [
+      "--with-nodes-clang=${clangOmpss2}"
+    ];
+
+    doCheck = false;
+    nativeCheckInputs = [
+      clangOmpss2
     ];
 
     # The "bindnow" flags are incompatible with ifunc resolution mechanism. We
