@@ -14,7 +14,9 @@ let
     clangOmpss2 = callPackage ./pkgs/llvm-ompss2/default.nix { };
     clangOmpss2Nanos6 = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nanos6; };
     clangOmpss2Nodes = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nodes; };
+    clangOmpss2OpenmpNodes = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nodes; clangOmpss2Unwrapped = final.clangOmpss2OpenmpUnwrapped; };
     clangOmpss2Unwrapped = callPackage ./pkgs/llvm-ompss2/clang.nix { };
+    clangOmpss2OpenmpUnwrapped = callPackage ./pkgs/llvm-ompss2/openmp.nix { clangOmpss2Unwrapped = final.clangOmpss2Unwrapped; };
     #extrae = callPackage ./pkgs/extrae/default.nix { }; # Broken and outdated
     gpi-2 = callPackage ./pkgs/gpi-2/default.nix { };
     intelPackages_2023 = callPackage ./pkgs/intel-oneapi/2023.nix { };
@@ -38,6 +40,7 @@ let
     stdenvClangOmpss2 = final.stdenv.override { cc = final.clangOmpss2; allowedRequisites = null; };
     stdenvClangOmpss2Nanos6 = final.stdenv.override { cc = final.clangOmpss2Nanos6; allowedRequisites = null; };
     stdenvClangOmpss2Nodes = final.stdenv.override { cc = final.clangOmpss2Nodes; allowedRequisites = null; };
+    stdenvClangOmpss2OpenmpNodes = final.stdenv.override { cc = final.clangOmpss2OpenmpNodes; allowedRequisites = null; };
     tagaspi = callPackage ./pkgs/tagaspi/default.nix { };
     tampi = callPackage ./pkgs/tampi/default.nix { };
     wxparaver = callPackage ./pkgs/paraver/default.nix { };

@@ -1,5 +1,6 @@
 {
   llvmPackages_latest
+, lib
 , fetchFromGitHub
 , cmake
 , bash
@@ -9,22 +10,43 @@
 , elfutils
 , libffi
 , zlib
+, nosv
 , pkg-config
 , enableDebug ? false
+, enableNosv ? false
+, useGit ? false
+, gitUrl ? "ssh://git@bscpm03.bsc.es/llvm-ompss/llvm-mono.git"
+, gitBranch ? "master"
+, gitCommit ? "8d106db69c02fb6ec10baedc47b76f068b419d4a"
 }:
 
 let
   stdenv = llvmPackages_latest.stdenv;
-in stdenv.mkDerivation rec {
-  version = "2023.05.1";
-  pname = "clang-ompss2";
 
-  src = fetchFromGitHub {
-    owner = "bsc-pm";
-    repo = "llvm";
-    rev = "refs/tags/github-release-${version}";
-    sha256 = "sha256-NB/27F1ZRJf6MXFQjinT2gCsoPbEZYlBMhd3uKcK2GM=";
+  release = rec {
+    version = "2023.05.1";
+    src = fetchFromGitHub {
+      owner = "bsc-pm";
+      repo = "llvm";
+      rev = "refs/tags/github-release-${version}";
+      sha256 = "sha256-NB/27F1ZRJf6MXFQjinT2gCsoPbEZYlBMhd3uKcK2GM=";
+    };
   };
+
+  git = rec {
+    version = src.shortRev;
+    src = builtins.fetchGit {
+      url = gitUrl;
+      ref = gitBranch;
+      rev = gitCommit;
+    };
+  };
+
+  source = if (useGit) then git else release;
+
+in stdenv.mkDerivation rec {
+  pname = "clang-ompss2";
+  inherit (source) src version;
 
   enableParallelBuilding = true;
   isClang = true;
@@ -49,6 +71,8 @@ in stdenv.mkDerivation rec {
     libffi
     pkg-config
     zlib
+  ] ++ lib.optionals enableNosv [
+    nosv
   ];
 
   # Error with -D_FORTIFY_SOURCE=2, see https://bugs.gentoo.org/636604:
@@ -86,6 +110,9 @@ in stdenv.mkDerivation rec {
       "-DCMAKE_INSTALL_BINDIR=bin"
       "-DLLVM_ENABLE_ZLIB=FORCE_ON"
       "-DLLVM_ENABLE_LIBXML2=OFF"
+  '' + (lib.optionalString enableNosv ''
+      "-DCLANG_DEFAULT_NOSV_HOME=${nosv}"
+  '') + ''
       # Set the rpath to include external libraries (zlib) both on build and
       # install
       "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON"
