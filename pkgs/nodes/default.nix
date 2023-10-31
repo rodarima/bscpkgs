@@ -12,7 +12,6 @@
 , papi
 , boost
 , autoreconfHook
-, jemalloc
 , ovni
 , nosv
 , clangOmpss2
@@ -54,7 +53,6 @@ in
     dontStrip = true;
 
     configureFlags = [
-      "--with-jemalloc=${jemalloc}"
       "--with-nosv=${nosv}"
       "--with-ovni=${ovni}"
     ] ++ lib.optionals doCheck [
@@ -80,7 +78,6 @@ in
       numactl
       hwloc
       papi
-      jemalloc
       nosv
       ovni
     ];
