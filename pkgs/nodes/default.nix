@@ -84,4 +84,8 @@ in
       nosv
       ovni
     ];
+
+    passthru = {
+      nosv = nosv;
+    };
   }

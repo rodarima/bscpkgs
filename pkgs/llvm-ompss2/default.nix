@@ -46,5 +46,8 @@ in wrapCCWith {
   '' + lib.optionalString (ompss2rt != null) ''
     echo "export OMPSS2_RUNTIME=${rtname}" >> $out/nix-support/cc-wrapper-hook
     echo "export ${homevar}=${ompss2rt}"   >> $out/nix-support/cc-wrapper-hook
+  '' + lib.optionalString (ompss2rt != null && ompss2rt.pname == "nodes") ''
+    echo "export NOSV_HOME=${ompss2rt.nosv}" >> $out/nix-support/cc-wrapper-hook
   '';
 }
+
