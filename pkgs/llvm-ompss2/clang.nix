@@ -101,7 +101,7 @@ in stdenv.mkDerivation rec {
       "-DCMAKE_BUILD_RPATH=$PWD/lib:${zlib}/lib"
       "-DLLVM_ENABLE_LLD=ON"
       "-DCMAKE_CXX_FLAGS_DEBUG=-g -ggnu-pubnames"
-      "-DCMAKE_EXE_LINKER_FLAGS_DEBUG=-Wl,-gdb-index"
+      "-DCMAKE_EXE_LINKER_FLAGS_DEBUG=-Wl,--gdb-index"
       "-DLLVM_LIT_ARGS=-sv --xunit-xml-output=xunit.xml"
       "-DLLVM_ENABLE_PROJECTS=clang;openmp;compiler-rt;lld"
       "-DLLVM_ENABLE_ASSERTIONS=ON"
