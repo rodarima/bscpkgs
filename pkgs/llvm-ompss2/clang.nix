@@ -122,8 +122,8 @@ in stdenv.mkDerivation rec {
 
   # Remove support for GNU and Intel Openmp
   postInstall = ''
-    rm $out/lib/libgomp*
-    rm $out/lib/libiomp*
+    rm -f $out/lib/libgomp*
+    rm -f $out/lib/libiomp*
   '';
 
 # About "-DCLANG_DEFAULT_NANOS6_HOME=${nanos6}", we could specify a default
