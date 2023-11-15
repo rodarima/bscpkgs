@@ -16,7 +16,7 @@ let
     clangOmpss2Nodes = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nodes; };
     clangOmpss2OpenmpNodes = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nodes; clangOmpss2Unwrapped = final.clangOmpss2OpenmpUnwrapped; };
     clangOmpss2Unwrapped = callPackage ./pkgs/llvm-ompss2/clang.nix { };
-    clangOmpss2OpenmpUnwrapped = callPackage ./pkgs/llvm-ompss2/openmp.nix { clangOmpss2Unwrapped = final.clangOmpss2Unwrapped; };
+    clangOmpss2OpenmpUnwrapped = import ./pkgs/llvm-ompss2/openmp.nix { clangOmpss2Unwrapped = final.clangOmpss2Unwrapped; };
     #extrae = callPackage ./pkgs/extrae/default.nix { }; # Broken and outdated
     gpi-2 = callPackage ./pkgs/gpi-2/default.nix { };
     intelPackages_2023 = callPackage ./pkgs/intel-oneapi/2023.nix { };
