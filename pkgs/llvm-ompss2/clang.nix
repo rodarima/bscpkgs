@@ -84,6 +84,8 @@ in stdenv.mkDerivation rec {
 
   cmakeBuildType = if enableDebug then "Debug" else "Release";
 
+  dontStrip = enableDebug;
+
   dontUseCmakeBuildDir = true;
 
   # Fix the host triple, as it has changed in a newer config.guess:
