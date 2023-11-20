@@ -1,7 +1,7 @@
 {
   stdenv
 , fetchurl
-, pkgconfig
+, pkg-config
 , glib
 , libuuid
 , popt
@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
   };
 
   enableParallelBuilding = true;
-  nativeBuildInputs = [ pkgconfig ];
+  nativeBuildInputs = [ pkg-config ];
   buildInputs = [ glib libuuid popt elfutils python3 swig4 ncurses breakpointHook ];
   hardeningDisable = [ "all" ];
 

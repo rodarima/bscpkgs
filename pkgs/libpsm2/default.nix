@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchFromGitHub, numactl, pkgconfig }:
+{ stdenv, lib, fetchFromGitHub, numactl, pkg-config }:
 
 let
   version = "11.2.185";
@@ -14,7 +14,7 @@ stdenv.mkDerivation {
 
   enableParallelBuilding = true;
 
-  buildInputs = [ numactl pkgconfig ];
+  buildInputs = [ numactl pkg-config ];
 
   installFlags = [ 
     "DESTDIR=$(out)"

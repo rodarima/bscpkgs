@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchurl, pkgconfig, expat, ncurses
+{ stdenv, lib, fetchurl, pkg-config, expat, ncurses
 , pciutils, numactl }:
 
 with lib;
@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
     sha256 = "1yl7dm2qplwmnidd712zy12qfvxk28k8ccs694n42ybwdjwzg1bn";
   };
 
-  nativeBuildInputs = [ pkgconfig ];
+  nativeBuildInputs = [ pkg-config ];
 
   # Filter out `null' inputs.  This allows users to `.override' the
   # derivation and set optional dependencies to `null'.

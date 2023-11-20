@@ -3,7 +3,7 @@
 , lib
 , autoreconfHook
 , fetchFromGitHub
-, pkgconfig
+, pkg-config
 , numactl
 , hwloc
 , ovni ? null
@@ -46,7 +46,7 @@ in
     configureFlags = [ "--with-ovni=${ovni}" ];
     buildInputs = [
       autoreconfHook
-      pkgconfig
+      pkg-config
       numactl
       hwloc
       ovni

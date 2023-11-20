@@ -11,7 +11,7 @@ let
 common =
   { lib, stdenv, fetchpatch, perl, curl, bzip2, sqlite, openssl ? null, xz
   , bash, coreutils, gzip, gnutar
-  , pkgconfig, boehmgc, perlPackages, libsodium, brotli, boost, editline, nlohmann_json
+  , pkg-config, boehmgc, perlPackages, libsodium, brotli, boost, editline, nlohmann_json
   , autoreconfHook, autoconf-archive, bison, flex, libxml2, libxslt, docbook5, docbook_xsl_ns
   , jq, libarchive, rustc, cargo
   # Used by tests
@@ -40,7 +40,7 @@ common =
       outputs = [ "out" "dev" "man" "doc" ];
 
       nativeBuildInputs =
-        [ pkgconfig ]
+        [ pkg-config ]
         ++ lib.optionals is24 [ autoreconfHook autoconf-archive bison flex libxml2 libxslt
                                 docbook5 docbook_xsl_ns jq gmock ];
 
@@ -158,7 +158,7 @@ common =
           # This is not cross-compile safe, don't have time to fix right now
           # but noting for future travellers.
           nativeBuildInputs =
-            [ perl pkgconfig curl nix libsodium boost autoreconfHook autoconf-archive ];
+            [ perl pkg-config curl nix libsodium boost autoreconfHook autoconf-archive ];
 
           configureFlags =
             [ "--with-dbi=${perlPackages.DBI}/${perl.libPrefix}"

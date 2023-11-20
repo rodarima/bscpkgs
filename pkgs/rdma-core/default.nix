@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchFromGitHub, cmake, pkgconfig, docutils
+{ stdenv, lib, fetchFromGitHub, cmake, pkg-config, docutils
 , pandoc, ethtool, iproute, libnl, udev, python, perl
 , makeWrapper
 } :
@@ -17,7 +17,7 @@ in stdenv.mkDerivation {
     sha256 = "1xkmdix6mgv6kjjj6wi844bfddhl0ybalrp5g8pf5izasc43brg7";
   };
 
-  nativeBuildInputs = [ cmake pkgconfig pandoc docutils makeWrapper ];
+  nativeBuildInputs = [ cmake pkg-config pandoc docutils makeWrapper ];
   buildInputs = [ libnl ethtool iproute udev python perl ];
 
   cmakeFlags = [
