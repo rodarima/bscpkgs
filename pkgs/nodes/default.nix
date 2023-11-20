@@ -51,6 +51,7 @@ in
 
     enableParallelBuilding = true;
     dontStrip = true;
+    separateDebugInfo = true;
 
     configureFlags = [
       "--with-nosv=${nosv}"

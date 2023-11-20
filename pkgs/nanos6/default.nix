@@ -87,6 +87,7 @@ in
 
     # Keep debug symbols in the debug variant of the library
     dontStrip = enableDebug;
+    separateDebugInfo = true;
 
     buildInputs = [
       autoconf

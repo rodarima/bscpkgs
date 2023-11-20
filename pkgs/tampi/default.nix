@@ -15,6 +15,7 @@ stdenv.mkDerivation rec {
   version = "2.0";
   pname = "tampi";
   enableParallelBuilding = true;
+  separateDebugInfo = true;
   buildInputs = [ autoreconfHook automake autoconf libtool gnumake boost mpi gcc ];
   dontDisableStatic = true;
 

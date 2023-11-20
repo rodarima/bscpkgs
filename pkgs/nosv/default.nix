@@ -42,6 +42,7 @@ in
     inherit (source) src version;
     hardeningDisable = [ "all" ];
     dontStrip = true;
+    separateDebugInfo = true;
     configureFlags = [ "--with-ovni=${ovni}" ];
     buildInputs = [
       autoreconfHook

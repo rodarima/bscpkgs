@@ -38,6 +38,8 @@ in
   stdenv.mkDerivation rec {
     pname = "ovni";
     inherit (source) src version;
+    dontStrip = true;
+    separateDebugInfo = true;
     postPatch = ''
       patchShebangs --build test/
     '';
@@ -47,7 +49,6 @@ in
     preCheck = ''
       export CTEST_OUTPUT_ON_FAILURE=1
     '';
-    dontStrip = true;
     doCheck = true;
     checkTarget = "test";
     hardeningDisable = [ "all" ];
