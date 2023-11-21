@@ -12,6 +12,7 @@
 , zlib
 , nosv
 , pkg-config
+, gcc # needed to set the rpath of libstdc++ for clang-tblgen
 , enableDebug ? false
 , enableNosv ? false
 , useGit ? false
@@ -71,6 +72,7 @@ in stdenv.mkDerivation rec {
     libffi
     pkg-config
     zlib
+    gcc.cc.lib # Required for libstdc++.so.6
   ] ++ lib.optionals enableNosv [
     nosv
   ];
@@ -100,7 +102,7 @@ in stdenv.mkDerivation rec {
       "-DLLVM_BUILD_LLVM_DYLIB=ON"
       "-DLLVM_LINK_LLVM_DYLIB=ON"
       # Required to run clang-ast-dump and clang-tblgen during build
-      "-DCMAKE_BUILD_RPATH=$PWD/lib:${zlib}/lib"
+      "-DCMAKE_BUILD_RPATH=$PWD/lib:${zlib}/lib:${gcc.cc.lib}/lib"
       "-DLLVM_ENABLE_LLD=ON"
       "-DCMAKE_CXX_FLAGS_DEBUG=-g -ggnu-pubnames"
       "-DCMAKE_EXE_LINKER_FLAGS_DEBUG=-Wl,--gdb-index"
@@ -117,7 +119,7 @@ in stdenv.mkDerivation rec {
       # Set the rpath to include external libraries (zlib) both on build and
       # install
       "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON"
-      "-DCMAKE_INSTALL_RPATH=${zlib}/lib"
+      "-DCMAKE_INSTALL_RPATH=${zlib}/lib:${gcc.cc.lib}/lib"
     )
 
   '';
