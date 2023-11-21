@@ -35,7 +35,6 @@ let
     ovni = callPackage ./pkgs/ovni/default.nix { };
     ovniGit = final.ovni.override { useGit = true; };
     paraverKernel = callPackage ./pkgs/paraver/kernel.nix { };
-    #paraverKernelFast = callPackage ./pkgs/paraver/kernel-fast.nix { }; # Outdated
     #pscom = callPackage ./pkgs/parastation/pscom.nix { }; # Unmaintaned
     #psmpi = callPackage ./pkgs/parastation/psmpi.nix { }; # Unmaintaned
     sonar = callPackage ./pkgs/sonar/default.nix { };
@@ -46,7 +45,6 @@ let
     tagaspi = callPackage ./pkgs/tagaspi/default.nix { };
     tampi = callPackage ./pkgs/tampi/default.nix { };
     wxparaver = callPackage ./pkgs/paraver/default.nix { };
-    #wxparaverFast = callPackage ./pkgs/paraver/wxparaver-fast.nix { }; # Outdated
   };
 
 in bscPkgs // {
