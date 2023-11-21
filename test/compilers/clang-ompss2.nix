@@ -5,9 +5,9 @@ stdenv.mkDerivation rec {
   name = "test-clang-ompss2";
   src = ./.;
   buildInputs = [ clang-ompss2 nanos6 ];
+  NIX_DEBUG = 1;
 
   buildPhase = ''
-    #export NIX_DEBUG=6
     clang -fompss-2 hello.c -o hello
     ./hello
     clang++ -fompss-2 hello.cc -o hello
