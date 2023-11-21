@@ -1,5 +1,6 @@
 {
   stdenv
+, symlinkJoin
 , slurm
 , rdma-core
 , autoconf
@@ -9,6 +10,13 @@
 , rsync
 , gfortran
 }:
+
+let
+  rdma-core-all = symlinkJoin {
+    name ="rdma-core-all";
+    paths = [ rdma-core.dev rdma-core.out ];
+  };
+in
 
 stdenv.mkDerivation rec {
   pname = "GPI-2";
@@ -28,14 +36,14 @@ stdenv.mkDerivation rec {
   '';
 
   configureFlags = [
-    "--with-infiniband=${rdma-core}"
+    "--with-infiniband=${rdma-core-all}"
     "--with-mpi=${mpi}"
     "--with-slurm"
     "CFLAGS=-fPIC"
     "CXXFLAGS=-fPIC"
   ];
 
-  buildInputs = [ slurm mpi rdma-core autoconf automake libtool rsync gfortran ];
+  buildInputs = [ slurm mpi rdma-core-all autoconf automake libtool rsync gfortran ];
 
   hardeningDisable = [ "all" ];
 }
