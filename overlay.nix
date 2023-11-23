@@ -78,6 +78,9 @@ in bscPkgs // {
       clangNosvOpenmp-task = callPackage ./test/compilers/clang-openmp.nix {
         stdenv = final.stdenvClangOmpss2OpenmpNodes;
       };
+      clangNosvOpenmp-nosv = callPackage ./test/compilers/clang-openmp-nosv.nix {
+        stdenv = final.stdenvClangOmpss2OpenmpNodes;
+      };
     };
 
     pkgs = final.runCommand "ci-pkgs" { }
