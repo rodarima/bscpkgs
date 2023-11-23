@@ -1,5 +1,6 @@
 {
   stdenv
+, fetchurl
 , symlinkJoin
 , slurm
 , rdma-core
@@ -20,12 +21,11 @@ in
 
 stdenv.mkDerivation rec {
   pname = "GPI-2";
-  version = src.shortRev;
+  version = "tagaspi-2021.11";
 
-  src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/interoperability/GPI-2";
-    ref = "refs/tags/tagaspi-2021.11";
-    rev = "9082fe7770fa9f6acba1b1ac938ad209a3d09477";
+  src = fetchurl {
+    url = "https://pm.bsc.es/gitlab/interoperability/extern/GPI-2/-/archive/${version}/GPI-2-${version}.tar.gz";
+    hash = "sha256-eY2wpyTpnOXRoAcYoAP82Jq9Q7p5WwDpMj+f1vEX5zw=";
   };
 
   enableParallelBuilding = true;
