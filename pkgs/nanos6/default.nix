@@ -19,7 +19,7 @@
 , useGit ? false
 , gitUrl ? "ssh://git@bscpm03.bsc.es/nanos6/nanos6"
 , gitBranch ? "master"
-, gitCommit ? "58712e669ac02f721fb841247361ea54f53a6a47"
+, gitCommit ? "4fdddf67b573fbe624bf64b92c0a9b4e344b9dd3"
 }:
 
 assert enableJemalloc -> (jemallocNanos6 != null);
@@ -28,12 +28,12 @@ with lib;
 
 let
   release = rec {
-    version = "3.0";
+    version = "4.0";
     src = fetchFromGitHub {
       owner = "bsc-pm";
       repo = "nanos6";
       rev = "version-${version}";
-      sha256 = "sha256-XEG8/8yQv5/OdSyK9Kig8xuWe6mTZ1eQKhXx3fXlQ1Y=";
+      hash = "sha256-o2j7xNufdjcWykbwDDHQYxYCs4kpyQvJnuFyeXYZULw=";
     };
   };
 
