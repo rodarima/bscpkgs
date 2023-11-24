@@ -1,5 +1,6 @@
 {
   stdenv
+, fetchFromGitHub
 , automake
 , autoconf
 , libtool
@@ -14,9 +15,16 @@
 
 stdenv.mkDerivation rec {
   pname = "tagaspi";
-  version = src.shortRev;
   enableParallelBuilding = true;
   separateDebugInfo = true;
+
+  version = "2.0";
+  src = fetchFromGitHub {
+    owner = "bsc-pm";
+    repo = "tagaspi";
+    rev = "v${version}";
+    hash = "sha256-RGG/Re2uM293HduZfGzKUWioDtwnSYYdfeG9pVrX9EM=";
+  };
 
   buildInputs = [
     autoreconfHook
@@ -37,12 +45,6 @@ stdenv.mkDerivation rec {
     "CFLAGS=-fPIC"
     "CXXFLAGS=-fPIC"
   ];
-
-  src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/interoperability/tagaspi";
-    ref = "refs/tags/2021.11";
-    rev = "5aabb1849de2e512cc8729f32783051ecd4cab97";
-  };
 
   hardeningDisable = [ "all" ];
 }
