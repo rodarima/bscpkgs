@@ -7,7 +7,7 @@
 , useGit ? false
 , gitBranch ? "master"
 , gitUrl ? "ssh://git@bscpm03.bsc.es/rarias/ovni.git"
-, gitCommit ? "d0a47783f20f8b177a48418966dae45454193a6a"
+, gitCommit ? "7a33deffb7aaae70527125d48428f22169c9d39e"
 , enableDebug ? false
 }:
 
@@ -15,13 +15,13 @@ with lib;
 
 let
   release = rec {
-    version = "1.3.0";
+    version = "1.4.1";
     src = fetchFromGitHub {
       owner = "bsc-pm";
       repo = "ovni";
       rev = "${version}";
-      sha256 = "sha256-4ulohGnbQwAZ/qnm5bmceoMhTuAHlCfLAWEodZ9YMP0=";
-    } // { shortRev = "b6903bc4"; };
+      hash = "sha256-/vv7Yy6dzoxuHjMc0h/vFFwWzysPLXFZIN2rbLT/SC8=";
+    } // { shortRev = "7a33def"; };
   };
 
   git = rec {
