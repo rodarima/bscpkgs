@@ -12,7 +12,7 @@
 }:
 
 stdenv.mkDerivation rec {
-  version = "2.0";
+  version = "3.0";
   pname = "tampi";
   enableParallelBuilding = true;
   separateDebugInfo = true;
@@ -23,7 +23,7 @@ stdenv.mkDerivation rec {
     owner = "bsc-pm";
     repo = "tampi";
     rev = "v${version}";
-    sha256 = "sha256-m0LDgP4pfUwavUaagcCsZ/ZHbnWBZdtHtGq108btGKM=";
+    hash = "sha256-qdWBxPsXKM428F2ojt2B6/0ZsQyGzEiojNaqbhDmrks=";
   };
 
   hardeningDisable = [ "all" ];
