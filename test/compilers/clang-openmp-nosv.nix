@@ -46,7 +46,7 @@ in stdenv.mkDerivation {
     set -x
 
     cp ${hello_c} hello.c
-    clang -fopenmp ./hello.c -lnosv -o hello
+    clang -fopenmp=libompv ./hello.c -lnosv -o hello
     ./hello | grep "INSIDE TASK OK"
 
     set +x
