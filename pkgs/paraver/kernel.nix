@@ -19,7 +19,7 @@ stdenv.mkDerivation rec {
 
   src = builtins.fetchGit {
     url = "https://github.com/bsc-performance-tools/paraver-kernel.git";
-    rev = "3f89ec68da8e53ee227c57a2024bf789fa68ba98"; # master (missing tag)
+    rev = "2e167da3cee78ca11e31b74faefb23f12bac2b8c"; # master (missing tag)
     ref = "master";
   };
 

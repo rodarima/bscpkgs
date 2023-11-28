@@ -17,11 +17,11 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "wxparaver";
-  version = "4.10.6";
+  version = "4.11.2";
 
   src = builtins.fetchGit {
     url = "https://github.com/bsc-performance-tools/wxparaver.git";
-    rev = "fe55c724ab59a5b0e60718919297bdf95582badb"; # v4.10.6 (missing tag)
+    rev = "129e6b4a4f061e5a319049db8db1620f5de3bd70"; # v4.11.2 (missing tag)
     ref = "master";
   };
 
