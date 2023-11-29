@@ -1,5 +1,6 @@
 {
   stdenv
+, lib
 , fetchFromGitHub
 , automake
 , autoconf
@@ -9,11 +10,17 @@
 , mpi
 , gcc
 , autoreconfHook
+, enableOvni ? true
+, ovni ? null
 , useGit ? false
 , gitUrl ? "ssh://git@bscpm03.bsc.es/interoperability/tampi.git"
 , gitBranch ? "master"
 , gitCommit ? "16f92094ca6da25e2f561c000f5fbc2901944f7b"
 }:
+
+with lib;
+
+assert enableOvni -> (ovni != null);
 
 let
   release = rec {
@@ -48,7 +55,8 @@ in stdenv.mkDerivation rec {
     boost
     mpi
     gcc
-  ];
+  ] ++ optional (enableOvni) ovni;
+  configureFlags = optional (enableOvni) "--with-ovni=${ovni}";
   dontDisableStatic = true;
   hardeningDisable = [ "all" ];
 }
