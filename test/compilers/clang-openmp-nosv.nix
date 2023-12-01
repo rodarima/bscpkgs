@@ -2,6 +2,7 @@
   stdenv
 , nosv
 , writeText
+, openmp
 }:
 
 let
@@ -40,7 +41,7 @@ in stdenv.mkDerivation {
   # fail to run otherwise, so we disable the sandbox for this test.
   __noChroot = true;
 
-  buildInputs = [ nosv ];
+  buildInputs = [ nosv openmp ];
 
   buildPhase = ''
     set -x

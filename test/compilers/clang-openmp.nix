@@ -1,6 +1,7 @@
 { 
   stdenv
 , writeText
+, openmp
 }:
 
 let
@@ -27,6 +28,8 @@ in stdenv.mkDerivation {
   # nOS-V requires access to /sys/devices to request NUMA information. It will
   # fail to run otherwise, so we disable the sandbox for this test.
   __noChroot = true;
+
+  buildInputs = [ openmp ];
 
   buildPhase = ''
     set -x

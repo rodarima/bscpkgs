@@ -10,11 +10,9 @@
 , elfutils
 , libffi
 , zlib
-, nosv
 , pkg-config
 , gcc # needed to set the rpath of libstdc++ for clang-tblgen
 , enableDebug ? false
-, enableNosv ? false
 , useGit ? false
 , gitUrl ? "ssh://git@bscpm03.bsc.es/llvm-ompss/llvm-mono.git"
 , gitBranch ? "master"
@@ -73,8 +71,6 @@ in stdenv.mkDerivation rec {
     pkg-config
     zlib
     gcc.cc.lib # Required for libstdc++.so.6
-  ] ++ lib.optionals enableNosv [
-    nosv
   ];
 
   # Error with -D_FORTIFY_SOURCE=2, see https://bugs.gentoo.org/636604:
@@ -107,27 +103,18 @@ in stdenv.mkDerivation rec {
       "-DCMAKE_CXX_FLAGS_DEBUG=-g -ggnu-pubnames"
       "-DCMAKE_EXE_LINKER_FLAGS_DEBUG=-Wl,--gdb-index"
       "-DLLVM_LIT_ARGS=-sv --xunit-xml-output=xunit.xml"
-      "-DLLVM_ENABLE_PROJECTS=clang;openmp;compiler-rt;lld"
+      "-DLLVM_ENABLE_PROJECTS=clang;compiler-rt;lld"
       "-DLLVM_ENABLE_ASSERTIONS=ON"
       "-DLLVM_INSTALL_TOOLCHAIN_ONLY=ON"
       "-DCMAKE_INSTALL_BINDIR=bin"
       "-DLLVM_ENABLE_ZLIB=FORCE_ON"
       "-DLLVM_ENABLE_LIBXML2=OFF"
-  '' + (lib.optionalString enableNosv ''
-      "-DCLANG_DEFAULT_NOSV_HOME=${nosv}"
-  '') + ''
       # Set the rpath to include external libraries (zlib) both on build and
       # install
       "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON"
       "-DCMAKE_INSTALL_RPATH=${zlib}/lib:${gcc.cc.lib}/lib"
     )
 
-  '';
-
-  # Remove support for GNU and Intel Openmp
-  postInstall = ''
-    rm -f $out/lib/libgomp*
-    rm -f $out/lib/libiomp*
   '';
 
 # About "-DCLANG_DEFAULT_NANOS6_HOME=${nanos6}", we could specify a default
