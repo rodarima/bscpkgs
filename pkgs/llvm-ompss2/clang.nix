@@ -23,12 +23,12 @@ let
   stdenv = llvmPackages_latest.stdenv;
 
   release = rec {
-    version = "2023.11";
+    version = "18.0.0-ompss-2";
     src = fetchFromGitHub {
       owner = "bsc-pm";
       repo = "llvm";
-      rev = "refs/tags/github-release-${version}";
-      hash = "sha256-XLYS401BixGw3Ke/JKuikVKvbA92ENCdUvYLyZX9UtI=";
+      rev = "refs/tags/${version}";
+      hash = "sha256-Z0TVrujOQNHiAuTlyexbIBA2pOk2Tdmv7JuQn3M3foY=";
     };
   };
 
@@ -114,7 +114,6 @@ in stdenv.mkDerivation rec {
       "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON"
       "-DCMAKE_INSTALL_RPATH=${zlib}/lib:${gcc.cc.lib}/lib"
     )
-
   '';
 
 # About "-DCLANG_DEFAULT_NANOS6_HOME=${nanos6}", we could specify a default
