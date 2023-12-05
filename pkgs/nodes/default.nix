@@ -84,6 +84,6 @@ in
     ];
 
     passthru = {
-      nosv = nosv;
+      inherit nosv;
     };
   }

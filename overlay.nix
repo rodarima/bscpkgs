@@ -12,9 +12,9 @@ let
   bscPkgs = {
     bench6 = callPackage ./pkgs/bench6/default.nix { };
     clangOmpss2 = callPackage ./pkgs/llvm-ompss2/default.nix { };
-    openmp = callPackage ./pkgs/llvm-ompss2/openmp.nix { monorepoSrc = final.clangOmpss2Unwrapped.src; version = final.clangOmpss2Unwrapped.version; };
     clangOmpss2Nanos6 = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nanos6; };
-    clangOmpss2Nodes = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nodes; };
+    clangOmpss2Nodes = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nodes; openmp = final.openmp; };
+    clangOmpss2NodesOmpv = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nodes; openmp = final.openmpv; };
     clangOmpss2Unwrapped = callPackage ./pkgs/llvm-ompss2/clang.nix { };
     #extrae = callPackage ./pkgs/extrae/default.nix { }; # Broken and outdated
     gpi-2 = callPackage ./pkgs/gpi-2/default.nix { };
@@ -30,6 +30,8 @@ let
     #nix-wrap = callPackage ./pkgs/nix-wrap/default.nix { };
     nodes = callPackage ./pkgs/nodes/default.nix { };
     nosv = callPackage ./pkgs/nosv/default.nix { };
+    openmp = callPackage ./pkgs/llvm-ompss2/openmp.nix { monorepoSrc = final.clangOmpss2Unwrapped.src; version = final.clangOmpss2Unwrapped.version; };
+    openmpv = final.openmp.override { enableNosv = true; };
     osumb = callPackage ./pkgs/osu/default.nix { };
     ovni = callPackage ./pkgs/ovni/default.nix { };
     ovniGit = final.ovni.override { useGit = true; };
@@ -40,6 +42,7 @@ let
     stdenvClangOmpss2 = final.stdenv.override { cc = final.clangOmpss2; allowedRequisites = null; };
     stdenvClangOmpss2Nanos6 = final.stdenv.override { cc = final.clangOmpss2Nanos6; allowedRequisites = null; };
     stdenvClangOmpss2Nodes = final.stdenv.override { cc = final.clangOmpss2Nodes; allowedRequisites = null; };
+    stdenvClangOmpss2NodesOmpv = final.stdenv.override { cc = final.clangOmpss2NodesOmpv; allowedRequisites = null; };
     tagaspi = callPackage ./pkgs/tagaspi/default.nix { };
     tampi = callPackage ./pkgs/tampi/default.nix { };
     wxparaver = callPackage ./pkgs/paraver/default.nix { };
@@ -76,11 +79,11 @@ in bscPkgs // {
       clangNosvOpenmp-task = callPackage ./test/compilers/clang-openmp.nix {
         stdenv = final.stdenvClangOmpss2Nodes;
       };
-      clangNosvOpenmp-nosv = callPackage ./test/compilers/clang-openmp-nosv.nix {
-        stdenv = final.stdenvClangOmpss2Nodes;
+      clangNosvOmpv-nosv = callPackage ./test/compilers/clang-openmp-nosv.nix {
+        stdenv = final.stdenvClangOmpss2NodesOmpv;
       };
-      clangNosvOpenmp-ld = callPackage ./test/compilers/clang-openmp-ld.nix {
-        stdenv = final.stdenvClangOmpss2Nodes;
+      clangNosvOmpv-ld = callPackage ./test/compilers/clang-openmp-ld.nix {
+        stdenv = final.stdenvClangOmpss2NodesOmpv;
       };
     };
 
