@@ -9,9 +9,13 @@
 , pkg-config
 , version
 , nosv
+, ovni
 , enableNosv ? false
 , enableDebug ? false
+, enableOvni ? false
 }:
+
+assert enableOvni -> enableNosv;
 
 let
   stdenv = llvmPackages_latest.stdenv;
@@ -35,6 +39,8 @@ stdenv.mkDerivation rec {
     pkg-config
   ] ++ lib.optionals enableNosv [
     nosv
+  ] ++ lib.optionals enableOvni [
+    ovni
   ];
 
   doCheck = false;

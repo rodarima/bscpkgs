@@ -31,7 +31,7 @@ let
     nodes = callPackage ./pkgs/nodes/default.nix { };
     nosv = callPackage ./pkgs/nosv/default.nix { };
     openmp = callPackage ./pkgs/llvm-ompss2/openmp.nix { monorepoSrc = final.clangOmpss2Unwrapped.src; version = final.clangOmpss2Unwrapped.version; };
-    openmpv = final.openmp.override { enableNosv = true; };
+    openmpv = final.openmp.override { enableNosv = true; enableOvni = true; };
     osumb = callPackage ./pkgs/osu/default.nix { };
     ovni = callPackage ./pkgs/ovni/default.nix { };
     ovniGit = final.ovni.override { useGit = true; };
