@@ -10,6 +10,7 @@
 , paraverKernel
 , openssl
 , glibcLocales
+, wrapGAppsHook
 }:
 
 let
@@ -46,6 +47,10 @@ stdenv.mkDerivation rec {
     "--with-wx-config=${wx}/bin/wx-config"
     "--with-paraver=${paraverKernel}"
     "--with-openssl=${openssl.dev}"
+  ];
+
+  nativeBuildInputs = [
+    wrapGAppsHook
   ];
 
   buildInputs = [
