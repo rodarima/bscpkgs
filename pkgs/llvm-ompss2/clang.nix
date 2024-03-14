@@ -113,6 +113,8 @@ in stdenv.mkDerivation rec {
       # install
       "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON"
       "-DCMAKE_INSTALL_RPATH=${zlib}/lib:${gcc.cc.lib}/lib"
+      "-DLLVM_APPEND_VC_REV=ON"
+      "-DLLVM_FORCE_VC_REVISION=${source.version}"
     )
   '';
 
