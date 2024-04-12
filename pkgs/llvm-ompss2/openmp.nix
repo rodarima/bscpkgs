@@ -51,6 +51,8 @@ stdenv.mkDerivation rec {
 
   dontStrip = enableDebug;
 
+  separateDebugInfo = true;
+
   cmakeFlags = [
     "-DLIBOMP_OMPD_SUPPORT=OFF"
     "-DOPENMP_ENABLE_LIBOMPTARGET=OFF"
