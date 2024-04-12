@@ -1,0 +1,32 @@
+From 6fc5bef066ac011d6b15a7c090f4498b0b730818 Mon Sep 17 00:00:00 2001
+From: Rodrigo Arias Mallo <rodrigo.arias@bsc.es>
+Date: Fri, 12 Apr 2024 14:44:43 +0200
+Subject: [PATCH] Add missing cstdint include
+
+---
+ src/dependencies/DataTrackingSupport.hpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/dependencies/DataTrackingSupport.hpp b/src/dependencies/DataTrackingSupport.hpp
+index 56226085..cdfd5e1c 100644
+--- a/src/dependencies/DataTrackingSupport.hpp
++++ b/src/dependencies/DataTrackingSupport.hpp
+@@ -1,13 +1,14 @@
+ /*
+ 	This file is part of Nanos6 and is licensed under the terms contained in the COPYING file.
+ 
+-	Copyright (C) 2020 Barcelona Supercomputing Center (BSC)
++	Copyright (C) 2020-2024 Barcelona Supercomputing Center (BSC)
+ */
+ 
+ #ifndef DATA_TRACKING_SUPPORT_HPP
+ #define DATA_TRACKING_SUPPORT_HPP
+ 
+ #include "support/config/ConfigVariable.hpp"
++#include <cstdint>
+ 
+ class Task;
+ 
+-- 
+2.44.0
+

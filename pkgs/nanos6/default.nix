@@ -35,6 +35,10 @@ let
       rev = "version-${version}";
       hash = "sha256-o2j7xNufdjcWykbwDDHQYxYCs4kpyQvJnuFyeXYZULw=";
     };
+    patches = [
+      # https://pm.bsc.es/gitlab/nanos6/nanos6/-/issues/185
+      ./0001-Add-missing-cstdint-include.patch
+    ];
   };
 
   git = rec {
@@ -48,9 +52,8 @@ let
 
   source = if (useGit) then git else release;
 in
-  stdenv.mkDerivation rec {
+  stdenv.mkDerivation (source // rec {
     pname = "nanos6";
-    inherit (source) src version;
 
     prePatch = ''
       patchShebangs scripts/generate_config.sh
@@ -114,4 +117,4 @@ in
       platforms = platforms.linux;
       license = licenses.gpl3;
     };
-  }
+  })
