@@ -11,6 +11,7 @@ let
 
   bscPkgs = {
     bench6 = callPackage ./pkgs/bench6/default.nix { };
+    bigotes = callPackage ./pkgs/bigotes/default.nix { };
     clangOmpss2 = callPackage ./pkgs/llvm-ompss2/default.nix { };
     clangOmpss2Nanos6 = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nanos6; };
     clangOmpss2Nodes = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nodes; openmp = final.openmp; };
