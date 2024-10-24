@@ -43,7 +43,7 @@ in
     postPatch = ''
       patchShebangs --build test/
     '';
-    buildInputs = [ cmake mpi ];
+    nativeBuildInputs = [ cmake mpi ];
     cmakeBuildType = if (enableDebug) then "Debug" else "Release";
     cmakeFlags = [ "-DOVNI_GIT_COMMIT=${src.shortRev}" ];
     preCheck = ''
