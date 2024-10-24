@@ -63,7 +63,6 @@ stdenv.mkDerivation rec {
     automake
     paraverKernel
     openssl.dev
-    paraverKernel
   ];
 
   postInstall = ''
@@ -74,5 +73,9 @@ stdenv.mkDerivation rec {
     # cp -p ${paraverKernel}/include/* $out/include
     cp -a ${paraverKernel}/lib/paraver-kernel $out/lib/paraver-kernel
     cp -p ${paraverKernel}/share/filters-config/* $out/share/filters-config
+
+    # Move man files to proper location
+    mkdir -p $out/share/man
+    mv $out/share/doc/wxparaver_help_contents/man $out/share/man/man1
   '';
 }
