@@ -44,9 +44,11 @@ in
     dontStrip = true;
     separateDebugInfo = true;
     configureFlags = [ "--with-ovni=${ovni}" ];
-    buildInputs = [
+    nativeBuildInputs = [
       autoreconfHook
       pkg-config
+    ];
+    buildInputs = [
       numactl
       hwloc
       ovni
