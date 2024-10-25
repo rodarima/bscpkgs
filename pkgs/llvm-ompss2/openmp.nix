@@ -10,6 +10,7 @@
 , version
 , nosv
 , ovni
+, python3
 , enableNosv ? false
 , enableDebug ? false
 , enableOvni ? false
@@ -37,6 +38,7 @@ stdenv.mkDerivation rec {
     ninja
     perl
     pkg-config
+    python3
   ] ++ lib.optionals enableNosv [
     nosv
   ] ++ lib.optionals enableOvni [
