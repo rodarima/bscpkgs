@@ -9,6 +9,8 @@
 , gitUrl ? "ssh://git@bscpm03.bsc.es/rarias/ovni.git"
 , gitCommit ? "7a33deffb7aaae70527125d48428f22169c9d39e"
 , enableDebug ? false
+# Only enable MPI if the build is native (fails on cross-compilation)
+, useMpi ? (stdenv.buildPlatform.canExecute stdenv.hostPlatform)
 }:
 
 with lib;
@@ -43,9 +45,12 @@ in
     postPatch = ''
       patchShebangs --build test/
     '';
-    nativeBuildInputs = [ cmake mpi ];
+    nativeBuildInputs = [ cmake ];
+    buildInputs = lib.optionals (useMpi) [ mpi ];
     cmakeBuildType = if (enableDebug) then "Debug" else "Release";
-    cmakeFlags = [ "-DOVNI_GIT_COMMIT=${src.shortRev}" ];
+    cmakeFlags = [
+      "-DOVNI_GIT_COMMIT=${src.shortRev}"
+    ] ++ lib.optionals (!useMpi) [ "-DUSE_MPI=OFF" ];
     preCheck = ''
       export CTEST_OUTPUT_ON_FAILURE=1
     '';
