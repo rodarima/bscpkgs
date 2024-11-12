@@ -1,15 +1,11 @@
 {
   stdenv
 , lib
-, automake
-, autoconf
-, libtool
 , fetchFromGitHub
 , pkg-config
 , perl
 , numactl
 , hwloc
-, papi
 , boost
 , autoreconfHook
 , ovni
@@ -71,9 +67,6 @@ in
 
     nativeBuildInputs = [
       autoreconfHook
-      autoconf
-      automake
-      libtool
       pkg-config
     ];
 
@@ -81,7 +74,6 @@ in
       boost
       numactl
       hwloc
-      papi
       nosv
       ovni
     ];
