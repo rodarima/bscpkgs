@@ -69,12 +69,15 @@ in
     # disable all by default, which includes bindnow.
     hardeningDisable = [ "all" ];
 
-    buildInputs = [
+    nativeBuildInputs = [
       autoreconfHook
       autoconf
       automake
       libtool
       pkg-config
+    ];
+
+    buildInputs = [
       boost
       numactl
       hwloc
