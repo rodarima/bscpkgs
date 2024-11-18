@@ -6,6 +6,7 @@
 , pkg-config
 , numactl
 , hwloc
+, cacheline ? 64 # bits
 , ovni ? null
 , useGit ? false
 , gitUrl ? "git@gitlab-internal.bsc.es:nos-v/nos-v.git"
@@ -43,7 +44,10 @@ in
     hardeningDisable = [ "all" ];
     dontStrip = true;
     separateDebugInfo = true;
-    configureFlags = [ "--with-ovni=${ovni}" ];
+    configureFlags = [
+      "--with-ovni=${ovni}"
+      "CACHELINE_WIDTH=${toString cacheline}"
+    ];
     nativeBuildInputs = [
       autoreconfHook
       pkg-config
