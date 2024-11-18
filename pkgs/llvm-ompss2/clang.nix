@@ -16,19 +16,19 @@
 , useGit ? false
 , gitUrl ? "ssh://git@bscpm03.bsc.es/llvm-ompss/llvm-mono.git"
 , gitBranch ? "master"
-, gitCommit ? "0a6d6c64b04f9bbbe1399f18be426e191fb6b42c"
+, gitCommit ? "8c0d267c04d7fc3fb923078f510fcd5f4719a6cc"
 }:
 
 let
   stdenv = llvmPackages_latest.stdenv;
 
   release = rec {
-    version = "18.0.0-ompss-2";
+    version = "2024.11";
     src = fetchFromGitHub {
       owner = "bsc-pm";
       repo = "llvm";
-      rev = "refs/tags/${version}";
-      hash = "sha256-Z0TVrujOQNHiAuTlyexbIBA2pOk2Tdmv7JuQn3M3foY=";
+      rev = "refs/tags/github-release-${version}";
+      hash = "sha256-pF0qa987nLkIJPUrXh1srzBkLPfb31skIegD0bl34Kg=";
     };
   };
 
