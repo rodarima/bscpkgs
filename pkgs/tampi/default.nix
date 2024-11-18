@@ -15,7 +15,7 @@
 , useGit ? false
 , gitUrl ? "ssh://git@bscpm03.bsc.es/interoperability/tampi.git"
 , gitBranch ? "master"
-, gitCommit ? "16f92094ca6da25e2f561c000f5fbc2901944f7b"
+, gitCommit ? "a5c93bf8ab045b71ad4a8d5e2c991ce774db5cbc"
 }:
 
 with lib;
@@ -24,12 +24,12 @@ assert enableOvni -> (ovni != null);
 
 let
   release = rec {
-    version = "3.0";
+    version = "4.0";
     src = fetchFromGitHub {
       owner = "bsc-pm";
       repo = "tampi";
       rev = "v${version}";
-      hash = "sha256-qdWBxPsXKM428F2ojt2B6/0ZsQyGzEiojNaqbhDmrks=";
+      hash = "sha256-R7ew5tsrxGReTvOeeZe1FD0oThBhOHoDGv6Mo2sbmDg=";
     };
   };
   git = rec {
