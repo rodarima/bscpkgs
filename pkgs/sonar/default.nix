@@ -8,12 +8,12 @@
 
 stdenv.mkDerivation rec {
   pname = "sonar";
-  version = "0.2.0";
+  version = "1.0.1";
   src = fetchFromGitHub {
     owner = "bsc-pm";
     repo = "sonar";
     rev = "${version}";
-    sha256 = "sha256-iQSw4PbFk0EALXPHpLBPPQ7U8Ed8fkez1uG9MuF6PJo=";
+    sha256 = "sha256-DazOEaiMfJLrZNtmQEEHdBkm/m4hq5e0mPEfMtzYqWk=";
   };
   hardeningDisable = [ "all" ];
   dontStrip = true;
