@@ -11,7 +11,15 @@
 , numactl
 , rdma-core
 , gfortran
+, symlinkJoin
 }:
+
+let
+  mpiAll = symlinkJoin {
+    name = "mpi-all";
+    paths = [ mpi.all ];
+  };
+in
 
 stdenv.mkDerivation rec {
   pname = "tagaspi";
@@ -32,10 +40,10 @@ stdenv.mkDerivation rec {
     autoconf
     libtool
     boost
-    mpi
     numactl
     rdma-core
     gfortran
+    mpiAll
   ];
 
   dontDisableStatic = true;

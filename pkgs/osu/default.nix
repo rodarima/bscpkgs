@@ -3,7 +3,15 @@
 , fetchurl
 , mpi
 , lib
+, symlinkJoin
 }:
+
+let
+  mpiAll = symlinkJoin {
+    name = "mpi-all";
+    paths = [ mpi.all ];
+  };
+in
 
 stdenv.mkDerivation rec {
   version = "7.1-1";
@@ -16,11 +24,11 @@ stdenv.mkDerivation rec {
 
   doCheck = true;
   enableParallelBuilding = true;
-  buildInputs = [ mpi ];
+  buildInputs = [ mpiAll ];
   hardeningDisable = [ "all" ];
   configureFlags = [ 
-      "CC=${mpi}/bin/mpicc"
-      "CXX=${mpi}/bin/mpicxx"
+      "CC=mpicc"
+      "CXX=mpicxx"
   ];
 
   postInstall = ''

@@ -17,6 +17,10 @@ let
     name ="rdma-core-all";
     paths = [ rdma-core.dev rdma-core.out ];
   };
+  mpiAll = symlinkJoin {
+    name = "mpi-all";
+    paths = [ mpi.all ];
+  };
 in
 
 stdenv.mkDerivation rec {
@@ -37,13 +41,13 @@ stdenv.mkDerivation rec {
 
   configureFlags = [
     "--with-infiniband=${rdma-core-all}"
-    "--with-mpi=${mpi}"
+    "--with-mpi=${mpiAll}"
     "--with-slurm"
     "CFLAGS=-fPIC"
     "CXXFLAGS=-fPIC"
   ];
 
-  buildInputs = [ slurm mpi rdma-core-all autoconf automake libtool rsync gfortran ];
+  buildInputs = [ slurm mpiAll rdma-core-all autoconf automake libtool rsync gfortran ];
 
   hardeningDisable = [ "all" ];
 }
