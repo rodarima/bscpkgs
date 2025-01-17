@@ -8,6 +8,7 @@
 , autoconf
 , automake
 , pkg-config
+, zlib
 }:
 
 let
@@ -51,5 +52,6 @@ stdenv.mkDerivation rec {
     autoconf
     automake
     pkg-config
+    zlib
   ];
 }
