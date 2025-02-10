@@ -48,7 +48,7 @@ let
 
   source = if (useGit) then git else release;
 in
-  stdenv.mkDerivation (source // rec {
+  stdenv.mkDerivation (source // {
     pname = "nanos6";
 
     prePatch = ''
@@ -62,7 +62,7 @@ in
       export CACHELINE_WIDTH=${toString cachelineBytes}
       ./autogen.sh
     '' + lib.optionalString (useGit) ''
-      export NANOS6_GIT_VERSION=${src.rev}
+      export NANOS6_GIT_VERSION=${gitCommit}
       export NANOS6_GIT_BRANCH=${gitBranch}
     '';
 
