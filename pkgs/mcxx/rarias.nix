@@ -19,7 +19,7 @@ stdenv.mkDerivation rec {
 
   #src = /home/Computational/rarias/mcxx;
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/rarias/mcxx";
+    url = "ssh://git@bscpm04.bsc.es/rarias/mcxx";
     rev = "44129a6ac05b8f78b06e9e2eff71438b5ca4d29f";
   };
 

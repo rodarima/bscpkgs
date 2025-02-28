@@ -14,7 +14,7 @@
 , gcc # needed to set the rpath of libstdc++ for clang-tblgen
 , enableDebug ? false
 , useGit ? false
-, gitUrl ? "ssh://git@bscpm03.bsc.es/llvm-ompss/llvm-mono.git"
+, gitUrl ? "ssh://git@bscpm04.bsc.es/llvm-ompss/llvm-mono.git"
 , gitBranch ? "master"
 , gitCommit ? "8c0d267c04d7fc3fb923078f510fcd5f4719a6cc"
 }:

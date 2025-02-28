@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
   ] ++ optionals (enableTest) [ mpi clangOmpss2 tampi ];
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/rarias/cn6.git";
+    url = "ssh://git@bscpm04.bsc.es/rarias/cn6.git";
     ref = "master";
     rev = "c72c3b66b720c2a33950f536fc819051c8f20a69";
   };

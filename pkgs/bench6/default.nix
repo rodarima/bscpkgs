@@ -7,7 +7,7 @@
 , mpi
 , tampi
 , gitBranch ? "master"
-, gitURL ? "ssh://git@bscpm03.bsc.es/rarias/bench6.git"
+, gitURL ? "ssh://git@bscpm04.bsc.es/rarias/bench6.git"
 , gitCommit ? "1e6ce2aa8ad7b4eef38df1581d7ec48a8815f85d"
 }:
 

@@ -13,7 +13,7 @@
 , enableOvni ? true
 , ovni ? null
 , useGit ? false
-, gitUrl ? "ssh://git@bscpm03.bsc.es/interoperability/tampi.git"
+, gitUrl ? "ssh://git@bscpm04.bsc.es/interoperability/tampi.git"
 , gitBranch ? "master"
 , gitCommit ? "a5c93bf8ab045b71ad4a8d5e2c991ce774db5cbc"
 }:

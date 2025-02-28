@@ -23,7 +23,7 @@ stdenv.mkDerivation rec {
   };
 
   src = builtins.fetchGit {
-    url = "ssh://git@bscpm03.bsc.es/mercurium/mcxx";
+    url = "ssh://git@bscpm04.bsc.es/mercurium/mcxx";
     ref = "master";
   };
 

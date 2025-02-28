@@ -17,7 +17,7 @@
 , cachelineBytes ? 64
 , enableGlibcxxDebug ? false
 , useGit ? false
-, gitUrl ? "ssh://git@bscpm03.bsc.es/nanos6/nanos6"
+, gitUrl ? "ssh://git@bscpm04.bsc.es/nanos6/nanos6"
 , gitBranch ? "master"
 , gitCommit ? "9f54c988e0a8b9c011d9d526acdb8d76f18fcae4"
 }:

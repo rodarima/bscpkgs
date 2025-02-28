@@ -6,7 +6,7 @@
 , fetchFromGitHub
 , useGit ? false
 , gitBranch ? "master"
-, gitUrl ? "ssh://git@bscpm03.bsc.es/rarias/ovni.git"
+, gitUrl ? "ssh://git@bscpm04.bsc.es/rarias/ovni.git"
 , gitCommit ? "a7103f8510d1ec124c3e01ceb47d1e443e98bbf4"
 , enableDebug ? false
 # Only enable MPI if the build is native (fails on cross-compilation)
