@@ -1,14 +1,22 @@
 {
   stdenv
+, bigotes
 , cmake
 , clangOmpss2
+, openmp
+, openmpv
 , nanos6
 , nodes
+, nosv
 , mpi
 , tampi
+, tagaspi
+, gpi-2
+, openblas
+, ovni
 , gitBranch ? "master"
 , gitURL ? "ssh://git@bscpm04.bsc.es/rarias/bench6.git"
-, gitCommit ? "1e6ce2aa8ad7b4eef38df1581d7ec48a8815f85d"
+, gitCommit ? "bf29a53113737c3aa74d2fe3d55f59868faea7b4"
 }:
 
 stdenv.mkDerivation rec {
@@ -21,9 +29,30 @@ stdenv.mkDerivation rec {
     rev = gitCommit;
   };
 
-  buildInputs = [ cmake clangOmpss2 nanos6 nodes mpi tampi ];
+  buildInputs = [
+    bigotes
+    cmake
+    clangOmpss2
+    openmp
+    openmpv
+    nanos6
+    nodes
+    nosv
+    mpi
+    tampi
+    tagaspi
+    gpi-2
+    openblas
+    openblas.dev
+    ovni
+  ];
 
-  enableParallelBuilding = false;
+  env = {
+    NANOS6_HOME = nanos6;
+    NODES_HOME = nodes;
+    NOSV_HOME = nosv;
+  };
+
   cmakeFlags = [
     "-DCMAKE_C_COMPILER=clang"
     "-DCMAKE_CXX_COMPILER=clang++"
