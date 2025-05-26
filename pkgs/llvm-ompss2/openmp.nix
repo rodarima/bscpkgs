@@ -68,6 +68,7 @@ stdenv.mkDerivation rec {
     rm -f $out/lib/libiomp*
   '' + lib.optionalString enableNosv ''
     rm -f $out/lib/libomp.*
+    rm -f $out/libllvmrt/libomp.*
   '';
 
   passthru = {
