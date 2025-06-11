@@ -21,7 +21,7 @@ let
     gpi-2 = callPackage ./pkgs/gpi-2/default.nix { };
     intelPackages_2023 = callPackage ./pkgs/intel-oneapi/2023.nix { };
     jemallocNanos6 = callPackage ./pkgs/nanos6/jemalloc.nix { };
-    #lmbench = callPackage ./pkgs/lmbench/default.nix { }; # Broken
+    lmbench = callPackage ./pkgs/lmbench/default.nix { };
     mcxx = callPackage ./pkgs/mcxx/default.nix { };
     nanos6 = callPackage ./pkgs/nanos6/default.nix { };
     nanos6Debug = final.nanos6.override { enableDebug = true; };
