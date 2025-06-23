@@ -88,7 +88,9 @@ in bscPkgs // {
       };
     };
 
-    pkgs = final.runCommand "ci-pkgs" { }
+    pkgs = filterAttrs (_: isDerivation) bscPkgs;
+
+    pkgsList = final.runCommand "ci-pkgs" { }
       "printf '%s\n' ${toString (collect isDerivation bscPkgs)} > $out";
 
     tests = final.runCommand "ci-tests" { }
@@ -96,7 +98,7 @@ in bscPkgs // {
 
     all = final.runCommand "ci-all" { }
     ''
-      deps="${toString [ final.bsc-ci.pkgs final.bsc-ci.tests ]}"
+      deps="${toString [ final.bsc-ci.pkgsList final.bsc-ci.tests ]}"
       cat $deps
       printf '%s\n' $deps > $out
     '';
