@@ -12,7 +12,7 @@
 , autoPatchelfHook
 , symlinkJoin
 , libfabric
-, gcc
+, gcc13
 , gcc7
 , wrapCCWith
 , linuxHeaders
@@ -29,6 +29,8 @@
 # But this is an attempt to install the packages from the APT repo
 
 let
+
+  gcc = gcc13;
 
   v = {
     hpckit   = "2023.1.0";
