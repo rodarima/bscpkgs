@@ -10,8 +10,6 @@
 , nosv
 , mpi
 , tampi
-, tagaspi
-, gpi-2
 , openblas
 , ovni
 , gitBranch ? "master"
@@ -40,8 +38,6 @@ stdenv.mkDerivation rec {
     nosv
     mpi
     tampi
-    tagaspi
-    gpi-2
     openblas
     openblas.dev
     ovni
