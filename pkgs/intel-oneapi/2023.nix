@@ -314,6 +314,7 @@ let
       "intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-runtime-${version}"
       "intel-oneapi-compiler-dpcpp-cpp-classic-fortran-shared-runtime-${version}"
     ];
+    dontCheckForBrokenSymlinks = true;
     # From https://aur.archlinux.org/packages/intel-oneapi-compiler:
     # - intel-oneapi-compiler-cpp-eclipse-cfg-2023.0.0-25370_all.deb
     # + intel-oneapi-compiler-dpcpp-cpp-2023.0.0-2023.0.0-25370_amd64.deb
