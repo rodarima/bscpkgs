@@ -1,0 +1,23 @@
+commit 60aa3ffa05f6b40db191a880e9e622d608744c1f
+Author: Aleix Boné <aleix.boneribo@bsc.es>
+Date:   Sun Jul 21 12:11:30 2025 +0200
+
+    fix libxml2 deprecated macro
+
+diff --git a/configure.ac b/configure.ac
+index 7fe1876..3ce1091 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -46,7 +46,10 @@ AC_PROG_CPP
+ AC_PROG_CXXCPP
+ AC_PROG_SED
+ 
+-AM_PATH_XML2
++PKG_PROG_PKG_CONFIG
++PKG_CHECK_MODULES([XML], [libxml-2.0])
++
++AC_SUBST(XML_CPPFLAGS, $XML_CFLAGS)
+ 
+ AX_BOOST_BASE(1.36)
+ AX_BOOST_SERIALIZATION
+

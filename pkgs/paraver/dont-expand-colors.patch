@@ -11,7 +11,7 @@ diff --git a/api/semanticcolor.cpp b/api/semanticcolor.cpp
 index 9f86960..22859eb 100644
 --- a/api/semanticcolor.cpp
 +++ b/api/semanticcolor.cpp
-@@ -232,8 +232,9 @@ rgb CodeColor::getColor( PRV_UINT32 pos ) const
+@@ -295,8 +295,9 @@ rgb SemanticColor::getColor( PRV_UINT32 pos ) const
  {
    if( pos == 0 && ParaverConfig::getInstance()->getColorsTimelineUseZero() )
      return ParaverConfig::getInstance()->getColorsTimelineColorZero();
@@ -22,26 +22,26 @@ index 9f86960..22859eb 100644
 +  return colors[ pos + 1 ];
  }
  
- void CodeColor::setColor( PRV_UINT32 whichPos, rgb whichColor )
-@@ -250,6 +251,12 @@ void CodeColor::setColor( PRV_UINT32 whichPos, rgb whichColor )
+ void SemanticColor::setColor( PRV_UINT32 whichPos, rgb whichColor )
+@@ -314,6 +315,12 @@ void SemanticColor::setColor( PRV_UINT32 whichPos, rgb whichColor )
    colors[ whichPos ] = whichColor;
  }
  
-+void CodeColor::cutAfter( PRV_UINT32 pos )
++void SemanticColor::cutAfter( PRV_UINT32 pos )
 +{
 +  if ( pos < colors.size() )
 +    colors.erase( colors.begin() + pos, colors.end() );
 +}
 +
- void CodeColor::setCustomColor( TSemanticValue whichValue, rgb color ) 
+ void SemanticColor::setCustomColor( TSemanticValue whichValue, rgb color ) 
  {
    customPalette[ whichValue ] = color;
 diff --git a/api/semanticcolor.h b/api/semanticcolor.h
 index a079556..bddf3d8 100644
 --- a/api/semanticcolor.h
 +++ b/api/semanticcolor.h
-@@ -98,6 +98,7 @@ class CodeColor: public SemanticColor
- 
+@@ -114,6 +114,7 @@ class SemanticColor
+     // Code Color methods
      PRV_UINT32 getNumColors() const;
      void setColor( PRV_UINT32 pos, rgb color );
 +    void cutAfter( PRV_UINT32 pos );
@@ -61,7 +61,7 @@ index b0d2050..ee2ab69 100644
    for ( auto it : semanticColors )
    {
      std::tie( tmpColor.red, tmpColor.green, tmpColor.blue ) = it.second;
-     myCodeColor.setColor( it.first, tmpColor );
+     mySemanticColor.setColor( it.first, tmpColor );
 +	if (it.first > maxValue)
 +      maxValue = it.first;
    }
@@ -69,7 +69,7 @@ index b0d2050..ee2ab69 100644
 +  // Cut the palette after the highest defined value, so there are no
 +  // extra expanded values
 +  if ( !pcfParser.expandColors )
-+	myCodeColor.cutAfter(maxValue);
++	mySemanticColor.cutAfter(maxValue);
 +
    myEventLabels = EventLabels( pcfParser );
    myStateLabels = StateLabels( pcfParser );

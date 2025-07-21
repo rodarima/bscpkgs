@@ -1,5 +1,6 @@
 {
   stdenv
+, fetchFromGitHub
 , autoreconfHook
 , boost
 , libxml2
@@ -16,17 +17,20 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "paraver-kernel";
-  version = "${src.shortRev}";
+  version = "4.12.0";
 
-  src = builtins.fetchGit {
-    url = "https://github.com/bsc-performance-tools/paraver-kernel.git";
-    rev = "2e167da3cee78ca11e31b74faefb23f12bac2b8c"; # master (missing tag)
-    ref = "master";
+  src = fetchFromGitHub {
+    owner = "bsc-performance-tools";
+    repo = "paraver-kernel";
+    rev = "v${version}";
+    sha256 = "sha256-Xs7g8ITZhPt00v7o2WlTddbou8C8Rc9kBMFpl2WsCS4=";
   };
 
   patches = [
     # https://github.com/bsc-performance-tools/paraver-kernel/pull/11
-    ./dont-expand-colors.patch
+    # TODO: add this back if it's still relevant
+    # ./dont-expand-colors.patch
+    ./fix-libxml2-deprecation.patch
   ];
 
   hardeningDisable = [ "all" ];
