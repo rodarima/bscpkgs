@@ -17,16 +17,12 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-SzwplRBO3V0R3m3p15n71ivYBMGoLsajFK2TapYxdqk=";
   };
 
-  postUnpack = ''
-    export sourceRoot="$sourceRoot/src"
-  '';
-
   postPatch = ''
     sed -i "s@/bin/rm@rm@g" $(find . -name Makefile)
   '';
 
   buildInputs = [ libtirpc ];
-  patches = [ ./fix-install.patch ];
+  patches = [ ./fix-install.patch ./gcc-14.patch ];
 
   hardeningDisable = [ "all" ];
 
@@ -34,7 +30,9 @@ stdenv.mkDerivation rec {
 
   preBuild = ''
     makeFlagsArray+=(
+      -C src
       BASE=$out
+      CFLAGS=-Wno-implicit-int
       CPPFLAGS=-I${libtirpc.dev}/include/tirpc
       LDFLAGS=-ltirpc
     )
