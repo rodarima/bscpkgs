@@ -1,7 +1,7 @@
 {
   stdenv
 , autoreconfHook
-, boost
+, boost186
 , libxml2
 , xml2
 , wxGTK32
@@ -15,6 +15,7 @@
 
 let
   wx = wxGTK32;
+  boost = boost186;
 in
 stdenv.mkDerivation rec {
   pname = "wxparaver";
