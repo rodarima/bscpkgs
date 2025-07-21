@@ -1,6 +1,5 @@
 { stdenv
 , fetchurl
-, ncurses
 , lib
 , dpkg
 , rsync
@@ -10,12 +9,9 @@
 , hwloc
 , zlib
 , autoPatchelfHook
-, symlinkJoin
 , libfabric
 , gcc13
-, gcc7
 , wrapCCWith
-, linuxHeaders
 }:
 
 # The distribution of intel packages is a mess. We are doing the installation
