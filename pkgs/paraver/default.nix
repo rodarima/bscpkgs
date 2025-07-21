@@ -29,6 +29,8 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-YsO5gsuEFQdki3lQudEqgo5WXOt/fPdvNw5OxZQ86Zo=";
   };
 
+  patches = [ ./do-not-steal-focus-on-redraw.patch ];
+
   hardeningDisable = [ "all" ];
 
   # Fix the PARAVER_HOME variable

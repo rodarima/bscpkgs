@@ -1,0 +1,26 @@
+From 2b185e1b5ce52808b3026334851dbcd5a640ed4d Mon Sep 17 00:00:00 2001
+From: aleixbonerib <aleix.boneribo@bsc.es>
+Date: Mon, 10 Jun 2024 20:59:45 +0200
+Subject: [PATCH] fix: do not set focus on redraw
+
+Some wm can change the window size without focusing. Right now, when the
+plot is resized it takes back focus.
+---
+ src/gtimeline.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/gtimeline.cpp b/src/gtimeline.cpp
+index 23ebef2..a896066 100644
+--- a/src/gtimeline.cpp
++++ b/src/gtimeline.cpp
+@@ -899,7 +899,6 @@ void gTimeline::redraw()
+ 
+   drawZone->Refresh();
+ 
+-  SetFocus();
+ }
+ 
+ 
+-- 
+2.44.1
+
