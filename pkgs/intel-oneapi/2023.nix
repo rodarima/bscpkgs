@@ -400,7 +400,9 @@ let
         echo "-L${cc}/lib" >> $out/nix-support/cc-ldflags
 
         # Need the gcc in the path
-        echo 'export "PATH=${mygcc}/bin:$PATH"' >> $out/nix-support/cc-wrapper-hook
+        # FIXME: We should find a better way to modify the PATH instead of using
+        # this ugly hack. See https://jungle.bsc.es/git/rarias/bscpkgs/issues/9
+        echo 'path_backup="${mygcc}/bin:$path_backup"' >> $out/nix-support/cc-wrapper-hook
 
         # Disable hardening by default
         echo "" > $out/nix-support/add-hardening.sh
