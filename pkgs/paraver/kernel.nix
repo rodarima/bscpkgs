@@ -5,16 +5,12 @@
 , boost
 , libxml2
 , xml2
-, wxGTK32
 , autoconf
 , automake
 , pkg-config
 , zlib
 }:
 
-let
-  wx = wxGTK32;
-in
 stdenv.mkDerivation rec {
   pname = "paraver-kernel";
   version = "4.12.0";
