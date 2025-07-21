@@ -2,7 +2,7 @@
   stdenv
 , fetchFromGitHub
 , autoreconfHook
-, boost186
+, boost
 , libxml2
 , xml2
 , wxGTK32
@@ -16,7 +16,6 @@
 
 let
   wx = wxGTK32;
-  boost = boost186;
 in
 stdenv.mkDerivation rec {
   pname = "wxparaver";
@@ -29,7 +28,13 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-YsO5gsuEFQdki3lQudEqgo5WXOt/fPdvNw5OxZQ86Zo=";
   };
 
-  patches = [ ./do-not-steal-focus-on-redraw.patch ];
+  patches = [
+    ./do-not-steal-focus-on-redraw.patch
+
+    # Fix for boost >=1.87 (thanks to gamezelda)
+    # https://aur.archlinux.org/cgit/aur.git/commit/?h=wxparaver&id=b0dcd08c472536e0a1a3cc1dfbc4c77d9f5e0d47
+    ./fix-boost-87.patch
+  ];
 
   hardeningDisable = [ "all" ];
 
