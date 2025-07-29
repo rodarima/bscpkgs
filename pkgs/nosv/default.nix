@@ -6,6 +6,8 @@
 , pkg-config
 , numactl
 , hwloc
+, papi
+, enablePapi ? true
 , cacheline ? 64 # bits
 , ovni ? null
 , useGit ? false
@@ -56,5 +58,5 @@ in
       numactl
       hwloc
       ovni
-    ];
+    ] ++ lib.optionals enablePapi [ papi ];
   }
