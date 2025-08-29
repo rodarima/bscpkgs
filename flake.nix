@@ -13,5 +13,8 @@
       bscOverlay = import ./overlay.nix;
       overlays.default = self.bscOverlay;
       legacyPackages.x86_64-linux = pkgs;
+
+      # propagate nixpkgs lib, so we can do bscpkgs.lib
+      inherit (nixpkgs) lib;
     };
 }
