@@ -1,0 +1,12 @@
+--- a/src/devices/ib/GPI2_IB.h	2025-09-12 13:25:31.564181121 +0200
++++ b/src/devices/ib/GPI2_IB.h	2025-09-12 13:24:49.105422150 +0200
+@@ -26,6 +26,9 @@ along with GPI-2. If not, see <http://ww
+ 
+ #include "GPI2_Dev.h"
+ 
++/* Missing prototype as driver.h is now private */
++int ibv_read_sysfs_file(const char *dir, const char *file, char *buf, size_t size);
++
+ #define GASPI_GID_INDEX   (0)
+ #define PORT_LINK_UP      (5)
+ #define MAX_INLINE_BYTES  (128)

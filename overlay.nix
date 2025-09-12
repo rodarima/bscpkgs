@@ -18,7 +18,7 @@ let
     clangOmpss2NodesOmpv = callPackage ./pkgs/llvm-ompss2/default.nix { ompss2rt = final.nodes; openmp = final.openmpv; };
     clangOmpss2Unwrapped = callPackage ./pkgs/llvm-ompss2/clang.nix { };
     #extrae = callPackage ./pkgs/extrae/default.nix { }; # Broken and outdated
-    #gpi-2 = callPackage ./pkgs/gpi-2/default.nix { }; # Broken: https://jungle.bsc.es/git/rarias/bscpkgs/issues/7
+    gpi-2 = callPackage ./pkgs/gpi-2/default.nix { };
     intelPackages_2023 = callPackage ./pkgs/intel-oneapi/2023.nix { };
     jemallocNanos6 = callPackage ./pkgs/nanos6/jemalloc.nix { };
     lmbench = callPackage ./pkgs/lmbench/default.nix { };
@@ -44,7 +44,7 @@ let
     stdenvClangOmpss2Nanos6 = final.stdenv.override { cc = final.clangOmpss2Nanos6; allowedRequisites = null; };
     stdenvClangOmpss2Nodes = final.stdenv.override { cc = final.clangOmpss2Nodes; allowedRequisites = null; };
     stdenvClangOmpss2NodesOmpv = final.stdenv.override { cc = final.clangOmpss2NodesOmpv; allowedRequisites = null; };
-    #tagaspi = callPackage ./pkgs/tagaspi/default.nix { }; # Broken due gpi-2
+    tagaspi = callPackage ./pkgs/tagaspi/default.nix { };
     tampi = callPackage ./pkgs/tampi/default.nix { };
     wxparaver = callPackage ./pkgs/paraver/default.nix { };
   };

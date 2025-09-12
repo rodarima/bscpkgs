@@ -1,0 +1,10 @@
+--- a/tests/tests/segments/max_mem.c	2025-09-12 13:30:53.449353591 +0200
++++ b/tests/tests/segments/max_mem.c	2025-09-12 13:33:49.750352401 +0200
+@@ -1,5 +1,7 @@
+ #include <test_utils.h>
+ 
++gaspi_size_t gaspi_get_system_mem (void);
++
+ /* Test allocates 45% of system memory and creates a segment that
+    large or if several ranks per node exist, divided among that
+    number */

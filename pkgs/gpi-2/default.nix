@@ -34,6 +34,8 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
+  patches = [ ./rdma-core.patch ./max-mem.patch ];
+
   preConfigure = ''
     patchShebangs autogen.sh
     ./autogen.sh
