@@ -1,0 +1,15 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:all:
+    runs-on: native
+    steps:
+      - uses: https://gitea.com/ScMi1/checkout@v1.4
+      - run: nix build -L --no-link --print-out-paths .#bsc-ci.all
